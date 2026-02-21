@@ -23,6 +23,36 @@ class CompanyEvents(TypedDict):
     events: list[CompanyEvent]
 
 
+def _web_search(query: str, max_results: int = 5) -> str:
+    """Run a web search and return formatted results."""
+    from ddgs import DDGS
+
+    with DDGS() as ddgs:
+        results = list(ddgs.text(query, max_results=max_results))
+    if not results:
+        return "(no results)"
+    return "\n".join(f"- {r['title']}: {r['body']}" for r in results)
+
+
+_SEARCH_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "web_search",
+        "description": ("Search the web "),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Search query",
+                }
+            },
+            "required": ["query"],
+        },
+    },
+}
+
+
 def discover_company_events(
     client: Groq, company_name: str, symbol: str, industry: str = ""
 ) -> CompanyEvents:
@@ -71,22 +101,51 @@ Return ONLY the JSON array, no other text.
 
 MAKE NO MISTAKES.
 
-YOU MUST CALL WEB SEARCH AT LEAST ONCE PER REQUEST.
+YOU MUST CALL web_search AT LEAST ONCE PER REQUEST.
 """
 
     try:
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert at researching corporate events and public appearances. You provide accurate, well-researched information about company-specific events that have YouTube video coverage.",
+            },
+            {"role": "user", "content": prompt},
+        ]
+        for _ in range(8):
+            resp = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages,
+                tools=[_SEARCH_TOOL],
+                temperature=0,
+            )
+            msg = resp.choices[0].message
+
+            if msg.tool_calls:
+                messages.append(msg)
+                for tc in msg.tool_calls:
+                    if tc.function.name == "web_search":
+                        args = json.loads(tc.function.arguments)
+                        print(f"  Searching: {args['query']}")
+                        result = _web_search(args["query"])
+                        messages.append(
+                            {
+                                "role": "tool",
+                                "tool_call_id": tc.id,
+                                "content": result,
+                            }
+                        )
+            else:
+                # Model finished researching — append its summary
+                messages.append(msg)
+                break
+
         chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert at researching corporate events and public appearances. You provide accurate, well-researched information about company-specific events that have YouTube video coverage.",
-                },
-                {"role": "user", "content": prompt},
-            ],
+            messages=messages,
             model="openai/gpt-oss-120b",
             temperature=0,
             max_tokens=2000,
-            response_format = {
+            response_format={
                 "type": "json_schema",
                 "json_schema": {
                     "name": "company_events",
@@ -98,10 +157,10 @@ YOU MUST CALL WEB SEARCH AT LEAST ONCE PER REQUEST.
                             "search_query": {"type": "string"},
                         },
                         "required": ["event_name", "search_query"],
-                        "additionalProperties": False
-                    }
-                }
-            }
+                        "additionalProperties": False,
+                    },
+                },
+            },
         )
 
         response_text = chat_completion.choices[0].message.content
