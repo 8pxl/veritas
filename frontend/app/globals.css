@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100..700;1,100..700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -42,12 +43,15 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-white: #FFF4E9;
+    --color-accent: var(--accent);
+    --sidebar-background: var(--sidebar);
 }
 
 :root {
     --radius: 0.625rem;
     --background: #FFF4E9;
     --foreground: #2A2D34;
+    --accent: #894048;
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
@@ -57,8 +61,7 @@
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
+    --muted-foreground: #A3A3A3;
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
@@ -69,15 +72,14 @@
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: hsl(0 0% 98%);
-    --sidebar-foreground: #9F4A54;
-    --sidebar-background: #9F4A54;
-    --sidebar-primary: hsl(240 5.9% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(240 4.8% 95.9%);
-    --sidebar-accent-foreground: hsl(240 5.9% 10%);
-    --sidebar-border: hsl(220 13% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --sidebar: #894048;
+    --sidebar-foreground: #FFF4E9;
+    --sidebar-primary: #FFF4E9;
+    --sidebar-primary-foreground: #894048;
+    --sidebar-accent: #8B3F48;
+    --sidebar-accent-foreground: #FFF4E9;
+    --sidebar-border: #B5616A;
+    --sidebar-ring: #B5616A;
 }
 
 @layer base {
@@ -86,5 +88,9 @@
     }
   body {
     @apply bg-background text-foreground;
+    font-family: "Josefin Slab", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
     }
 }

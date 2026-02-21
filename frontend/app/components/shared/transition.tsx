@@ -1,9 +1,8 @@
 export default function TransitionLayer() {
 
-  const col1 = "#726FA6"
-  const col2 = "#3F3D63"
-  const col3 = "#23223D"
-  const col0 = "#9F9BD2"
+  const col1 = "#5E2C32"
+  const col2 = "#893F47"
+  const col3 = "#BF5864"
   return (
     <>
 

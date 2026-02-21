@@ -17,7 +17,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <div className="h-screen overflow-hidden">
+              {children}
+            </div>
+          </TooltipProvider>
         </Providers>
       </body>
     </html >
