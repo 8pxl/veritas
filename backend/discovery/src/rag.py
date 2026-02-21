@@ -83,6 +83,7 @@ Think about:
 
 For EACH event type, provide:
 - The specific name of the event (e.g., "WWDC" not just "developer conference") 
+- If an event occurs multiple times per year, please treat each event as seperate events. (e.g., Q1, Q2 events should be outputed as seperate entries.)
 - An optimal YouTube search query to find these videos. Don't include any dates.
 
 Return your response as a JSON array of events. Each event should have this structure:
@@ -99,9 +100,9 @@ Focus on events that:
 
 Return ONLY the JSON array, no other text.
 
-MAKE NO MISTAKES.
+Please limit web searches to 8. YOU MUST CALL web_search AT LEAST ONCE PER REQUEST.
 
-YOU MUST CALL web_search AT LEAST ONCE PER REQUEST.
+MAKE NO MISTAKES.
 """
 
     try:

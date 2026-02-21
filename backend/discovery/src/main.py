@@ -2,14 +2,12 @@ import csv
 import json
 import os
 from rag import *
+from judge import judge_videos_batch, deduplicate_videos
 from datetime import datetime
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from groq import Groq
 
-import sys
-
-sys.path.append("src")
 from youtube_types import (
     SearchListResponse,
     CompanyData,
@@ -23,6 +21,7 @@ def parse_iso_date(date_str: str) -> datetime:
     """Parse ISO 8601 date string to datetime object."""
     return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
 
+
 def search_videos(
     youtube, search_query: str, year: int, max_results: int = 10
 ) -> list[VideoInfo]:
@@ -35,7 +34,7 @@ def search_videos(
     try:
         request = youtube.search().list(
             part="snippet",
-            q=search_query,
+            q=f"search_query {year}",
             type="video",
             maxResults=max_results,
             publishedAfter=published_after,
@@ -47,26 +46,28 @@ def search_videos(
 
         videos = []
         for item in response.get("items", []):
-            if item["id"]["kind"] == "youtube#video":
-                snippet = item["snippet"]
+            resource_id = item["id"]
+            if resource_id["kind"] != "youtube#video":
+                continue
+            snippet = item["snippet"]
 
-                # Get the best available thumbnail
-                thumbnails = snippet["thumbnails"]
-                thumbnail_url = (
-                    thumbnails.get("high", {}).get("url")
-                    or thumbnails.get("medium", {}).get("url")
-                    or thumbnails.get("default", {}).get("url", "")
-                )
+            # Get the best available thumbnail
+            thumbnails = snippet["thumbnails"]
+            thumbnail_url = (
+                thumbnails.get("high", {}).get("url")
+                or thumbnails.get("medium", {}).get("url")
+                or thumbnails.get("default", {}).get("url", "")
+            )
 
-                video_info: VideoInfo = {
-                    "video_id": item["id"]["videoId"],
-                    "title": snippet["title"],
-                    "description": snippet["description"],
-                    "channel_title": snippet["channelTitle"],
-                    "published_at": snippet["publishedAt"],
-                    "thumbnail_url": thumbnail_url,
-                }
-                videos.append(video_info)
+            video_info: VideoInfo = {
+                "video_id": resource_id.get("videoId", ""),  # type: ignore[typeddict-item]
+                "title": snippet["title"],
+                "description": snippet["description"],
+                "channel_title": snippet["channelTitle"],
+                "published_at": snippet["publishedAt"],
+                "thumbnail_url": thumbnail_url,
+            }
+            videos.append(video_info)
 
         return videos
 
@@ -88,9 +89,10 @@ def fetch_company_videos(
 
     # Step 1: Discover events for this company using Groq
     print("  Discovering company events with Groq...")
-    discovered_events = discover_company_events(
+    discovery_result = discover_company_events(
         groq_client, company_name, symbol, sector
     )
+    discovered_events = discovery_result["events"]
 
     if not discovered_events:
         print("  No events discovered, skipping company")
@@ -98,22 +100,38 @@ def fetch_company_videos(
 
     print(f"  Found {len(discovered_events)} events:")
     for event in discovered_events:
-        print(f"    - {event['event_name']} ({event['frequency']})")
+        print(f"    - {event['event_name']}")
 
-    # Step 2: Search for videos for each discovered event
+    # Step 2: Search for videos for each discovered event, judge, deduplicate
     event_videos_list: list[EventVideos] = []
 
     for event in discovered_events:
-        all_videos = []
+        all_videos: list[VideoInfo] = []
 
         print(f"\n  Searching for: {event['event_name']}")
 
         # Search for each year separately
         for year in years:
-            videos = search_videos(youtube, event["search_query"], year)
-            all_videos.extend(videos)
-            if videos:
-                print(f"    {year}: {len(videos)} videos")
+            print(event["search_query"])
+            raw_videos = search_videos(youtube, event["search_query"], year)
+            if raw_videos:
+                print(f"    {year}: {len(raw_videos)} raw results", end="")
+
+                # Judge relevance — returns the single best video or None
+                best = judge_videos_batch(
+                    groq_client,
+                    raw_videos,
+                    event_name=event["event_name"],
+                    company_name=company_name,
+                )
+                if best is not None:
+                    print(f" -> kept 1 (score {best.get('relevance_score', '?')})")
+                    all_videos.append(best)
+                else:
+                    print(" -> none relevant")
+
+        # Deduplicate across all years (same video can appear in multiple searches)
+        all_videos = deduplicate_videos(all_videos)
 
         # Sort all videos by date (newest first)
         all_videos.sort(key=lambda v: parse_iso_date(v["published_at"]), reverse=True)
@@ -125,7 +143,7 @@ def fetch_company_videos(
         }
 
         event_videos_list.append(event_videos)
-        print(f"    Total: {len(all_videos)} videos")
+        print(f"    Final: {len(all_videos)} videos (after dedup + judge)")
 
     company_data: CompanyData = {
         "symbol": symbol,

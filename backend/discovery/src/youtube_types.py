@@ -87,8 +87,8 @@ class SearchListResponse(TypedDict, total=False):
     items: list[SearchResultItem]
 
 
-class VideoInfo(TypedDict):
-    """Processed video information."""
+class _VideoInfoBase(TypedDict):
+    """Required fields for processed video information."""
 
     video_id: str
     title: str
@@ -96,6 +96,13 @@ class VideoInfo(TypedDict):
     channel_title: str
     published_at: str  # ISO 8601 format
     thumbnail_url: str
+
+
+class VideoInfo(_VideoInfoBase, total=False):
+    """Processed video information with optional judge metadata."""
+
+    relevance_score: float  # 0-10 relevance score from LLM judge
+    judge_reasoning: str  # Explanation of why the video was scored this way
 
 
 class CompanyEvent(TypedDict):
