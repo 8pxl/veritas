@@ -428,7 +428,6 @@ Identify every speaker with their full name and title. Ensure that they are in o
                     tools=_TOOLS,
                     temperature=0,
                 ),
-            retry_tool_use_failed=True,
             op_name=f"av_recognition.step1.turn_{i}",
         )
 
@@ -464,7 +463,6 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 response_format={"type": "json_object"},
                 temperature=0,
             ),
-            retry_tool_use_failed=True,
             op_name=f"av_recognition.step2.turn_{i}",
         )
         structured_msg = structured_resp.choices[0].message

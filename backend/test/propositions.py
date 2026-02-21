@@ -29,7 +29,13 @@ Instructions:
 2. Use get_frame with timestamps in MM:SS format (for example "06:48") to inspect video frames for additional visual context — slides, charts, \
    on-screen numbers, product names — whenever the transcript alone is ambiguous.
    You can request at most 5 frames total.
-3. Extract ALL verifiable propositions made by company representatives.
+3. Extract ONLY important, non-trivial, verifiable propositions made by company representatives.
+   Keep statements that materially influence:
+   - product strategy/roadmap/releases,
+   - company performance, growth, guidance, risks, decisions,
+   - customer/consumer impact,
+   - investor-relevant metrics, commitments, outlook.
+   Skip greetings, filler, broad marketing claims, and low-impact comments.
 4. Each proposition must:
    - Be fully self-contained (name the company/product/person explicitly, no dangling pronouns)
    - Represent a single factual claim (split compound claims into separate propositions)
@@ -142,7 +148,6 @@ def _chat_completion_with_retry(
     return groq_call_with_retry(
         lambda: client.chat.completions.create(**kwargs),
         max_retries=max_retries,
-        retry_tool_use_failed=True,
         op_name="propositions.chat_completion",
     )
 
@@ -252,6 +257,7 @@ def extract_propositions(
             "content": (
                 "Now output ONLY a JSON object with key 'propositions' containing an array. "
                 "Each element must have: start (MM:SS), end (MM:SS), statement (string). "
+                "Include only high-impact statements affecting product/company/consumers/investors. "
                 "The statement must be self-contained — include company/product names explicitly."
             ),
         }
