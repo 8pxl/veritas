@@ -15,7 +15,7 @@ _detector = None
 def _get_detector():
     global _detector
     if _detector is None:
-        _detector = Detector(device="cuda")
+        _detector = Detector(device="cpu")
     return _detector
 
 
