@@ -171,6 +171,8 @@ def transcript_to_llm(result: Any) -> str:
         start = int(segment.get("start", 0))
         end = int(segment.get("end", 0))
         text = segment.get("text", "").strip()
+        if len(text) < 10:
+            continue
 
         start_min = start // 60
         start_sec = start % 60
