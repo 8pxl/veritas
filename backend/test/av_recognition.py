@@ -448,18 +448,22 @@ Identify every speaker with their full name and title. Ensure that they are in o
         #     print(f"  . face  {display_name}  (skipped in audio-only mode)")
 
         # Audio: extract segment and embed voice
+        segment_duration = max(0.0, t1 - t0)
+        if segment_duration < 0.2:
+            print(f"  - audio {display_name}  (segment too short)")
+            continue
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
             wav_path = f.name
-        subprocess.run(
+        ffmpeg_res = subprocess.run(
             [
                 "ffmpeg",
                 "-y",
+                "-ss",
+                str(max(0.0, t0)),
+                "-t",
+                str(segment_duration),
                 "-i",
                 av_path,
-                "-ss",
-                str(t0),
-                "-to",
-                str(t1),
                 "-vn",
                 "-ar",
                 "16000",
@@ -468,14 +472,26 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 wav_path,
             ],
             capture_output=True,
+            text=True,
         )
         try:
+            if ffmpeg_res.returncode != 0:
+                print(f"  - audio {display_name}  (ffmpeg failed)")
+                continue
+            if not os.path.exists(wav_path) or os.path.getsize(wav_path) < 1024:
+                print(f"  - audio {display_name}  (invalid wav segment)")
+                continue
             emb = _embed_voice(wav_path, voice_enc)
             if emb:
                 _vector_store.add_audio_embedding(f"audio_{run_id}_{i}", emb, meta)
                 print(f"  + audio {display_name}")
+            else:
+                print(f"  - audio {display_name}  (no voice embedding)")
+        except (RuntimeError, ValueError, OSError) as e:
+            print(f"  - audio {display_name}  (embed error: {e})")
         finally:
-            os.unlink(wav_path)
+            if os.path.exists(wav_path):
+                os.unlink(wav_path)
 
     print("Indexing complete.")
     return speakers
