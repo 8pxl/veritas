@@ -212,10 +212,10 @@ def _web_search(query: str, max_results: int = 5) -> str:
 
 
 def _lookup_speaker(speaker_id: str) -> dict:
-    for p in MOCK_DB:
-        if p["speakerId"] == speaker_id:
-            return p
-    return {}
+    import requests
+
+    resp = requests.get("http://totsuki.harvey-l.com:7000/people/" + speaker_id)
+    return resp.json()
 
 
 def _db_search(query: str, max_results: int = 5) -> str:
