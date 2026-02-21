@@ -17,8 +17,8 @@ def transcribe_with_groq(file_path):
             model="whisper-large-v3-turbo", 
             file=audio_file,
             response_format="verbose_json",  # Mandatory for timestamps
-            timestamp_granularities=["segment"] # Optional but helpful
+            timestamp_granularities=["word", "segment"] # Optional but helpful
         )
-    return transcription.segments
+    return transcription.words, transcription.segments
 
 print(transcribe_with_groq("temp_audio.mp3"))
