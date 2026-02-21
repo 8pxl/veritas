@@ -108,6 +108,8 @@ def _extract_audio_clip(input_path: str, start_s: float, end_s: float) -> str:
         "16000",
         "-ac",
         "1",
+        "-acodec",
+        "pcm_s16le",
         out_path,
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)

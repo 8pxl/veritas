@@ -21,6 +21,7 @@ def groq_call_with_retry(
     *,
     max_retries: int = 5,
     initial_delay: float = 0.8,
+    retry_everything: bool = True,
     retry_tool_use_failed: bool = False,
     retry_json_validate_failed: bool = True,
     op_name: str = "groq_call",
@@ -32,6 +33,8 @@ def groq_call_with_retry(
         except BadRequestError as e:
             code = getattr(e, "body", {}).get("error", {}).get("code")
             should_retry_bad_request = (
+                retry_everything
+                or
                 (code == "tool_use_failed" and retry_tool_use_failed)
                 or (code == "json_validate_failed" and retry_json_validate_failed)
             )
@@ -58,11 +61,21 @@ def groq_call_with_retry(
             delay = min(delay * 2, 8.0)
         except APIStatusError as e:
             status_code = getattr(e, "status_code", None)
-            should_retry = status_code is not None and status_code >= 500
+            should_retry = retry_everything or (
+                status_code is not None and status_code >= 500
+            )
             if not should_retry or attempt == max_retries - 1:
                 raise
             print(
                 f"{op_name}: status {status_code}; retrying ({attempt + 1}/{max_retries})"
+            )
+            time.sleep(delay + random.uniform(0.0, 0.25))
+            delay = min(delay * 2, 8.0)
+        except Exception as e:
+            if not retry_everything or attempt == max_retries - 1:
+                raise
+            print(
+                f"{op_name}: {type(e).__name__}; retrying ({attempt + 1}/{max_retries})"
             )
             time.sleep(delay + random.uniform(0.0, 0.25))
             delay = min(delay * 2, 8.0)

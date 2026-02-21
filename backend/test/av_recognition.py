@@ -56,6 +56,46 @@ def _ts_to_sec(ts: str) -> float:
     return float(ts)
 
 
+def _compress_transcript_for_speakers(
+    transcript: str, max_lines: int = 400, head_lines: int = 120
+) -> str:
+    lines = [line.strip() for line in transcript.splitlines() if line.strip()]
+    if len(lines) <= max_lines:
+        return transcript
+
+    cue_keywords = (
+        "my name is",
+        "i'm",
+        "i am",
+        "introduce",
+        "welcome",
+        "please welcome",
+        "joining me",
+        "next speaker",
+        "hand over",
+        "cto",
+        "cfo",
+        "ceo",
+        "president",
+        "vp",
+        "svp",
+        "chief",
+    )
+
+    selected = set(range(min(head_lines, len(lines))))
+    selected.update(range(max(0, len(lines) - 40), len(lines)))
+
+    for i, line in enumerate(lines):
+        line_lower = line.lower()
+        if any(k in line_lower for k in cue_keywords):
+            selected.add(i)
+        if i % 20 == 0:
+            selected.add(i)
+
+    picked_idx = sorted(selected)[:max_lines]
+    return "\n".join(lines[i] for i in picked_idx)
+
+
 def _grab_frame(video_path: str, sec: float):
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_POS_MSEC, sec * 1000)
@@ -151,7 +191,10 @@ def _embed_face_query(img_array, mtcnn, resnet):
 def _embed_voice(audio_path: str, encoder):
     from resemblyzer import preprocess_wav
 
-    wav = preprocess_wav(audio_path)
+    try:
+        wav = preprocess_wav(audio_path)
+    except (RuntimeError, OSError, ValueError):
+        return None
     if len(wav) < 1600:
         return None
     return encoder.embed_utterance(wav).tolist()
@@ -219,6 +262,22 @@ def _execute_tool(name: str, args: dict) -> str:
         print(f"  DB Insert: {payload}")
         return _db_insert(**payload)
     return "(unknown tool)"
+
+
+def _append_tool_results(messages: list, tool_calls: list) -> None:
+    for tc in tool_calls:
+        try:
+            args = json.loads(tc.function.arguments or "{}")
+        except json.JSONDecodeError:
+            args = {}
+        result = _execute_tool(tc.function.name, args)
+        messages.append(
+            {
+                "role": "tool",
+                "tool_call_id": tc.id,
+                "content": result,
+            }
+        )
 
 
 _TOOLS = [
@@ -343,6 +402,8 @@ def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = 
     except:
         duration = 0.0
 
+    transcript_for_speakers = _compress_transcript_for_speakers(transcript)
+
     # ── Phase 1: tool-use loop — research speakers ────────────
     messages = [
         {"role": "system", "content": _SYSTEM_PROMPT},
@@ -351,8 +412,8 @@ def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = 
             "content": f"""Video description: {desc}
 Video duration: {duration:.0f} seconds ({duration / 60:.1f} minutes)
 
-Full transcript:
-{transcript}
+Condensed transcript (speaker-focused):
+{transcript_for_speakers}
 
 Identify every speaker with their full name and title. Ensure that they are in our database, then return the segments linked with speakerId.""",
         },
@@ -375,19 +436,7 @@ Identify every speaker with their full name and title. Ensure that they are in o
 
         if msg.tool_calls:
             messages.append(msg)
-            for tc in msg.tool_calls:
-                try:
-                    args = json.loads(tc.function.arguments or "{}")
-                except json.JSONDecodeError:
-                    args = {}
-                result = _execute_tool(tc.function.name, args)
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": tc.id,
-                        "content": result,
-                    }
-                )
+            _append_tool_results(messages, msg.tool_calls)
 
         else:
             # Model finished researching — append its summary
@@ -405,17 +454,38 @@ Identify every speaker with their full name and title. Ensure that they are in o
             ),
         }
     )
-    structured_resp = groq_call_with_retry(
-        lambda: _groq.chat.completions.create(
-            model="openai/gpt-oss-20b",
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0,
-        ),
-        op_name="av_recognition.step2.structured_output",
-    )
+    data = {"segments": []}
+    for i in range(20):
+        structured_resp = groq_call_with_retry(
+            lambda: _groq.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                messages=messages,
+                tools=_TOOLS,
+                response_format={"type": "json_object"},
+                temperature=0,
+            ),
+            retry_tool_use_failed=True,
+            op_name=f"av_recognition.step2.turn_{i}",
+        )
+        structured_msg = structured_resp.choices[0].message
+        if structured_msg.tool_calls:
+            messages.append(structured_msg)
+            _append_tool_results(messages, structured_msg.tool_calls)
+            continue
+        messages.append(structured_msg)
+        try:
+            data = json.loads(structured_msg.content or "{}")
+            break
+        except json.JSONDecodeError:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "Return only valid JSON with key 'segments'. No markdown, no prose."
+                    ),
+                }
+            )
 
-    data = json.loads(structured_resp.choices[0].message.content)
     speakers = data.get("segments", [])
 
     print(f"\nIdentified {len(speakers)} speaker segment(s):")
@@ -469,6 +539,8 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 "16000",
                 "-ac",
                 "1",
+                "-acodec",
+                "pcm_s16le",
                 wav_path,
             ],
             capture_output=True,
