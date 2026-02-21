@@ -211,9 +211,6 @@ def _web_search(query: str, max_results: int = 5) -> str:
     return "\n".join(f"- {r['title']}: {r['body']}" for r in results)
 
 
-MOCK_DB = []
-
-
 def _lookup_speaker(speaker_id: str) -> dict:
     for p in MOCK_DB:
         if p["speakerId"] == speaker_id:
@@ -225,7 +222,10 @@ def _db_search(query: str, max_results: int = 5) -> str:
     """
     Search in our people database
     """
-    return json.dumps(MOCK_DB)
+    import requests
+
+    resp = requests.get("http://totsuki.harvey-l.com:7000/people", params={"q": query})
+    return resp.text
 
 
 def _db_insert(name: str, organization: str, role: str) -> str:
@@ -236,10 +236,7 @@ def _db_insert(name: str, organization: str, role: str) -> str:
         json={"name": name, "organization": organization, "role": role},
     )
 
-    print(resp.json())
-
-
-_db_insert("DEMO", "demo", "demo")
+    return resp.text
 
 
 def _execute_tool(name: str, args: dict) -> str:
@@ -333,28 +330,6 @@ _TOOLS = [
             },
         },
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "web_search",
-            "description": (
-                "Search the web to find the full name, job title, and role of a "
-                "person mentioned in a corporate video. Use this for speakers not in our database "
-                "to resolve their full identity. Search with the company name and "
-                "any partial name or role clues from the transcript."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query, e.g. 'Intuit Sasan CEO' or 'Intuit investor day 2025 speakers'",
-                    }
-                },
-                "required": [],
-            },
-        },
-    },
 ]
 
 _SYSTEM_PROMPT = """\
@@ -366,12 +341,8 @@ Your task:
 2. Extract every person mentioned or implied as a speaker: look for \
    introductions ("please welcome..."), name drops ("after Sasan, Alex will..."), \
    self-introductions, and speaker transitions.
-3. For EACH speaker, first use db_search to check if it is already in our database. \
-    - If YES, you can skip web_search and use the returned id as speakerId.
-    - If NO, you need to add them to our DB. Use the web_search tool to find their FULL NAME and \
-      JOB TITLE at the company. Search queries like "{company} {partial name} {role hint}" work best.
-      The audio transcripts might contain typos. Fix them.
-4. Do NOT skip searching. You must ensure the speaker is in our database.
+3. For EACH speaker, use db_search to check if it is already in our database.
+4. If a speaker is missing, infer best-effort name/title from transcript context and insert with db_insert.
 5. Return only the segments that you are ABSOLUTELY certain is said by the speaker. As many as possible, but don't have to be exaustive. \
    Ignore short or ambiguous sentences like "Thank you".
 6. Ensure all the people are either already existing in the db, or inserted with db_insert.
@@ -381,7 +352,7 @@ Your task:
 def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = False):
     """
     av_path: any video / wav file
-    Step 1: Use transcript and LLM (with RAG + web search) to associate
+    Step 1: Use transcript and LLM (DB tools only) to associate
             speaker full names with their appearance times in the video.
     Step 2: Extract face and audio keypoints and add them to a vector database.
     """
