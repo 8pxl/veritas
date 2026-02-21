@@ -2,15 +2,9 @@ import cv2
 import json
 import base64
 import os
-import time
 from dotenv import load_dotenv
-from groq import (
-    Groq,
-    APIConnectionError,
-    APITimeoutError,
-    BadRequestError,
-    RateLimitError,
-)
+from groq import Groq
+from groq_retry import groq_call_with_retry
 
 load_dotenv()
 
@@ -93,30 +87,23 @@ def _chat_completion_with_retry(
     messages: list[dict],
     tools: list[dict] | None = None,
     response_format: dict | None = None,
-    max_retries: int = 3,
+    max_retries: int = 5,
 ):
-    for attempt in range(max_retries):
-        kwargs = {
-            "model": EXTRACTION_MODEL,
-            "messages": messages,
-            "temperature": 0,
-        }
-        if tools is not None:
-            kwargs["tools"] = tools
-        if response_format is not None:
-            kwargs["response_format"] = response_format
-        try:
-            return client.chat.completions.create(**kwargs)
-        except BadRequestError as e:
-            code = getattr(e, "body", {}).get("error", {}).get("code")
-            if code != "tool_use_failed" or attempt == max_retries - 1:
-                raise
-            print(f"  tool_use_failed; retrying ({attempt + 1}/{max_retries})")
-        except (RateLimitError, APIConnectionError, APITimeoutError):
-            if attempt == max_retries - 1:
-                raise
-            print(f"  transient API error; retrying ({attempt + 1}/{max_retries})")
-        time.sleep(0.6 * (attempt + 1))
+    kwargs = {
+        "model": EXTRACTION_MODEL,
+        "messages": messages,
+        "temperature": 0,
+    }
+    if tools is not None:
+        kwargs["tools"] = tools
+    if response_format is not None:
+        kwargs["response_format"] = response_format
+    return groq_call_with_retry(
+        lambda: client.chat.completions.create(**kwargs),
+        max_retries=max_retries,
+        retry_tool_use_failed=True,
+        op_name="propositions.chat_completion",
+    )
 
 
 def extract_propositions(

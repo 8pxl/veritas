@@ -7,6 +7,7 @@ from typing import Any, List, Tuple, Dict
 from concurrent.futures import ThreadPoolExecutor
 from groq import Groq
 from dotenv import load_dotenv
+from groq_retry import groq_call_with_retry
 
 load_dotenv()
 
@@ -54,11 +55,15 @@ def _extract_chunk(path: str, start: float, duration: float, out_path: str):
 
 def _transcribe_file(path: str) -> dict:
     with open(path, "rb") as file:
-        transcription = _client.audio.transcriptions.create(
-            file=(path, file.read()),
-            model="whisper-large-v3-turbo",
-            response_format="verbose_json",
-            timestamp_granularities=["segment", "word"],
+        audio_bytes = file.read()
+        transcription = groq_call_with_retry(
+            lambda: _client.audio.transcriptions.create(
+                file=(path, audio_bytes),
+                model="whisper-large-v3-turbo",
+                response_format="verbose_json",
+                timestamp_granularities=["segment", "word"],
+            ),
+            op_name="transcribe._transcribe_file",
         )
     return transcription.model_dump()
 

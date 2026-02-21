@@ -8,6 +8,7 @@ import parselmouth
 from parselmouth.praat import call
 import os
 from dotenv import load_dotenv
+from groq_retry import groq_call_with_retry
 
 load_dotenv()
 
@@ -88,11 +89,15 @@ def extract_voice_quality(audio_path):
 def transcribe(path: str):
     client = Groq(api_key=os.getenv("OPENAI_API_KEY"))
     with open(path, "rb") as f:
-        r = client.audio.transcriptions.create(
-            model="whisper-large-v3-turbo",
-            file=f,
-            response_format="verbose_json",
-            timestamp_granularities=["word", "segment"],
+        audio_bytes = f.read()
+        r = groq_call_with_retry(
+            lambda: client.audio.transcriptions.create(
+                model="whisper-large-v3-turbo",
+                file=(path, audio_bytes),
+                response_format="verbose_json",
+                timestamp_granularities=["word", "segment"],
+            ),
+            op_name="audio_analysis.transcribe",
         )
     return r.to_dict()
 

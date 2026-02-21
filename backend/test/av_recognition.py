@@ -9,6 +9,7 @@ import uuid
 from PIL import Image
 from dotenv import load_dotenv
 from vector_store import VectorStore
+from groq_retry import groq_call_with_retry
 
 load_dotenv()
 
@@ -353,21 +354,16 @@ Identify every speaker with their full name and title. Ensure that they are in o
 
     print("Identifying speakers (with web search)...")
     for i in range(100):
-        resp = None
-        for retry in range(3):
-            try:
-                resp = _groq.chat.completions.create(
+        resp = groq_call_with_retry(
+            lambda: _groq.chat.completions.create(
                     model="openai/gpt-oss-20b",
                     messages=messages,
                     tools=_TOOLS,
                     temperature=0,
-                )
-                break
-            except groq.BadRequestError as e:
-                err = getattr(e, "body", {}).get("error", {})
-                if err.get("code") != "tool_use_failed" or retry == 2:
-                    raise
-                print(f"  tool_use_failed; retrying ({retry + 1}/3)")
+                ),
+            retry_tool_use_failed=True,
+            op_name=f"av_recognition.step1.turn_{i}",
+        )
 
         msg = resp.choices[0].message
 
@@ -403,11 +399,14 @@ Identify every speaker with their full name and title. Ensure that they are in o
             ),
         }
     )
-    structured_resp = _groq.chat.completions.create(
-        model="openai/gpt-oss-20b",
-        messages=messages,
-        response_format={"type": "json_object"},
-        temperature=0,
+    structured_resp = groq_call_with_retry(
+        lambda: _groq.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0,
+        ),
+        op_name="av_recognition.step2.structured_output",
     )
 
     data = json.loads(structured_resp.choices[0].message.content)
