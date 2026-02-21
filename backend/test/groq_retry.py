@@ -22,6 +22,7 @@ def groq_call_with_retry(
     max_retries: int = 5,
     initial_delay: float = 0.8,
     retry_tool_use_failed: bool = False,
+    retry_json_validate_failed: bool = True,
     op_name: str = "groq_call",
 ) -> T:
     delay = initial_delay
@@ -30,8 +31,14 @@ def groq_call_with_retry(
             return fn()
         except BadRequestError as e:
             code = getattr(e, "body", {}).get("error", {}).get("code")
-            if code == "tool_use_failed" and retry_tool_use_failed and attempt < max_retries - 1:
-                print(f"{op_name}: tool_use_failed; retrying ({attempt + 1}/{max_retries})")
+            should_retry_bad_request = (
+                (code == "tool_use_failed" and retry_tool_use_failed)
+                or (code == "json_validate_failed" and retry_json_validate_failed)
+            )
+            if should_retry_bad_request and attempt < max_retries - 1:
+                print(
+                    f"{op_name}: {code}; retrying ({attempt + 1}/{max_retries})"
+                )
                 time.sleep(delay + random.uniform(0.0, 0.25))
                 delay = min(delay * 2, 8.0)
                 continue
