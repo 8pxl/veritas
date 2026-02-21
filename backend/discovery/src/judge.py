@@ -3,6 +3,7 @@
 import json
 from groq import Groq
 from youtube_types import VideoInfo
+from prompts import load_prompt
 
 
 def judge_videos_batch(
@@ -39,54 +40,18 @@ def judge_videos_batch(
 
     video_entries_json = json.dumps(video_entries, indent=2)
 
-    prompt = f"""You are a strict video relevance judge. You must decide which (if any) of the following YouTube videos is a genuine, primary-source recording of the event "{event_name}" by or about "{company_name}".
-
-Videos:
-{video_entries_json}
-
-RULES — read carefully:
-
-1. Pick AT MOST ONE video — the single best match.
-2. If NONE of the videos are a genuine recording of the event, return {{"chosen_index": -1}}.
-   Do NOT be afraid to return -1. Some searches will not have a relevant result.
-3. The video MUST be an actual recording where company leaders (CEO, CTO, executives)
-   are speaking, OR an official recording of the event itself.
-4. DO NOT pick:
-   - Third-party commentary, reactions, or recap videos
-   - News segments that merely discuss the event
-   - Stock/trading analysis referencing the event
-   - Tutorials or educational content
-   - Compilations or highlight reels made by fans
-   - Videos about a different company or event
-5. Prefer official company channels, but accept reputable media uploads of the
-   actual event footage (e.g. Bloomberg uploading a full keynote).
-6. Use the yt-dlp metadata as signals:
-   - Verified channels are more likely to be official sources
-   - Very short videos (<2 min) are unlikely to be full event recordings
-   - Very high view counts on official channels are a good signal
-   - Duration consistent with the event type matters (e.g. earnings calls ~45-90 min,
-     keynotes ~60-120 min, product launches ~30-90 min)
-
-Return ONLY this JSON (no other text):
-{{
-  "chosen_index": <integer>,
-  "relevance_score": <float 0-10>,
-  "reasoning": "<one sentence>"
-}}"""
+    system_prompt = load_prompt("judge_system")
+    user_prompt = load_prompt("judge_user").format(
+        event_name=event_name,
+        company_name=company_name,
+        video_entries_json=video_entries_json,
+    )
 
     try:
         resp = groq_client.chat.completions.create(
             messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are an extremely strict video relevance judge. "
-                        "You output only valid JSON. "
-                        "You frequently return chosen_index -1 when nothing matches. "
-                        "Quality over quantity."
-                    ),
-                },
-                {"role": "user", "content": prompt},
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ],
             model="openai/gpt-oss-120b",
             temperature=0,

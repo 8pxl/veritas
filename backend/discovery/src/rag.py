@@ -4,6 +4,7 @@ import os
 import json
 from typing import TypedDict
 from groq import Groq
+from prompts import load_prompt
 
 
 class CompanyEvent(TypedDict):
@@ -71,47 +72,17 @@ def discover_company_events(
 
     industry_context = f" in the {industry} industry" if industry else ""
 
-    prompt = f"""You are a corporate events research assistant. For the company {company_name} ({symbol}){industry_context}, identify the specific PUBLIC events, conferences, and presentations they regularly host or participate in that would have videos on YouTube.
-
-Think about:
-1. Company-specific annual conferences (like Apple's WWDC, Google I/O, Salesforce Dreamforce)
-2. Regular investor events (earnings calls, investor days, shareholder meetings)
-3. Product launches and keynotes
-4. Developer conferences
-5. CEO interviews and appearances
-6. Press conferences
-
-For EACH event type, provide:
-- The specific name of the event (e.g., "WWDC" not just "developer conference") 
-- If an event occurs multiple times per year, please treat each event as seperate events. (e.g., Q1, Q2 events should be outputed as seperate entries.)
-- An optimal YouTube search query to find these videos. Don't include any dates.
-
-Return your response as a JSON array of events. Each event should have this structure:
-{{
-  "event_name": "Event Name",
-  "search_query": "optimal search terms for YouTube",
-}}
-
-Focus on events that:
-- Are likely to have video recordings on YouTube
-- Are public-facing (not internal meetings)
-- Happen regularly or are significant enough to search for
-- Use the company's actual event names when applicable
-
-Return ONLY the JSON array, no other text.
-
-Please limit web searches to 8. YOU MUST CALL web_search AT LEAST ONCE PER REQUEST.
-
-MAKE NO MISTAKES.
-"""
+    system_prompt = load_prompt("event_discovery_system")
+    user_prompt = load_prompt("event_discovery_user").format(
+        company_name=company_name,
+        symbol=symbol,
+        industry_context=industry_context,
+    )
 
     try:
         messages = [
-            {
-                "role": "system",
-                "content": "You are an expert at researching corporate events and public appearances. You provide accurate, well-researched information about company-specific events that have YouTube video coverage.",
-            },
-            {"role": "user", "content": prompt},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
         for _ in range(8):
             resp = client.chat.completions.create(
