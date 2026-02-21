@@ -3,13 +3,12 @@ import json
 import os
 from rag import *
 from judge import judge_videos_batch, deduplicate_videos
-from datetime import datetime
 from dotenv import load_dotenv
-from googleapiclient.discovery import build
 from groq import Groq
 
+import yt_dlp
+
 from youtube_types import (
-    SearchListResponse,
     CompanyData,
     VideoInfo,
     EventVideos,
@@ -17,57 +16,43 @@ from youtube_types import (
 )
 
 
-def parse_iso_date(date_str: str) -> datetime:
-    """Parse ISO 8601 date string to datetime object."""
-    return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
-
-
 def search_videos(
-    youtube, search_query: str, year: int, max_results: int = 10
+    search_query: str, year: int, max_results: int = 10
 ) -> list[VideoInfo]:
-    """Search for videos for a specific search query and year."""
+    """Search YouTube for videos using yt-dlp (no API key required)."""
 
-    # Date range for the year
-    published_after = f"{year}-01-01T00:00:00Z"
-    published_before = f"{year + 1}-01-01T00:00:00Z"
+    query = f"ytsearch{max_results}:{search_query} {year}"
+
+    ydl_opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "extract_flat": "in_playlist",
+        "skip_download": True,
+    }
 
     try:
-        request = youtube.search().list(
-            part="snippet",
-            q=f"search_query {year}",
-            type="video",
-            maxResults=max_results,
-            publishedAfter=published_after,
-            publishedBefore=published_before,
-            order="date",
-            relevanceLanguage="en",
-        )
-        response: SearchListResponse = request.execute()
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            result = ydl.extract_info(query, download=False)
 
-        videos = []
-        for item in response.get("items", []):
-            resource_id = item["id"]
-            if resource_id["kind"] != "youtube#video":
+        videos: list[VideoInfo] = []
+        for entry in (result or {}).get("entries", []):
+            if entry is None:
                 continue
-            snippet = item["snippet"]
 
-            # Get the best available thumbnail
-            thumbnails = snippet["thumbnails"]
-            thumbnail_url = (
-                thumbnails.get("high", {}).get("url")
-                or thumbnails.get("medium", {}).get("url")
-                or thumbnails.get("default", {}).get("url", "")
+            video_id = entry.get("id", "")
+            videos.append(
+                {
+                    "video_id": video_id,
+                    "title": entry.get("title", ""),
+                    "channel_title": entry.get("channel")
+                    or entry.get("uploader")
+                    or "",
+                    "thumbnail_url": f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg",
+                    "view_count": entry.get("view_count"),
+                    "duration": entry.get("duration"),
+                    "channel_is_verified": entry.get("channel_is_verified", False),
+                }
             )
-
-            video_info: VideoInfo = {
-                "video_id": resource_id.get("videoId", ""),  # type: ignore[typeddict-item]
-                "title": snippet["title"],
-                "description": snippet["description"],
-                "channel_title": snippet["channelTitle"],
-                "published_at": snippet["publishedAt"],
-                "thumbnail_url": thumbnail_url,
-            }
-            videos.append(video_info)
 
         return videos
 
@@ -77,7 +62,6 @@ def search_videos(
 
 
 def fetch_company_videos(
-    youtube,
     groq_client: Groq,
     symbol: str,
     company_name: str,
@@ -112,8 +96,8 @@ def fetch_company_videos(
 
         # Search for each year separately
         for year in years:
-            print(event["search_query"])
-            raw_videos = search_videos(youtube, event["search_query"], year)
+            print(f"    {event['search_query']} {year}")
+            raw_videos = search_videos(event["search_query"], year)
             if raw_videos:
                 print(f"    {year}: {len(raw_videos)} raw results", end="")
 
@@ -133,8 +117,8 @@ def fetch_company_videos(
         # Deduplicate across all years (same video can appear in multiple searches)
         all_videos = deduplicate_videos(all_videos)
 
-        # Sort all videos by date (newest first)
-        all_videos.sort(key=lambda v: parse_iso_date(v["published_at"]), reverse=True)
+        # Sort by relevance score (highest first)
+        all_videos.sort(key=lambda v: v.get("relevance_score", 0), reverse=True)
 
         event_videos: EventVideos = {
             "event_name": event["event_name"],
@@ -157,20 +141,14 @@ def fetch_company_videos(
 def main():
     load_dotenv()
 
-    # Get API keys
-    yt_api_key = os.getenv("YT_KEY")
+    # Get API key
     groq_api_key = os.getenv("GROQ_API_KEY")
-
-    if not yt_api_key:
-        print("Error: YT_KEY not found in environment variables")
-        return
 
     if not groq_api_key:
         print("Error: GROQ_API_KEY not found in environment variables")
         return
 
-    # Initialize API clients
-    youtube = build("youtube", "v3", developerKey=yt_api_key)
+    # Initialize Groq client
     groq_client = Groq(api_key=groq_api_key)
 
     # Get year range from user
@@ -224,7 +202,6 @@ def main():
 
         try:
             company_data = fetch_company_videos(
-                youtube,
                 groq_client,
                 company["symbol"],
                 company["name"],
