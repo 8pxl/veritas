@@ -198,10 +198,14 @@ def _db_insert(name: str, organization: str, role: str) -> str:
 def _execute_tool(name: str, args: dict) -> str:
     if name == "web_search":
         query = args.get("query", "")
+        if not str(query).strip():
+            return "(missing query)"
         print(f"  Web Searching: {query}")
         return _web_search(query)
     if name == "db_search":
         query = args.get("query", "")
+        if not str(query).strip():
+            return json.dumps({"error": "missing query"})
         print(f"  DB Searching: {query}")
         return _db_search(query)
     if name == "db_insert":
@@ -210,6 +214,8 @@ def _execute_tool(name: str, args: dict) -> str:
             "organization": args.get("organization", ""),
             "role": args.get("role", ""),
         }
+        if not str(payload["name"]).strip():
+            return json.dumps({"error": "missing name"})
         print(f"  DB Insert: {payload}")
         return _db_insert(**payload)
     return "(unknown tool)"
@@ -233,7 +239,7 @@ _TOOLS = [
                         "description": "Search query, e.g. 'Intuit Sasan CEO' or 'Intuit investor day 2025 speakers'",
                     }
                 },
-                "required": ["query"],
+                "required": [],
             },
         },
     },
@@ -260,7 +266,7 @@ _TOOLS = [
                         "description": "The role of this person in the company. Can be empty. e.g. 'CTO'",
                     },
                 },
-                "required": ["name", "organization", "role"],
+                "required": [],
             },
         },
     },
@@ -282,7 +288,7 @@ _TOOLS = [
                         "description": "Search query, e.g. 'Intuit Sasan CEO' or 'Intuit investor day 2025 speakers'",
                     }
                 },
-                "required": ["query"],
+                "required": [],
             },
         },
     },
