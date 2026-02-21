@@ -460,7 +460,6 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 model="openai/gpt-oss-20b",
                 messages=messages,
                 tools=_TOOLS,
-                response_format={"type": "json_object"},
                 temperature=0,
             ),
             op_name=f"av_recognition.step2.turn_{i}",
@@ -471,10 +470,19 @@ Identify every speaker with their full name and title. Ensure that they are in o
             _append_tool_results(messages, structured_msg.tool_calls)
             continue
         messages.append(structured_msg)
+        raw_content = structured_msg.content or "{}"
         try:
-            data = json.loads(structured_msg.content or "{}")
+            data = json.loads(raw_content)
             break
         except json.JSONDecodeError:
+            start = raw_content.find("{")
+            end = raw_content.rfind("}")
+            if start != -1 and end != -1 and end > start:
+                try:
+                    data = json.loads(raw_content[start : end + 1])
+                    break
+                except json.JSONDecodeError:
+                    pass
             messages.append(
                 {
                     "role": "user",
