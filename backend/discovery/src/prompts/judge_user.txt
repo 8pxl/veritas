@@ -25,10 +25,11 @@ RULES — read carefully:
    - Very high view counts on official channels are a good signal
    - Duration consistent with the event type matters (e.g. earnings calls ~45-90 min,
      keynotes ~60-120 min, product launches ~30-90 min)
-
+7. Please keep the reasoning short, you can only use 300 tokens total in total for the response
 Return ONLY this JSON (no other text):
 {{
   "chosen_index": <integer>,
   "relevance_score": <float 0-10>,
   "reasoning": "<one sentence>"
 }}
+

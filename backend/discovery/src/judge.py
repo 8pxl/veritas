@@ -22,6 +22,7 @@ def judge_videos_batch(
     if not videos:
         return None
 
+
     video_entries = []
     for i, v in enumerate(videos):
         duration_sec = v.get("duration")
@@ -40,6 +41,12 @@ def judge_videos_batch(
 
     video_entries_json = json.dumps(video_entries, indent=2)
 
+    print(event_name)
+    print("-----")
+    print(company_name)
+    print("-----")
+    print(video_entries_json)
+
     system_prompt = load_prompt("judge_system")
     user_prompt = load_prompt("judge_user").format(
         event_name=event_name,
@@ -55,11 +62,12 @@ def judge_videos_batch(
             ],
             model="openai/gpt-oss-120b",
             temperature=0,
-            max_tokens=256,
+            max_tokens=1000,
             response_format={
                 "type": "json_schema",
                 "json_schema": {
                     "name": "yt_res",
+                    "strict": True,
                     "schema": {
                         "type": "object",
                         "properties": {
@@ -67,7 +75,7 @@ def judge_videos_batch(
                             "relevance_score": {"type": "number"},
                             "reasoning": {"type": "string"},
                         },
-                        "required": ["chosen_index"],
+                        "required": ["chosen_index", "relevance_score", "reasoning"],
                         "additionalProperties": False,
                     },
                 },
