@@ -229,13 +229,17 @@ def _db_search(query: str, max_results: int = 5) -> str:
 
 
 def _db_insert(name: str, organization: str, role: str) -> str:
-    import uuid as _uuid
+    import requests
 
-    uid = str(_uuid.uuid4())
-    MOCK_DB.append(
-        {"speakerId": uid, "name": name, "organization": organization, "role": role}
+    resp = requests.post(
+        "http://totsuki.harvey-l.com:7000/people",
+        json={"name": name, "organization": organization, "role": role},
     )
-    return json.dumps({"speakerId": uid})
+
+    print(resp.json())
+
+
+_db_insert("DEMO", "demo", "demo")
 
 
 def _execute_tool(name: str, args: dict) -> str:
@@ -423,11 +427,11 @@ Identify every speaker with their full name and title. Ensure that they are in o
     for i in range(100):
         resp = groq_call_with_retry(
             lambda: _groq.chat.completions.create(
-                    model="openai/gpt-oss-20b",
-                    messages=messages,
-                    tools=_TOOLS,
-                    temperature=0,
-                ),
+                model="openai/gpt-oss-20b",
+                messages=messages,
+                tools=_TOOLS,
+                temperature=0,
+            ),
             op_name=f"av_recognition.step1.turn_{i}",
         )
 

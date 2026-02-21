@@ -212,27 +212,16 @@ def _match_speaker(
     return _match_speaker_by_overlap(statement, speaker_segments)
 
 
-def _process_step2_chunk(
-    input_path: str, chunk_transcript: str, chunk_desc: str, is_audio: bool
-) -> tuple[list[dict], list[dict]]:
-    from av_recognition import index_face_audio
+def _extract_propositions_chunk(
+    input_path: str, chunk_transcript: str, chunk_desc: str
+) -> list[dict]:
     from propositions import extract_propositions
 
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        index_future = pool.submit(
-            index_face_audio,
-            input_path,
-            chunk_transcript,
-            chunk_desc,
-            is_audio,
-        )
-        props_future = pool.submit(
-            extract_propositions,
-            input_path,
-            chunk_transcript,
-            chunk_desc,
-        )
-        return index_future.result(), props_future.result()
+    return extract_propositions(
+        input_path,
+        chunk_transcript,
+        chunk_desc,
+    )
 
 
 def _analyze_statement(
@@ -319,14 +308,22 @@ def run_pipeline(input_path: str, description: str = "") -> dict:
             }
         ]
 
-    print("Step 2/4: Running chunked indexing + proposition extraction in parallel...")
+    print("Step 2/4: Running single-pass AV index + chunked propositions...")
     has_video = _has_video_stream(input_path)
     is_audio_only = not has_video
-    max_workers = min(3, max(1, len(chunked_transcripts)))
-    speaker_segments_all: list[dict] = []
+    from av_recognition import index_face_audio
+
+    max_workers = min(4, max(2, 1 + len(chunked_transcripts)))
     propositions_all: list[dict] = []
     chunk_meta: list[dict] = []
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        index_future = pool.submit(
+            index_face_audio,
+            input_path,
+            transcript_text,
+            description or os.path.basename(input_path),
+            is_audio_only,
+        )
         futures = []
         for idx, chunk in enumerate(chunked_transcripts):
             chunk_desc = (
@@ -339,37 +336,27 @@ def run_pipeline(input_path: str, description: str = "") -> dict:
                     idx,
                     chunk,
                     pool.submit(
-                        _process_step2_chunk,
+                        _extract_propositions_chunk,
                         input_path,
                         chunk["transcript"],
                         chunk_desc,
-                        is_audio_only,
                     ),
                 )
             )
 
         for idx, chunk, future in futures:
-            chunk_speakers, chunk_props = future.result()
-            speaker_segments_all.extend(chunk_speakers or [])
+            chunk_props = future.result()
             propositions_all.extend(chunk_props or [])
             chunk_meta.append(
                 {
                     "chunk_index": idx,
                     "start_sec": chunk["start_sec"],
                     "end_sec": chunk["end_sec"],
-                    "speaker_segments_count": len(chunk_speakers or []),
                     "propositions_count": len(chunk_props or []),
                 }
             )
+        speaker_segments = index_future.result() or []
 
-    speaker_seen: set[tuple] = set()
-    speaker_segments: list[dict] = []
-    for seg in speaker_segments_all:
-        key = (seg.get("speakerId"), seg.get("start"), seg.get("end"))
-        if key in speaker_seen:
-            continue
-        speaker_seen.add(key)
-        speaker_segments.append(seg)
     speaker_segments.sort(key=lambda s: _ts_to_sec(s.get("start", 0)))
 
     prop_seen: set[tuple] = set()
@@ -406,6 +393,7 @@ def run_pipeline(input_path: str, description: str = "") -> dict:
         "step2_chunking": {
             "chunk_seconds": 1200,
             "chunk_count": len(chunked_transcripts),
+            "av_index_mode": "single_pass_compressed_transcript",
             "chunks": chunk_meta,
         },
         "speaker_segments": speaker_segments,
