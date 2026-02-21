@@ -58,7 +58,7 @@ def download_video(video_id: str, out_dir: str) -> bool:
     os.makedirs(out_dir, exist_ok=True)
 
     ydl_opts = {
-        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "format": "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/best",
         "merge_output_format": "mp4",
         "outtmpl": os.path.join(out_dir, "%(id)s.%(ext)s"),
         "quiet": True,
