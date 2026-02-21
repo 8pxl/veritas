@@ -41,12 +41,6 @@ def judge_videos_batch(
 
     video_entries_json = json.dumps(video_entries, indent=2)
 
-    print(event_name)
-    print("-----")
-    print(company_name)
-    print("-----")
-    print(video_entries_json)
-
     system_prompt = load_prompt("judge_system")
     user_prompt = load_prompt("judge_user").format(
         event_name=event_name,

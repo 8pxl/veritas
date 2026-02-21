@@ -131,6 +131,31 @@ def search_videos(
         return []
 
 
+def fetch_video_upload_date(video_id: str) -> str | None:
+    """Fetch the upload date for a single video using yt-dlp (full extraction).
+
+    Returns the date as an ISO 8601 string (YYYY-MM-DD), or None on failure.
+    """
+    ydl_opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(
+                f"https://www.youtube.com/watch?v={video_id}", download=False
+            )
+        raw = (info or {}).get("upload_date")  # yt-dlp returns "YYYYMMDD"
+        if raw and len(raw) == 8:
+            return f"{raw[:4]}-{raw[4:6]}-{raw[6:8]}"
+        return None
+    except Exception as e:
+        print(f"      Warning: could not fetch upload date for {video_id}: {e}")
+        return None
+
+
 def fetch_company_videos(
     groq_client: Groq,
     symbol: str,
@@ -144,12 +169,7 @@ def fetch_company_videos(
     # Step 1: Discover events for this company using Groq
     print("  Discovering company events with Groq...")
     discovery_result = discover_company_events(
-        groq_client,
-        company_name,
-        symbol,
-        sector,
-        start_year=years.start,
-        end_year=years.stop - 1,
+        groq_client, company_name, symbol, sector
     )
     discovered_events = discovery_result["events"]
 
@@ -184,7 +204,16 @@ def fetch_company_videos(
                     company_name=company_name,
                 )
                 if best is not None:
-                    print(f" -> kept 1 (score {best.get('relevance_score', '?')})")
+                    print(
+                        f" -> kept 1 (score {best.get('relevance_score', '?')})", end=""
+                    )
+                    # Fetch the actual upload date for the chosen video
+                    upload_date = fetch_video_upload_date(best["video_id"])
+                    if upload_date:
+                        best["upload_date"] = upload_date
+                        print(f" [{upload_date}]")
+                    else:
+                        print()
                     all_videos.append(best)
                 else:
                     print(" -> none relevant")

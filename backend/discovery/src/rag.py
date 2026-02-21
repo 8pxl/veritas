@@ -55,23 +55,17 @@ _SEARCH_TOOL = {
 
 
 def discover_company_events(
-    client: Groq,
-    company_name: str,
-    symbol: str,
-    industry: str = "",
-    start_year: int = 2020,
-    end_year: int = 2025,
+    client: Groq, company_name: str, symbol: str, industry: str = ""
 ) -> CompanyEvents:
     """
-    Use Groq to discover what types of events a company hosts that would have YouTube videos.
+    Use Groq to discover what types of recurring events a company hosts
+    that would have YouTube videos.
 
     Args:
         client: Groq client instance
         company_name: Full company name
         symbol: Stock symbol
         industry: Company industry/sector (optional, helps with context)
-        start_year: Start of the year range to search for events
-        end_year: End of the year range to search for events
 
     Returns:
         CompanyEvents with discovered events
@@ -84,8 +78,6 @@ def discover_company_events(
         company_name=company_name,
         symbol=symbol,
         industry_context=industry_context,
-        start_year=start_year,
-        end_year=end_year,
     )
 
     try:

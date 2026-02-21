@@ -18,6 +18,7 @@ class VideoInfo(_VideoInfoBase, total=False):
     # Fields not available in yt-dlp flat mode
     description: str
     published_at: str  # ISO 8601 format
+    upload_date: str  # ISO 8601 date (YYYY-MM-DD), fetched after judge selection
 
     # Fields from yt-dlp flat mode
     view_count: int

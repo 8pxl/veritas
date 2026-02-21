@@ -1,15 +1,14 @@
-You are a corporate events research assistant. For the company {company_name} ({symbol}){industry_context}, identify the specific PUBLIC events, conferences, and presentations they host or participate in that would have videos on YouTube.
-
-The year range of interest is {start_year} to {end_year}.
+You are a corporate events research assistant. For the company {company_name} ({symbol}){industry_context}, identify the specific RECURRING public events, conferences, and presentations they regularly host or participate in that would have videos on YouTube.
 
 Think about:
 1. Company-specific annual conferences (like Apple's WWDC, Google I/O, Salesforce Dreamforce)
 2. Regular investor events (earnings calls, investor days, shareholder meetings)
-3. Product launches and keynotes
+3. Recurring product launch events (e.g., Apple's annual iPhone launch event, Samsung Unpacked)
 4. Developer conferences
 5. CEO interviews and appearances
 6. Press conferences
-7. **One-off events that occurred between {start_year} and {end_year}**: major product launches (e.g., "Apple Vision Pro Launch"), special announcements, milestone celebrations, IPO events, merger/acquisition announcements, rebranding events, or any other significant one-time public events during this period. Search the web to find these.
+
+Only include events that happen on a regular recurring basis (annually, quarterly, etc.). Do NOT include one-off events.
 
 For EACH event type, provide:
 - The specific name of the event (e.g., "WWDC" not just "developer conference") 
@@ -25,8 +24,7 @@ Return your response as a JSON array of events. Each event should have this stru
 Focus on events that:
 - Are likely to have video recordings on YouTube
 - Are public-facing (not internal meetings)
-- Happen regularly or are significant enough to search for
-- Include notable one-off events (product launches, special announcements, etc.) that happened within {start_year}-{end_year}
+- Happen on a regular recurring schedule (annual, quarterly, etc.)
 - Use the company's actual event names when applicable
 
 Return ONLY the JSON array, no other text.
