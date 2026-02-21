@@ -4,10 +4,18 @@ from sqlalchemy import text as sql_text
 from database import engine, get_db, Base
 from models import OrganizationDB, PersonDB, VideoDB, PropositionDB
 from structures import (
-    Organization, OrganizationCreate, OrganizationUpdate,
-    Person, PersonCreate, PersonUpdate,
-    Video, VideoCreate, VideoUpdate,
-    Proposition, PropositionCreate, PropositionUpdate,
+    Organization,
+    OrganizationCreate,
+    OrganizationUpdate,
+    Person,
+    PersonCreate,
+    PersonUpdate,
+    Video,
+    VideoCreate,
+    VideoUpdate,
+    Proposition,
+    PropositionCreate,
+    PropositionUpdate,
 )
 from typing import List
 import uuid
@@ -23,24 +31,36 @@ def _org_to_schema(org: OrganizationDB) -> Organization:
 
 
 def _person_to_schema(p: PersonDB, org: OrganizationDB) -> Person:
-    return Person(id=p.id, name=p.name, position=p.position, organization=_org_to_schema(org))
+    return Person(
+        id=p.id, name=p.name, position=p.position, organization=_org_to_schema(org)
+    )
 
 
 def _video_to_schema(v: VideoDB) -> Video:
     return Video(
-        video_id=v.video_id, video_path=v.video_path, title=v.title,
-        description=v.description, video_url=v.video_url, time=v.time,
+        video_id=v.video_id,
+        video_path=v.video_path,
+        title=v.title,
+        description=v.description,
+        video_url=v.video_url,
+        time=v.time,
     )
 
 
-def _prop_to_schema(p: PropositionDB, speaker: PersonDB, org: OrganizationDB, video: VideoDB) -> Proposition:
+def _prop_to_schema(
+    p: PropositionDB, speaker: PersonDB, org: OrganizationDB, video: VideoDB
+) -> Proposition:
     return Proposition(
-        id=p.id, speaker=_person_to_schema(speaker, org),
-        statement=p.statement, verifyAt=p.verify_at, video=_video_to_schema(video),
+        id=p.id,
+        speaker=_person_to_schema(speaker, org),
+        statement=p.statement,
+        verifyAt=p.verify_at,
+        video=_video_to_schema(video),
     )
 
 
 # ========== Organization CRUD ==========
+
 
 @app.post("/organizations", response_model=Organization)
 def create_organization(org: OrganizationCreate, db: Session = Depends(get_db)):
@@ -65,7 +85,9 @@ def get_organization(org_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/organizations/{org_id}", response_model=Organization)
-def update_organization(org_id: int, data: OrganizationUpdate, db: Session = Depends(get_db)):
+def update_organization(
+    org_id: int, data: OrganizationUpdate, db: Session = Depends(get_db)
+):
     org = db.get(OrganizationDB, org_id)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -88,6 +110,7 @@ def delete_organization(org_id: int, db: Session = Depends(get_db)):
 
 # ========== Person CRUD ==========
 
+
 def _resolve_org(db: Session, org_name: str) -> OrganizationDB:
     """Look up org by name; create if missing."""
     org = db.query(OrganizationDB).filter(OrganizationDB.name == org_name).first()
@@ -103,7 +126,9 @@ def _resolve_org(db: Session, org_name: str) -> OrganizationDB:
 def create_person(person: PersonCreate, db: Session = Depends(get_db)):
     org = _resolve_org(db, person.organization)
     person_id = str(uuid.uuid4())
-    db_person = PersonDB(id=person_id, name=person.name, position=person.role, organization_id=org.id)
+    db_person = PersonDB(
+        id=person_id, name=person.name, position=person.role, organization_id=org.id
+    )
     db.add(db_person)
     db.commit()
     db.refresh(db_person)
@@ -113,12 +138,16 @@ def create_person(person: PersonCreate, db: Session = Depends(get_db)):
 @app.get("/people", response_model=List[Person])
 def list_people(db: Session = Depends(get_db)):
     people = db.query(PersonDB).all()
-    return [_person_to_schema(p, db.get(OrganizationDB, p.organization_id)) for p in people]
+    return [
+        _person_to_schema(p, db.get(OrganizationDB, p.organization_id)) for p in people
+    ]
 
 
 @app.get("/people/search", response_model=List[Person])
 def search_people(
-    q: str = Query(..., min_length=1, description="Search query (name, position, or org)"),
+    q: str = Query(
+        ..., min_length=1, description="Search query (name, position, or org)"
+    ),
     top_k: int = Query(5, ge=1, le=50, description="Number of results"),
     db: Session = Depends(get_db),
 ):
@@ -148,8 +177,15 @@ def search_people(
 
     return [
         Person(
-            id=row.id, name=row.name, position=row.position,
-            organization=Organization(id=row.org_id, name=row.org_name, url=row.org_url, logo_url=row.org_logo_url),
+            id=row.id,
+            name=row.name,
+            position=row.position,
+            organization=Organization(
+                id=row.org_id,
+                name=row.org_name,
+                url=row.org_url,
+                logo_url=row.org_logo_url,
+            ),
         )
         for row in rows
     ]
@@ -192,6 +228,7 @@ def delete_person(person_id: str, db: Session = Depends(get_db)):
 
 
 # ========== Video CRUD ==========
+
 
 @app.post("/videos", response_model=Video)
 def create_video(video: VideoCreate, db: Session = Depends(get_db)):
@@ -239,6 +276,7 @@ def delete_video(video_id: str, db: Session = Depends(get_db)):
 
 # ========== Proposition CRUD ==========
 
+
 @app.post("/propositions", response_model=Proposition)
 def create_proposition(prop: PropositionCreate, db: Session = Depends(get_db)):
     speaker = db.get(PersonDB, prop.speaker_id)
@@ -248,8 +286,10 @@ def create_proposition(prop: PropositionCreate, db: Session = Depends(get_db)):
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
     db_prop = PropositionDB(
-        speaker_id=prop.speaker_id, statement=prop.statement,
-        verify_at=prop.verify_at, video_id=prop.video_id,
+        speaker_id=prop.speaker_id,
+        statement=prop.statement,
+        verify_at=prop.verify_at,
+        video_id=prop.video_id,
     )
     db.add(db_prop)
     db.commit()
@@ -282,7 +322,9 @@ def get_proposition(prop_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/propositions/{prop_id}", response_model=Proposition)
-def update_proposition(prop_id: int, data: PropositionUpdate, db: Session = Depends(get_db)):
+def update_proposition(
+    prop_id: int, data: PropositionUpdate, db: Session = Depends(get_db)
+):
     p = db.get(PropositionDB, prop_id)
     if not p:
         raise HTTPException(status_code=404, detail="Proposition not found")
@@ -318,6 +360,7 @@ def delete_proposition(prop_id: int, db: Session = Depends(get_db)):
 
 
 # ========== Propositions by Person ==========
+
 
 @app.get("/people/{person_id}/propositions", response_model=List[Proposition])
 def get_propositions_by_person(person_id: str, db: Session = Depends(get_db)):
