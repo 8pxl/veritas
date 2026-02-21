@@ -214,7 +214,7 @@ def _web_search(query: str, max_results: int = 5) -> str:
 def _lookup_speaker(speaker_id: str) -> dict:
     import requests
 
-    resp = requests.get("http://totsuki.harvey-l.com:7000/people/" + speaker_id)
+    resp = requests.get("http://totsuki.harvey-l.com:7000/people/" + str(speaker_id))
     return resp.json()
 
 
@@ -224,7 +224,9 @@ def _db_search(query: str, max_results: int = 5) -> str:
     """
     import requests
 
-    resp = requests.get("http://totsuki.harvey-l.com:7000/people", params={"q": query})
+    resp = requests.get(
+        "http://totsuki.harvey-l.com:7000/people/search", params={"q": query}
+    )
     return resp.text
 
 
