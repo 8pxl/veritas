@@ -89,7 +89,7 @@ def _compress_transcript_for_speakers(
         line_lower = line.lower()
         if any(k in line_lower for k in cue_keywords):
             selected.add(i)
-        if i % 20 == 0:
+        if i % 5 == 0:
             selected.add(i)
 
     picked_idx = sorted(selected)[:max_lines]
