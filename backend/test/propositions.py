@@ -10,6 +10,7 @@ from groq_retry import groq_call_with_retry
 load_dotenv()
 
 EXTRACTION_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct"
+MAX_FRAME_IMAGES = 5
 
 client = Groq(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -27,6 +28,7 @@ Instructions:
 1. Read the transcript carefully. Each line format: MM:SS - MM:SS <spoken text>
 2. Use get_frame with timestamps in MM:SS format (for example "06:48") to inspect video frames for additional visual context — slides, charts, \
    on-screen numbers, product names — whenever the transcript alone is ambiguous.
+   You can request at most 5 frames total.
 3. Extract ALL verifiable propositions made by company representatives.
 4. Each proposition must:
    - Be fully self-contained (name the company/product/person explicitly, no dangling pronouns)
@@ -179,6 +181,7 @@ def extract_propositions(
     ]
 
     # ── Phase 1: multi-turn tool-use loop ────────────────────────────────────
+    frame_images_sent = 0
     for _ in range(max_turns):
         response = _chat_completion_with_retry(messages, tools=_TOOLS)
         msg = response.choices[0].message
@@ -193,6 +196,18 @@ def extract_propositions(
         pending_images: list[tuple[str, str]] = []
         for tc in msg.tool_calls:
             if tc.function.name == "get_frame":
+                if frame_images_sent >= MAX_FRAME_IMAGES:
+                    messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tc.id,
+                            "content": (
+                                f"Frame budget reached ({MAX_FRAME_IMAGES} max). "
+                                "Do not request more frames."
+                            ),
+                        }
+                    )
+                    continue
                 try:
                     args = json.loads(tc.function.arguments or "{}")
                 except json.JSONDecodeError:
@@ -215,6 +230,7 @@ def extract_propositions(
                 )
                 if b64:
                     pending_images.append((str(ts_raw), b64))
+                    frame_images_sent += 1
 
         # Pass grabbed frames back as a user message with inline images
         if pending_images:

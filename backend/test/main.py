@@ -320,7 +320,7 @@ def run_pipeline(input_path: str, description: str = "") -> dict:
     print("Step 2/4: Running chunked indexing + proposition extraction in parallel...")
     has_video = _has_video_stream(input_path)
     is_audio_only = not has_video
-    max_workers = min(4, max(1, len(chunked_transcripts)))
+    max_workers = min(3, max(1, len(chunked_transcripts)))
     speaker_segments_all: list[dict] = []
     propositions_all: list[dict] = []
     chunk_meta: list[dict] = []
