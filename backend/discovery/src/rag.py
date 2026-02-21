@@ -108,6 +108,7 @@ def discover_company_events(
                                 "content": result,
                             }
                         )
+                        
             else:
                 # Model finished researching — append its summary
                 messages.append(msg)
@@ -115,7 +116,7 @@ def discover_company_events(
 
         chat_completion = client.chat.completions.create(
             messages=messages,
-            model="openai/gpt-oss-120b",
+            model="openai/gpt-oss-20b",
             temperature=0,
             max_tokens=2000,
             response_format={

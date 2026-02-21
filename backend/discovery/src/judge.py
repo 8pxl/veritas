@@ -54,7 +54,7 @@ def judge_videos_batch(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            model="openai/gpt-oss-120b",
+            model="openai/gpt-oss-20b",
             temperature=0,
             max_tokens=1000,
             response_format={
