@@ -2,7 +2,7 @@
   "input_file": "./samples/investor_day_short.webm",
   "description": "Intuit Investor Day",
   "has_video_stream": true,
-  "generated_at": "2026-02-21T20:44:04.818300+00:00",
+  "generated_at": "2026-02-21T21:10:26.852759+00:00",
   "transcription_raw": {
     "text": " Hello everyone, welcome to Intuit's Investor Day. My name is Kim Watkins. Really wonderful to see all of you here in Mountain View with us and also wanted to welcome those of you joining us online. We really appreciate you taking the time to be with us today. We have a great day planned for you. Sasan is going to kick us off and take us through our AI-driven expert platform strategy. After Sasan, Alex will come up and take us through the technology fueling our innovation and powering our platform. Then we'll head to a deep dive on the business platform growth strategy. First, Mariana will take us through small business, and she'll be followed by Ashley, who will take us through mid-market. it. Then David will come up and take us through an immersion of our business platform offerings, really to bring the strategy to life. After a short break, Mark will come up and take us through our consumer group, our consumer platform growth strategy, followed by Iron Dottie, who will also take us through another immersion. And then Sandeep will finish us off with some financial perspectives. And then don't worry, we'll have plenty of time for Q&A. For those of you here with us in Mountain View, we also invite you to join us for lunch, where you'll have plenty of time to interact with all the presenters. We have one change today, which is that we're going to actually be immersing you in our offerings and our strategy right here on this stage, so you actually will not need to leave your seats. A couple quick housekeeping items. First, Wi-Fi is available on the Intuit Guest Network. Hopefully you found that already. There's no access code required. Second, the restrooms are to your back left, just across from the elevators. And the presentations we'll be sharing today are available on the investor relations page of our website. And so now we're ready for the part that everyone loves, the forward-looking statements. Forward-looking statements. These presentations contain forward-looking statements. There are a number of factors that could cause our results to differ materially from our expectations Please see this section entitled Cautions about Forward Statements in the appendix accompanying this presentation for information regarding forward-looking statements and related risks and uncertainties. You can also learn more about the risks in our Form 10-K for Fiscal 2025 and our other SEC filings which are available on investor relations page of Intuit's website at www.intuit.com. We assume no obligation to update any forward-looking statement except as required by law. Non-GAAP financial measures. These presentations include certain non-GAAP financial measures. Please see the section entitled About Non-GAAP Financial Measures in the enclosed appendix for an explanation of management's use of these measures and reconciliations to the most directly comparable gap financial measures. In this presentation, we may also announce plans or intentions regarding functionality that is not yet delivered. This information is intended to outline our general product direction, but represents no obligation and should not be relied on in making a purchasing or investing decision. Additional terms, conditions, and fees may apply with certain features and functionality. Eligibility criteria may apply. Product offers, features, functionality are subject to change without notice. Certain product screen images are simulated and video shortened. Some numbers may not agree with the sum of the components nor with SEC filings due to immaterial rounding adjustments. Okay, I think we're ready to get started. Please join me in welcoming Sasan. All right. Good morning, good afternoon to everyone on the webcast and a very, very warm welcome to everyone in the room. So we believe that every SaaS company, anybody that makes software, is either going to get disrupted or they're going to be the disruptors. And that's because of what's possible with AI. We believe that SaaS players must become the system of intelligence which means you have to be great at data data models data ingestion and AI capabilities to ultimately architect learning systems that learn from customers and deliver the experiences that they are looking for, which means business logic, workflows, and the app layer will completely get disrupted. it. Which brings us to what we're going to talk about today. Today we're going to talk about three things and what you're going to experience is one, what the growth drivers of the company have been looking backwards, what got us to 16% growth this past fiscal year. Two, what you can expect from us in the coming months and this fiscal year to accelerate growth. And then three, why we are the disruptors. Now it was in this room six years ago where where we shared with you that we're betting the entire company on data and AI. And six years later, AI has become a force multiplier for Intuit. And we now have all of the pieces and parts to ultimately become the system of intelligence, a learning system that delivers done-for-you experiences. And in fact, in the last several months, we've kicked it into an entirely new gear. We've narrowed from five bets to three bets. We've significantly reallocated more capital to three bets and put our best talent on those three bets. And we believe that will significantly accelerate impactful innovation for our customers and accelerate the growth of the company. In fact, based on our declaration of becoming an AI company, we have profoundly changed the growth profile of Intuit. About 10 years ago, we were less than 5 billion in size, growing 8%. Today, we are four times that size, nearly 20 billion, growing at double the rate at 16%, with 40% operating margins. And the best is yet to come. And this past year, we exceeded on every metric that we committed to you. and we are constructively dissatisfied with two areas of the company. One is MailChimp, one is international. Both of which we have the best talent on and the proper focus so it can be accretive to the company growth Now one of the things that I love about Intuit is we try to practice a day one mindset every single day And a day one mindset for us means if today is your day one on the job, the curiosity that you bring, the questions that you ask, the objectivity that you bring, you're never in love with what you've declared, but you're in love with making things better. We apply that once a year very intentionally to the reflections of the company. We step back and think about it through the lens of if today we were a new management team that took over the company, what would we be proud of? And what would we be constructively dissatisfied with? We share this with our board, then with our leadership team, and then the entire company, and you are our last stop. So we walk through. If today was Sasan's first day as CEO, this is what I would share with you. First and foremost, we are an absolute talent magnet. We are bringing in talent from the outside, some of the best builders, some of the best makers, some of the best senior talent from the outside. And we have all of the pieces and parts to truly become a one-stop shop. Half of the company's TAM is mid-market and the assisted tax segment. The assisted tax segment is a $2 billion business growing at 47%. Mid-market is growing at 40%. And we are constructively dissatisfied with both. We believe we can do better because of what's possible, because of our capabilities, and because of the size of the opportunity. In my 20-plus years of the company, I would tell you this past year was our biggest year of really durable, impactful innovation. You know, there's innovation, and then there's impactful innovation. This was our biggest year ever. The innovation, which was the combination of AI and HI, that drove a $2 billion business growing 47% in TurboTax Live was the most incredible adoption we've ever had. In Credit Karma, you're gonna hear later that we took four to five points of share respectfully in credit cards and personal loans all because of the innovation across the platform. It was this time last year where we launched Intuit Enterprise Suite. It may seem like a long time ago, it's only been a year.",
     "segments": [
@@ -339,9 +339,9 @@
           50728
         ],
         "temperature": 0,
-        "avg_logprob": -0.12781008,
+        "avg_logprob": -0.1274884,
         "compression_ratio": 1.7522124,
-        "no_speech_prob": 1.5921278e-12
+        "no_speech_prob": 2.2016998e-12
       },
       {
         "id": 11,
@@ -375,9 +375,9 @@
           51082
         ],
         "temperature": 0,
-        "avg_logprob": -0.12781008,
+        "avg_logprob": -0.1274884,
         "compression_ratio": 1.7522124,
-        "no_speech_prob": 1.5921278e-12
+        "no_speech_prob": 2.2016998e-12
       },
       {
         "id": 12,
@@ -410,9 +410,9 @@
           51363
         ],
         "temperature": 0,
-        "avg_logprob": -0.12781008,
+        "avg_logprob": -0.1274884,
         "compression_ratio": 1.7522124,
-        "no_speech_prob": 1.5921278e-12
+        "no_speech_prob": 2.2016998e-12
       },
       {
         "id": 13,
@@ -445,9 +445,9 @@
           51640
         ],
         "temperature": 0,
-        "avg_logprob": -0.12781008,
+        "avg_logprob": -0.1274884,
         "compression_ratio": 1.7522124,
-        "no_speech_prob": 1.5921278e-12
+        "no_speech_prob": 2.2016998e-12
       },
       {
         "id": 14,
@@ -477,9 +477,9 @@
           50555
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 15,
@@ -513,9 +513,9 @@
           50824
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 16,
@@ -542,9 +542,9 @@
           50983
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 17,
@@ -578,9 +578,9 @@
           51359
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 18,
@@ -613,9 +613,9 @@
           51602
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 19,
@@ -634,9 +634,9 @@
           51727
         ],
         "temperature": 0,
-        "avg_logprob": -0.14890586,
+        "avg_logprob": -0.1489245,
         "compression_ratio": 1.6679245,
-        "no_speech_prob": 1.9583697e-12
+        "no_speech_prob": 1.5921811e-12
       },
       {
         "id": 20,
@@ -1019,9 +1019,9 @@
           50873
         ],
         "temperature": 0,
-        "avg_logprob": -0.054395378,
+        "avg_logprob": -0.0539671,
         "compression_ratio": 1.6042553,
-        "no_speech_prob": 2.2274558e-12
+        "no_speech_prob": 2.5840753e-12
       },
       {
         "id": 32,
@@ -1053,9 +1053,9 @@
           51208
         ],
         "temperature": 0,
-        "avg_logprob": -0.054395378,
+        "avg_logprob": -0.0539671,
         "compression_ratio": 1.6042553,
-        "no_speech_prob": 2.2274558e-12
+        "no_speech_prob": 2.5840753e-12
       },
       {
         "id": 33,
@@ -1084,9 +1084,9 @@
           51523
         ],
         "temperature": 0,
-        "avg_logprob": -0.054395378,
+        "avg_logprob": -0.0539671,
         "compression_ratio": 1.6042553,
-        "no_speech_prob": 2.2274558e-12
+        "no_speech_prob": 2.5840753e-12
       },
       {
         "id": 34,
@@ -1118,9 +1118,9 @@
           51792
         ],
         "temperature": 0,
-        "avg_logprob": -0.054395378,
+        "avg_logprob": -0.0539671,
         "compression_ratio": 1.6042553,
-        "no_speech_prob": 2.2274558e-12
+        "no_speech_prob": 2.5840753e-12
       },
       {
         "id": 35,
@@ -1150,9 +1150,9 @@
           50649
         ],
         "temperature": 0,
-        "avg_logprob": -0.092919506,
+        "avg_logprob": -0.09320313,
         "compression_ratio": 1.641593,
-        "no_speech_prob": 3.317158e-12
+        "no_speech_prob": 4.2590753e-12
       },
       {
         "id": 36,
@@ -1181,9 +1181,9 @@
           50973
         ],
         "temperature": 0,
-        "avg_logprob": -0.092919506,
+        "avg_logprob": -0.09320313,
         "compression_ratio": 1.641593,
-        "no_speech_prob": 3.317158e-12
+        "no_speech_prob": 4.2590753e-12
       },
       {
         "id": 37,
@@ -1210,9 +1210,9 @@
           51245
         ],
         "temperature": 0,
-        "avg_logprob": -0.092919506,
+        "avg_logprob": -0.09320313,
         "compression_ratio": 1.641593,
-        "no_speech_prob": 3.317158e-12
+        "no_speech_prob": 4.2590753e-12
       },
       {
         "id": 38,
@@ -1241,9 +1241,9 @@
           51585
         ],
         "temperature": 0,
-        "avg_logprob": -0.092919506,
+        "avg_logprob": -0.09320313,
         "compression_ratio": 1.641593,
-        "no_speech_prob": 3.317158e-12
+        "no_speech_prob": 4.2590753e-12
       },
       {
         "id": 39,
@@ -1273,9 +1273,9 @@
           50657
         ],
         "temperature": 0,
-        "avg_logprob": -0.10447061,
+        "avg_logprob": -0.10255368,
         "compression_ratio": 1.6582278,
-        "no_speech_prob": 1.5014899e-12
+        "no_speech_prob": 1.4494921e-12
       },
       {
         "id": 40,
@@ -1305,9 +1305,9 @@
           50997
         ],
         "temperature": 0,
-        "avg_logprob": -0.10447061,
+        "avg_logprob": -0.10255368,
         "compression_ratio": 1.6582278,
-        "no_speech_prob": 1.5014899e-12
+        "no_speech_prob": 1.4494921e-12
       },
       {
         "id": 41,
@@ -1336,9 +1336,9 @@
           51321
         ],
         "temperature": 0,
-        "avg_logprob": -0.10447061,
+        "avg_logprob": -0.10255368,
         "compression_ratio": 1.6582278,
-        "no_speech_prob": 1.5014899e-12
+        "no_speech_prob": 1.4494921e-12
       },
       {
         "id": 42,
@@ -1371,9 +1371,9 @@
           51681
         ],
         "temperature": 0,
-        "avg_logprob": -0.10447061,
+        "avg_logprob": -0.10255368,
         "compression_ratio": 1.6582278,
-        "no_speech_prob": 1.5014899e-12
+        "no_speech_prob": 1.4494921e-12
       },
       {
         "id": 43,
@@ -1397,9 +1397,9 @@
           50627
         ],
         "temperature": 0,
-        "avg_logprob": -0.31300896,
+        "avg_logprob": -0.31391975,
         "compression_ratio": 1.4042553,
-        "no_speech_prob": 2.729134e-12
+        "no_speech_prob": 2.8266666e-12
       },
       {
         "id": 44,
@@ -1420,9 +1420,9 @@
           50827
         ],
         "temperature": 0,
-        "avg_logprob": -0.31300896,
+        "avg_logprob": -0.31391975,
         "compression_ratio": 1.4042553,
-        "no_speech_prob": 2.729134e-12
+        "no_speech_prob": 2.8266666e-12
       },
       {
         "id": 45,
@@ -1438,9 +1438,9 @@
           51238
         ],
         "temperature": 0,
-        "avg_logprob": -0.31300896,
+        "avg_logprob": -0.31391975,
         "compression_ratio": 1.4042553,
-        "no_speech_prob": 2.729134e-12
+        "no_speech_prob": 2.8266666e-12
       },
       {
         "id": 46,
@@ -1471,9 +1471,9 @@
           51455
         ],
         "temperature": 0,
-        "avg_logprob": -0.31300896,
+        "avg_logprob": -0.31391975,
         "compression_ratio": 1.4042553,
-        "no_speech_prob": 2.729134e-12
+        "no_speech_prob": 2.8266666e-12
       },
       {
         "id": 47,
@@ -1492,9 +1492,9 @@
           51562
         ],
         "temperature": 0,
-        "avg_logprob": -0.31300896,
+        "avg_logprob": -0.31391975,
         "compression_ratio": 1.4042553,
-        "no_speech_prob": 2.729134e-12
+        "no_speech_prob": 2.8266666e-12
       },
       {
         "id": 48,
@@ -1525,9 +1525,9 @@
           50731
         ],
         "temperature": 0,
-        "avg_logprob": -0.10673728,
+        "avg_logprob": -0.10570775,
         "compression_ratio": 1.5902439,
-        "no_speech_prob": 5.1283603e-13
+        "no_speech_prob": 6.357312e-13
       },
       {
         "id": 49,
@@ -1551,9 +1551,9 @@
           50951
         ],
         "temperature": 0,
-        "avg_logprob": -0.10673728,
+        "avg_logprob": -0.10570775,
         "compression_ratio": 1.5902439,
-        "no_speech_prob": 5.1283603e-13
+        "no_speech_prob": 6.357312e-13
       },
       {
         "id": 50,
@@ -1577,9 +1577,9 @@
           51144
         ],
         "temperature": 0,
-        "avg_logprob": -0.10673728,
+        "avg_logprob": -0.10570775,
         "compression_ratio": 1.5902439,
-        "no_speech_prob": 5.1283603e-13
+        "no_speech_prob": 6.357312e-13
       },
       {
         "id": 51,
@@ -1727,9 +1727,9 @@
           50654
         ],
         "temperature": 0,
-        "avg_logprob": -0.07108628,
+        "avg_logprob": -0.072005436,
         "compression_ratio": 1.7857143,
-        "no_speech_prob": 1.019975e-12
+        "no_speech_prob": 1.0985497e-12
       },
       {
         "id": 55,
@@ -1759,9 +1759,9 @@
           50833
         ],
         "temperature": 0,
-        "avg_logprob": -0.07108628,
+        "avg_logprob": -0.072005436,
         "compression_ratio": 1.7857143,
-        "no_speech_prob": 1.019975e-12
+        "no_speech_prob": 1.0985497e-12
       },
       {
         "id": 56,
@@ -1792,9 +1792,9 @@
           51073
         ],
         "temperature": 0,
-        "avg_logprob": -0.07108628,
+        "avg_logprob": -0.072005436,
         "compression_ratio": 1.7857143,
-        "no_speech_prob": 1.019975e-12
+        "no_speech_prob": 1.0985497e-12
       },
       {
         "id": 57,
@@ -1827,9 +1827,9 @@
           51340
         ],
         "temperature": 0,
-        "avg_logprob": -0.07108628,
+        "avg_logprob": -0.072005436,
         "compression_ratio": 1.7857143,
-        "no_speech_prob": 1.019975e-12
+        "no_speech_prob": 1.0985497e-12
       },
       {
         "id": 58,
@@ -1865,9 +1865,9 @@
           51768
         ],
         "temperature": 0,
-        "avg_logprob": -0.07108628,
+        "avg_logprob": -0.072005436,
         "compression_ratio": 1.7857143,
-        "no_speech_prob": 1.019975e-12
+        "no_speech_prob": 1.0985497e-12
       },
       {
         "id": 59,
@@ -1897,9 +1897,9 @@
           50659
         ],
         "temperature": 0,
-        "avg_logprob": -0.12030143,
+        "avg_logprob": -0.12023971,
         "compression_ratio": 1.5991561,
-        "no_speech_prob": 1.6684777e-12
+        "no_speech_prob": 1.3724934e-12
       },
       {
         "id": 60,
@@ -1927,9 +1927,9 @@
           50938
         ],
         "temperature": 0,
-        "avg_logprob": -0.12030143,
+        "avg_logprob": -0.12023971,
         "compression_ratio": 1.5991561,
-        "no_speech_prob": 1.6684777e-12
+        "no_speech_prob": 1.3724934e-12
       },
       {
         "id": 61,
@@ -1960,9 +1960,9 @@
           51259
         ],
         "temperature": 0,
-        "avg_logprob": -0.12030143,
+        "avg_logprob": -0.12023971,
         "compression_ratio": 1.5991561,
-        "no_speech_prob": 1.6684777e-12
+        "no_speech_prob": 1.3724934e-12
       },
       {
         "id": 62,
@@ -1987,9 +1987,9 @@
           51490
         ],
         "temperature": 0,
-        "avg_logprob": -0.12030143,
+        "avg_logprob": -0.12023971,
         "compression_ratio": 1.5991561,
-        "no_speech_prob": 1.6684777e-12
+        "no_speech_prob": 1.3724934e-12
       },
       {
         "id": 63,
@@ -2022,9 +2022,9 @@
           51786
         ],
         "temperature": 0,
-        "avg_logprob": -0.12030143,
+        "avg_logprob": -0.12023971,
         "compression_ratio": 1.5991561,
-        "no_speech_prob": 1.6684777e-12
+        "no_speech_prob": 1.3724934e-12
       },
       {
         "id": 64,
@@ -2906,9 +2906,9 @@
           50615
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 96,
@@ -2930,9 +2930,9 @@
           50765
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 97,
@@ -2957,9 +2957,9 @@
           50915
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 98,
@@ -2982,9 +2982,9 @@
           51065
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 99,
@@ -3006,9 +3006,9 @@
           51165
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 100,
@@ -3030,9 +3030,9 @@
           51315
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 101,
@@ -3056,9 +3056,9 @@
           51565
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 102,
@@ -3077,9 +3077,9 @@
           51715
         ],
         "temperature": 0,
-        "avg_logprob": -0.09019374,
+        "avg_logprob": -0.09011468,
         "compression_ratio": 1.7309644,
-        "no_speech_prob": 1.3353329e-12
+        "no_speech_prob": 1.5429384e-12
       },
       {
         "id": 103,
@@ -3106,9 +3106,9 @@
           50715
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 104,
@@ -3129,9 +3129,9 @@
           50865
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 105,
@@ -3154,9 +3154,9 @@
           51015
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 106,
@@ -3181,9 +3181,9 @@
           51165
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 107,
@@ -3210,9 +3210,9 @@
           51415
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 108,
@@ -3235,9 +3235,9 @@
           51665
         ],
         "temperature": 0,
-        "avg_logprob": -0.16945733,
+        "avg_logprob": -0.16948332,
         "compression_ratio": 1.4832536,
-        "no_speech_prob": 1.648639e-12
+        "no_speech_prob": 1.8901358e-12
       },
       {
         "id": 109,
@@ -4554,11 +4554,11 @@
       {
         "word": "we'll",
         "start": 83.14,
-        "end": 83.6
+        "end": 83.58
       },
       {
         "word": "have",
-        "start": 83.6,
+        "start": 83.58,
         "end": 83.76
       },
       {
@@ -4759,11 +4759,11 @@
       {
         "word": "change",
         "start": 96.12,
-        "end": 96.62
+        "end": 96.6
       },
       {
         "word": "today,",
-        "start": 96.62,
+        "start": 96.6,
         "end": 97.08
       },
       {
@@ -5684,11 +5684,11 @@
       {
         "word": "obligation",
         "start": 181.621,
-        "end": 182.121
+        "end": 182.14099
       },
       {
         "word": "to",
-        "start": 182.121,
+        "start": 182.14099,
         "end": 182.70099
       },
       {
@@ -5734,11 +5734,11 @@
       {
         "word": "law.",
         "start": 186.70099,
-        "end": 187.14099
+        "end": 186.98099
       },
       {
         "word": "Non-GAAP",
-        "start": 187.14099,
+        "start": 186.98099,
         "end": 188.101
       },
       {
@@ -5764,11 +5764,11 @@
       {
         "word": "include",
         "start": 190.48099,
-        "end": 191.061
+        "end": 191.041
       },
       {
         "word": "certain",
-        "start": 191.061,
+        "start": 191.041,
         "end": 191.461
       },
       {
@@ -6124,11 +6124,11 @@
       {
         "word": "relied",
         "start": 222.681,
-        "end": 223.001
+        "end": 222.98099
       },
       {
         "word": "on",
-        "start": 223.001,
+        "start": 222.98099,
         "end": 223.341
       },
       {
@@ -6169,11 +6169,11 @@
       {
         "word": "Additional",
         "start": 226.721,
-        "end": 227.501
+        "end": 227.521
       },
       {
         "word": "terms,",
-        "start": 227.501,
+        "start": 227.521,
         "end": 228.04099
       },
       {
@@ -6228,7 +6228,7 @@
       },
       {
         "word": "Eligibility",
-        "start": 232.64099,
+        "start": 232.581,
         "end": 233.221
       },
       {
@@ -6294,11 +6294,11 @@
       {
         "word": "notice.",
         "start": 238.98099,
-        "end": 239.621
+        "end": 239.601
       },
       {
         "word": "Certain",
-        "start": 239.621,
+        "start": 239.601,
         "end": 240.221
       },
       {
@@ -6344,11 +6344,11 @@
       {
         "word": "Some",
         "start": 243.801,
-        "end": 244.501
+        "end": 244.48099
       },
       {
         "word": "numbers",
-        "start": 244.501,
+        "start": 244.48099,
         "end": 244.861
       },
       {
@@ -6654,11 +6654,11 @@
       {
         "word": "company,",
         "start": 279.621,
-        "end": 280.261
+        "end": 280.281
       },
       {
         "word": "anybody",
-        "start": 280.261,
+        "start": 280.281,
         "end": 280.961
       },
       {
@@ -7119,11 +7119,11 @@
       {
         "word": "talk",
         "start": 324.962,
-        "end": 325.12198
+        "end": 325.142
       },
       {
         "word": "about",
-        "start": 325.12198,
+        "start": 325.142,
         "end": 325.34198
       },
       {
@@ -7139,11 +7139,11 @@
       {
         "word": "we're",
         "start": 326.802,
-        "end": 327.022
+        "end": 327.042
       },
       {
         "word": "going",
-        "start": 327.022,
+        "start": 327.042,
         "end": 327.122
       },
       {
@@ -7629,7 +7629,7 @@
       {
         "word": "Intuit.",
         "start": 359.78198,
-        "end": 360.422
+        "end": 360.322
       },
       {
         "word": "And",
@@ -9524,11 +9524,11 @@
       {
         "word": "the",
         "start": 507.383,
-        "end": 507.503
+        "end": 507.48297
       },
       {
         "word": "outside,",
-        "start": 507.503,
+        "start": 507.48297,
         "end": 507.86298
       },
       {
@@ -9779,11 +9779,11 @@
       {
         "word": "segment",
         "start": 529.123,
-        "end": 529.483
+        "end": 529.463
       },
       {
         "word": "is",
-        "start": 529.483,
+        "start": 529.463,
         "end": 529.683
       },
       {
@@ -9818,7 +9818,7 @@
       },
       {
         "word": "Mid-market",
-        "start": 534.143,
+        "start": 534.123,
         "end": 534.703
       },
       {
@@ -9839,7 +9839,7 @@
       {
         "word": "40%.",
         "start": 535.823,
-        "end": 536.583
+        "end": 536.60297
       },
       {
         "word": "And",
@@ -10602,31 +10602,36 @@
   "transcript_for_llm": "00:00 - 00:13 Hello everyone, welcome to Intuit's Investor Day.\n00:14 - 00:15 My name is Kim Watkins.\n00:16 - 00:20 Really wonderful to see all of you here in Mountain View with us\n00:20 - 00:23 and also wanted to welcome those of you joining us online.\n00:24 - 00:27 We really appreciate you taking the time to be with us today.\n00:27 - 00:30 We have a great day planned for you.\n00:30 - 00:35 Sasan is going to kick us off and take us through our AI-driven expert platform strategy.\n00:36 - 00:43 After Sasan, Alex will come up and take us through the technology fueling our innovation and powering our platform.\n00:44 - 00:48 Then we'll head to a deep dive on the business platform growth strategy.\n00:49 - 00:55 First, Mariana will take us through small business, and she'll be followed by Ashley, who will take us through mid-market.\n00:55 - 01:03 it. Then David will come up and take us through an immersion of our business platform offerings,\n01:03 - 01:10 really to bring the strategy to life. After a short break, Mark will come up and take us through\n01:10 - 01:15 our consumer group, our consumer platform growth strategy, followed by Iron Dottie, who will also\n01:15 - 01:21 take us through another immersion. And then Sandeep will finish us off with some financial perspectives.\n01:21 - 01:25 And then don't worry, we'll have plenty of time for Q&A.\n01:26 - 01:30 For those of you here with us in Mountain View, we also invite you to join us for lunch,\n01:30 - 01:33 where you'll have plenty of time to interact with all the presenters.\n01:35 - 01:41 We have one change today, which is that we're going to actually be immersing you in our offerings\n01:41 - 01:46 and our strategy right here on this stage, so you actually will not need to leave your seats.\n01:46 - 01:48 A couple quick housekeeping items.\n01:48 - 01:52 First, Wi-Fi is available on the Intuit Guest Network.\n01:52 - 01:53 Hopefully you found that already.\n01:53 - 01:55 There's no access code required.\n01:55 - 01:59 Second, the restrooms are to your back left, just across from the elevators.\n02:00 - 02:06 And the presentations we'll be sharing today are available on the investor relations page of our website.\n02:07 - 02:11 And so now we're ready for the part that everyone loves, the forward-looking statements.\n02:16 - 02:17 Forward-looking statements.\n02:17 - 02:21 These presentations contain forward-looking statements.\n02:22 - 02:37 There are a number of factors that could cause our results to differ materially from our expectations Please see this section entitled Cautions about Forward Statements in the appendix accompanying this presentation for information\n02:37 - 02:43 regarding forward-looking statements and related risks and uncertainties. You can also learn more\n02:43 - 02:53 about the risks in our Form 10-K for Fiscal 2025 and our other SEC filings which are available on\n02:53 - 03:03 investor relations page of Intuit's website at www.intuit.com. We assume no obligation to update\n03:03 - 03:09 any forward-looking statement except as required by law. Non-GAAP financial measures. These\n03:09 - 03:16 presentations include certain non-GAAP financial measures. Please see the section entitled About\n03:16 - 03:21 Non-GAAP Financial Measures in the enclosed appendix for an explanation of management's use\n03:21 - 03:27 of these measures and reconciliations to the most directly comparable gap financial measures.\n03:27 - 03:33 In this presentation, we may also announce plans or intentions regarding functionality that is not\n03:33 - 03:39 yet delivered. This information is intended to outline our general product direction,\n03:39 - 03:45 but represents no obligation and should not be relied on in making a purchasing or investing\n03:45 - 03:51 decision. Additional terms, conditions, and fees may apply with certain features and functionality.\n03:52 - 03:58 Eligibility criteria may apply. Product offers, features, functionality are subject to change\n03:58 - 04:05 without notice. Certain product screen images are simulated and video shortened. Some numbers may\n04:05 - 04:12 not agree with the sum of the components nor with SEC filings due to immaterial rounding adjustments.\n04:12 - 04:17 Okay, I think we're ready to get started.\n04:17 - 04:21 Please join me in welcoming Sasan.\n04:21 - 04:29 All right.\n04:29 - 04:34 Good morning, good afternoon to everyone on the webcast and a very, very warm welcome\n04:34 - 04:36 to everyone in the room.\n04:36 - 04:43 So we believe that every SaaS company, anybody that makes software, is either going to get\n04:43 - 04:47 disrupted or they're going to be the disruptors.\n04:47 - 04:51 And that's because of what's possible with AI.\n04:51 - 05:11 We believe that SaaS players must become the system of intelligence which means you have to be great at data data models data ingestion and AI capabilities to ultimately architect learning systems that learn from\n05:11 - 05:17 customers and deliver the experiences that they are looking for, which means business logic,\n05:18 - 05:21 workflows, and the app layer will completely get disrupted.\n05:21 - 05:27 it. Which brings us to what we're going to talk about today. Today we're going to talk\n05:27 - 05:31 about three things and what you're going to experience is one, what the growth drivers\n05:31 - 05:35 of the company have been looking backwards, what got us to 16% growth this past fiscal\n05:35 - 05:41 year. Two, what you can expect from us in the coming months and this fiscal year to accelerate\n05:41 - 05:49 growth. And then three, why we are the disruptors. Now it was in this room six years ago where\n05:49 - 05:55 where we shared with you that we're betting the entire company on data and AI.\n05:55 - 06:01 And six years later, AI has become a force multiplier for Intuit.\n06:01 - 06:07 And we now have all of the pieces and parts to ultimately become the system of intelligence,\n06:07 - 06:12 a learning system that delivers done-for-you experiences.\n06:12 - 06:18 And in fact, in the last several months, we've kicked it into an entirely new gear.\n06:18 - 06:22 We've narrowed from five bets to three bets.\n06:22 - 06:28 We've significantly reallocated more capital to three bets and put our best talent on those\n06:28 - 06:30 three bets.\n06:30 - 06:35 And we believe that will significantly accelerate impactful innovation for our customers and\n06:35 - 06:38 accelerate the growth of the company.\n06:38 - 06:45 In fact, based on our declaration of becoming an AI company, we have profoundly changed\n06:45 - 06:48 the growth profile of Intuit.\n06:48 - 06:55 About 10 years ago, we were less than 5 billion in size, growing 8%.\n06:55 - 06:59 Today, we are four times that size, nearly 20 billion,\n06:59 - 07:06 growing at double the rate at 16%, with 40% operating margins.\n07:06 - 07:08 And the best is yet to come.\n07:08 - 07:14 And this past year, we exceeded on every metric that we committed to you.\n07:14 - 07:18 and we are constructively dissatisfied with two areas of the company.\n07:18 - 07:21 One is MailChimp, one is international.\n07:21 - 07:36 Both of which we have the best talent on and the proper focus so it can be accretive to the company growth Now one of the things that I love about Intuit is we try to practice a day one mindset every single day\n07:37 - 07:39 And a day one mindset for us means\n07:39 - 07:41 if today is your day one on the job,\n07:41 - 07:43 the curiosity that you bring,\n07:44 - 07:45 the questions that you ask,\n07:45 - 07:47 the objectivity that you bring,\n07:47 - 07:48 you're never in love with what you've declared,\n07:48 - 07:50 but you're in love with making things better.\n07:51 - 07:53 We apply that once a year very intentionally\n07:53 - 07:55 to the reflections of the company.\n07:55 - 08:01 We step back and think about it through the lens of if today we were a new management team\n08:01 - 08:04 that took over the company, what would we be proud of?\n08:04 - 08:07 And what would we be constructively dissatisfied with?\n08:07 - 08:12 We share this with our board, then with our leadership team, and then the entire company,\n08:13 - 08:14 and you are our last stop.\n08:14 - 08:15 So we walk through.\n08:15 - 08:19 If today was Sasan's first day as CEO, this is what I would share with you.\n08:19 - 08:24 First and foremost, we are an absolute talent magnet.\n08:24 - 08:27 We are bringing in talent from the outside,\n08:27 - 08:30 some of the best builders, some of the best makers,\n08:30 - 08:33 some of the best senior talent from the outside.\n08:33 - 08:35 And we have all of the pieces and parts\n08:35 - 08:38 to truly become a one-stop shop.\n08:38 - 08:43 Half of the company's TAM is mid-market\n08:43 - 08:46 and the assisted tax segment.\n08:46 - 08:53 The assisted tax segment is a $2 billion business growing at 47%.\n08:53 - 08:56 Mid-market is growing at 40%.\n08:56 - 08:59 And we are constructively dissatisfied with both.\n08:59 - 09:02 We believe we can do better because of what's possible,\n09:02 - 09:07 because of our capabilities, and because of the size of the opportunity.\n09:07 - 09:12 In my 20-plus years of the company,\n09:12 - 09:19 I would tell you this past year was our biggest year of really durable, impactful innovation.\n09:20 - 09:23 You know, there's innovation, and then there's impactful innovation.\n09:24 - 09:25 This was our biggest year ever.\n09:26 - 09:30 The innovation, which was the combination of AI and HI,\n09:30 - 09:36 that drove a $2 billion business growing 47% in TurboTax Live\n09:36 - 09:39 was the most incredible adoption we've ever had.\n09:39 - 09:41 In Credit Karma, you're gonna hear later\n09:41 - 09:45 that we took four to five points of share respectfully\n09:45 - 09:47 in credit cards and personal loans\n09:47 - 09:50 all because of the innovation across the platform.\n09:51 - 09:53 It was this time last year\n09:53 - 09:56 where we launched Intuit Enterprise Suite.\n09:56 - 09:59 It may seem like a long time ago, it's only been a year.",
   "speaker_segments": [
     {
-      "speakerId": "4b1d0971-c5d3-417e-a3b2-29a374b4258e",
+      "speakerId": "5801eab5-e220-4056-b1c3-6f774340b158",
       "start": "00:00",
-      "end": "00:35"
+      "end": "00:15"
     },
     {
-      "speakerId": "6450ea17-699e-400a-b2f3-1acb27ce896d",
+      "speakerId": "60545eb1-aa5e-4696-bfce-850a50aa82ee",
       "start": "04:29",
-      "end": "05:29"
+      "end": "09:59"
     }
   ],
   "propositions": [
     {
       "start": "06:55",
       "end": "06:59",
-      "statement": "Intuit's revenue was nearly $20 billion in FY25."
+      "statement": "Intuit's revenue grew to nearly $20 billion by FY25."
     },
     {
       "start": "06:59",
       "end": "07:06",
-      "statement": "Intuit's revenue grew 16% in FY25."
+      "statement": "Intuit's revenue growth was 16% in FY25."
     },
     {
       "start": "07:06",
       "end": "07:08",
       "statement": "Intuit's non-GAAP operating margin was 40% in FY25."
+    },
+    {
+      "start": "07:08",
+      "end": "07:14",
+      "statement": "Intuit exceeded every metric it committed to in the past year."
     },
     {
       "start": "08:46",
@@ -10635,30 +10640,37 @@
     },
     {
       "start": "08:53",
-      "end": "08:56",
+      "end": "08:59",
       "statement": "Intuit's mid-market segment is growing at 40%."
+    },
+    {
+      "start": "08:56",
+      "end": "09:02",
+      "statement": "Intuit is constructively dissatisfied with its assisted tax share and mid-market penetration."
+    },
+    {
+      "start": "08:27",
+      "end": "08:30",
+      "statement": "Intuit is a talent magnet and has an all-in-one platform."
     },
     {
       "start": "06:48",
       "end": "06:55",
-      "statement": "Intuit was less than $5 billion in size 10 years ago."
-    },
-    {
-      "start": "06:48",
-      "end": "07:06",
-      "statement": "Intuit grew from less than $5 billion to nearly $20 billion in 10 years."
+      "statement": "Intuit was less than $5 billion in size 10 years ago, growing at 8%."
     }
   ],
   "statement_analyses": [
     {
       "start": "06:55",
       "end": "06:59",
-      "statement": "Intuit's revenue was nearly $20 billion in FY25.",
+      "statement": "Intuit's revenue grew to nearly $20 billion by FY25.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "6211befb-d7e7-47bc-9eb7-0734779b873b",
+        "segment_start": 261.0,
+        "segment_end": 542.0,
+        "vector_distance": 0.06482100057337914,
+        "vector_time": "261s-542s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
@@ -10704,19 +10716,198 @@
         "transcript_text": " Today, we are four times that size, nearly 20 billion,"
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+        "confidence_score": 0.3535,
+        "components": {
+          "composure": 0.6735,
+          "positive_affect": 0.0667,
+          "emotional_stability": 0.4556,
+          "gaze_stability": 0.2483,
+          "neutrality": 0.1374
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 8,
+          "faces_detected": 8,
+          "timing": {
+            "frame_extraction_s": 0.66,
+            "detection_s": 4.98,
+            "total_s": 5.64
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.31602747924625874,
+              "std": 0.08335127645062766,
+              "max": 0.4253201484680176
+            },
+            "AU02": {
+              "mean": 0.14733084570616484,
+              "std": 0.04446702650478939,
+              "max": 0.21883314847946167
+            },
+            "AU04": {
+              "mean": 0.5737225562334061,
+              "std": 0.16373057725831452,
+              "max": 0.7996774315834045
+            },
+            "AU05": {
+              "mean": 0.3029998168349266,
+              "std": 0.0712687852028699,
+              "max": 0.38666239380836487
+            },
+            "AU06": {
+              "mean": 0.1577215064316988,
+              "std": 0.17030220946041746,
+              "max": 0.6060702204704285
+            },
+            "AU07": {
+              "mean": 0.375,
+              "std": 0.4841229182759271,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.29881360568106174,
+              "std": 0.16712222464763785,
+              "max": 0.7172111868858337
+            },
+            "AU10": {
+              "mean": 0.15408858526643598,
+              "std": 0.2144091367167013,
+              "max": 0.6218587160110474
+            },
+            "AU11": {
+              "mean": 0.625,
+              "std": 0.4841229182759271,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.08225928852334619,
+              "std": 0.09886429214090746,
+              "max": 0.34177011251449585
+            },
+            "AU14": {
+              "mean": 0.3244669232517481,
+              "std": 0.20365048444854023,
+              "max": 0.717509388923645
+            },
+            "AU15": {
+              "mean": 0.3686165474355221,
+              "std": 0.18626799634905672,
+              "max": 0.7053691148757935
+            },
+            "AU17": {
+              "mean": 0.3531457092612982,
+              "std": 0.10495109196960696,
+              "max": 0.46339622139930725
+            },
+            "AU20": {
+              "mean": 0.125,
+              "std": 0.33071891388307384,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.4679287225008011,
+              "std": 0.15773804633352742,
+              "max": 0.6910417675971985
+            },
+            "AU24": {
+              "mean": 0.3529953171964735,
+              "std": 0.22016476315247635,
+              "max": 0.6904079914093018
+            },
+            "AU25": {
+              "mean": 0.6554638773668557,
+              "std": 0.356189570732981,
+              "max": 0.9999091625213623
+            },
+            "AU26": {
+              "mean": 0.4053457686677575,
+              "std": 0.240258636821136,
+              "max": 0.8173789381980896
+            },
+            "AU28": {
+              "mean": 0.2489625564776361,
+              "std": 0.2031710670854555,
+              "max": 0.6263282299041748
+            },
+            "AU43": {
+              "mean": 0.2574052712880075,
+              "std": 0.17236211567426304,
+              "max": 0.6156524419784546
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.22634796984493732,
+              "std": 0.24758576540759133
+            },
+            "disgust": {
+              "mean": 0.09292393475698191,
+              "std": 0.21635337746774888
+            },
+            "fear": {
+              "mean": 0.16623003408312798,
+              "std": 0.28231172350860606
+            },
+            "happiness": {
+              "mean": 0.01337233607773669,
+              "std": 0.015761348643025676
+            },
+            "sadness": {
+              "mean": 0.020863182086031884,
+              "std": 0.01916191091901391
+            },
+            "surprise": {
+              "mean": 0.3304714730766136,
+              "std": 0.31536137302767336
+            },
+            "neutral": {
+              "mean": 0.14979108371699112,
+              "std": 0.2199792136919518
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -10.199048598652455,
+              "std": 5.9167424878131065
+            },
+            "Roll": {
+              "mean": -3.3489689491216543,
+              "std": 2.7073943976033723
+            },
+            "Yaw": {
+              "mean": -0.39365571085837736,
+              "std": 28.22828503287197
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 2,
+            "disgust": 1,
+            "fear": 1,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 3,
+            "neutral": 1
+          }
+        }
       }
     },
     {
       "start": "06:59",
       "end": "07:06",
-      "statement": "Intuit's revenue grew 16% in FY25.",
+      "statement": "Intuit's revenue growth was 16% in FY25.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.03799349760461734,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
@@ -10762,8 +10953,185 @@
         "transcript_text": " growing at double the rate at 16% with 40% operating margins."
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+        "confidence_score": 0.3855,
+        "components": {
+          "composure": 0.6821,
+          "positive_affect": 0.0542,
+          "emotional_stability": 0.5707,
+          "gaze_stability": 0.2548,
+          "neutrality": 0.1552
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 14,
+          "faces_detected": 14,
+          "timing": {
+            "frame_extraction_s": 1.02,
+            "detection_s": 3.21,
+            "total_s": 4.23
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.4073028032268797,
+              "std": 0.07180557799084633,
+              "max": 0.5123445987701416
+            },
+            "AU02": {
+              "mean": 0.18956938173089707,
+              "std": 0.07498714808178056,
+              "max": 0.321308434009552
+            },
+            "AU04": {
+              "mean": 0.5440481432846614,
+              "std": 0.157372124712275,
+              "max": 0.7879485487937927
+            },
+            "AU05": {
+              "mean": 0.32080560816185816,
+              "std": 0.06129906359949649,
+              "max": 0.44377660751342773
+            },
+            "AU06": {
+              "mean": 0.09809067605861596,
+              "std": 0.05705084697214686,
+              "max": 0.24992816150188446
+            },
+            "AU07": {
+              "mean": 0.2857142857142857,
+              "std": 0.45175395145262565,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.2526462014232363,
+              "std": 0.0906914391532831,
+              "max": 0.4265238344669342
+            },
+            "AU10": {
+              "mean": 0.060458762172077386,
+              "std": 0.18574100532301377,
+              "max": 0.7227984070777893
+            },
+            "AU11": {
+              "mean": 0.42857142857142855,
+              "std": 0.49487165930539345,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.07531855967161911,
+              "std": 0.09951918851311667,
+              "max": 0.3926635980606079
+            },
+            "AU14": {
+              "mean": 0.33526444541556494,
+              "std": 0.16025453386088392,
+              "max": 0.6842664480209351
+            },
+            "AU15": {
+              "mean": 0.36671367819820133,
+              "std": 0.1838433016069036,
+              "max": 0.7707025408744812
+            },
+            "AU17": {
+              "mean": 0.4178859697920935,
+              "std": 0.0798838742195978,
+              "max": 0.541455864906311
+            },
+            "AU20": {
+              "mean": 0.07142857142857142,
+              "std": 0.25753937681885636,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.5265490135976246,
+              "std": 0.12093576479846882,
+              "max": 0.7941503524780273
+            },
+            "AU24": {
+              "mean": 0.49194729008844923,
+              "std": 0.17840689804299378,
+              "max": 0.7859969139099121
+            },
+            "AU25": {
+              "mean": 0.3184864436209734,
+              "std": 0.39873433386061913,
+              "max": 0.9934365749359131
+            },
+            "AU26": {
+              "mean": 0.343244374862739,
+              "std": 0.19970011071158664,
+              "max": 0.7481482028961182
+            },
+            "AU28": {
+              "mean": 0.20014773681759834,
+              "std": 0.1362565168359802,
+              "max": 0.5009523630142212
+            },
+            "AU43": {
+              "mean": 0.21600187037672317,
+              "std": 0.1279453967680191,
+              "max": 0.534296452999115
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.22758745121037854,
+              "std": 0.2648141818349402
+            },
+            "disgust": {
+              "mean": 0.023490429213520007,
+              "std": 0.05883322639056709
+            },
+            "fear": {
+              "mean": 0.07804390357133732,
+              "std": 0.11527781435824237
+            },
+            "happiness": {
+              "mean": 0.021675018410730575,
+              "std": 0.03461035997426381
+            },
+            "sadness": {
+              "mean": 0.032368374755606055,
+              "std": 0.03706281000294975
+            },
+            "surprise": {
+              "mean": 0.44932905678537544,
+              "std": 0.3041044529160962
+            },
+            "neutral": {
+              "mean": 0.16750576939167722,
+              "std": 0.2973359646409304
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -14.110518295210701,
+              "std": 5.80576092284102
+            },
+            "Roll": {
+              "mean": -7.449231497128401,
+              "std": 6.321329373670752
+            },
+            "Yaw": {
+              "mean": 20.27532529377974,
+              "std": 33.66078040241932
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 2,
+            "disgust": 0,
+            "fear": 1,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 9,
+            "neutral": 2
+          }
+        }
       }
     },
     {
@@ -10771,10 +11139,12 @@
       "end": "07:08",
       "statement": "Intuit's non-GAAP operating margin was 40% in FY25.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "6211befb-d7e7-47bc-9eb7-0734779b873b",
+        "segment_start": 261.0,
+        "segment_end": 542.0,
+        "vector_distance": 0.12523755182593566,
+        "vector_time": "261s-542s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
@@ -10820,8 +11190,422 @@
         "transcript_text": " and the best is yet to come."
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+        "confidence_score": 0.4688,
+        "components": {
+          "composure": 0.6246,
+          "positive_affect": 0.0625,
+          "emotional_stability": 0.9443,
+          "gaze_stability": 0.385,
+          "neutrality": 0.0421
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 4,
+          "faces_detected": 4,
+          "timing": {
+            "frame_extraction_s": 0.25,
+            "detection_s": 1.16,
+            "total_s": 1.4
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.3824206590652466,
+              "std": 0.06233371169530345,
+              "max": 0.4786764681339264
+            },
+            "AU02": {
+              "mean": 0.15829033963382244,
+              "std": 0.06904251750550336,
+              "max": 0.2578371465206146
+            },
+            "AU04": {
+              "mean": 0.46613676100969315,
+              "std": 0.18910943201268499,
+              "max": 0.7872713804244995
+            },
+            "AU05": {
+              "mean": 0.34654757380485535,
+              "std": 0.02215355097971831,
+              "max": 0.38444194197654724
+            },
+            "AU06": {
+              "mean": 0.1500004231929779,
+              "std": 0.0729235339874229,
+              "max": 0.2700847387313843
+            },
+            "AU07": {
+              "mean": 0.25,
+              "std": 0.4330127018922193,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.21382666006684303,
+              "std": 0.041841497629288314,
+              "max": 0.26649975776672363
+            },
+            "AU10": {
+              "mean": 0.09959510568296537,
+              "std": 0.12661593319391892,
+              "max": 0.31378719210624695
+            },
+            "AU11": {
+              "mean": 0.0,
+              "std": 0.0,
+              "max": 0.0
+            },
+            "AU12": {
+              "mean": 0.0887318360619247,
+              "std": 0.06282536714530808,
+              "max": 0.18605104088783264
+            },
+            "AU14": {
+              "mean": 0.4281091168522835,
+              "std": 0.17987502876546377,
+              "max": 0.6618495583534241
+            },
+            "AU15": {
+              "mean": 0.44107940420508385,
+              "std": 0.23842470051475598,
+              "max": 0.6934086680412292
+            },
+            "AU17": {
+              "mean": 0.3663741499185562,
+              "std": 0.08829714495671905,
+              "max": 0.45376458764076233
+            },
+            "AU20": {
+              "mean": 0.25,
+              "std": 0.4330127018922193,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.5310019552707672,
+              "std": 0.22955529019859805,
+              "max": 0.872383713722229
+            },
+            "AU24": {
+              "mean": 0.5016776323318481,
+              "std": 0.10318140086767495,
+              "max": 0.6529592275619507
+            },
+            "AU25": {
+              "mean": 0.5559490565210581,
+              "std": 0.42694634058836317,
+              "max": 0.9758169054985046
+            },
+            "AU26": {
+              "mean": 0.4203943833708763,
+              "std": 0.19759935722729233,
+              "max": 0.6897459626197815
+            },
+            "AU28": {
+              "mean": 0.3374793007969856,
+              "std": 0.17495189719665696,
+              "max": 0.5206360816955566
+            },
+            "AU43": {
+              "mean": 0.18256061431020498,
+              "std": 0.1396038595384684,
+              "max": 0.4179874360561371
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.16444320883601904,
+              "std": 0.09442679200182368
+            },
+            "disgust": {
+              "mean": 0.0032267553033307195,
+              "std": 0.002734731142538207
+            },
+            "fear": {
+              "mean": 0.038034792349208146,
+              "std": 0.035945527914144855
+            },
+            "happiness": {
+              "mean": 0.00555615674238652,
+              "std": 0.0015398907283065723
+            },
+            "sadness": {
+              "mean": 0.01430098625132814,
+              "std": 0.013307161528738362
+            },
+            "surprise": {
+              "mean": 0.6901635527610779,
+              "std": 0.15251663939710633
+            },
+            "neutral": {
+              "mean": 0.08427451754687354,
+              "std": 0.05504877959615414
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -18.074936922644937,
+              "std": 3.6151525929928017
+            },
+            "Roll": {
+              "mean": -0.9507252560940382,
+              "std": 7.163692921620423
+            },
+            "Yaw": {
+              "mean": -15.547233806065403,
+              "std": 24.998880769844504
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 0,
+            "disgust": 0,
+            "fear": 0,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 4,
+            "neutral": 0
+          }
+        }
+      }
+    },
+    {
+      "start": "07:08",
+      "end": "07:14",
+      "statement": "Intuit exceeded every metric it committed to in the past year.",
+      "speaker_alignment": {
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.06673822411519093,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
+      },
+      "speaker_info": {},
+      "audio_confidence": {
+        "confidence_score": 0.8074,
+        "components": {
+          "pitch_stability": 0.7226,
+          "speech_rate": 0.9827,
+          "pause_fluency": 0.7831,
+          "filler_control": 1.0,
+          "voice_quality": 0.4648
+        },
+        "weights": {
+          "pitch_stability": 0.2,
+          "speech_rate": 0.15,
+          "pause_fluency": 0.25,
+          "filler_control": 0.25,
+          "voice_quality": 0.15
+        },
+        "features": {
+          "f0_mean": 165.78975072616817,
+          "f0_std": 32.41159628642249,
+          "f0_range": 155.0308806627059,
+          "f0_median": 165.56317111642403,
+          "voiced_fraction": 0.4154103852596315,
+          "jitter": 0.020636674982862743,
+          "shimmer": 0.11248859636143688,
+          "hnr": 9.727797673443114,
+          "energy_mean": 0.015497504733502865,
+          "energy_std": 0.015068002976477146,
+          "energy_range": 0.061435189098119736,
+          "speech_rate_wpm": 145.32871972318338,
+          "pause_count": 0,
+          "pause_mean_duration": 0.0,
+          "pause_rate": 0.0,
+          "filler_rate_per_min": 0.0,
+          "articulation_ratio": 1.0
+        },
+        "derived": {
+          "pitch_cv": 0.1955,
+          "range_ratio": 0.9351,
+          "pause_rep_factor": 0.0
+        },
+        "transcript_text": " And this past year, we exceeded on every metric that we committed to you."
+      },
+      "facial_confidence": {
+        "confidence_score": 0.3618,
+        "components": {
+          "composure": 0.6861,
+          "positive_affect": 0.0614,
+          "emotional_stability": 0.5086,
+          "gaze_stability": 0.1611,
+          "neutrality": 0.1777
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 12,
+          "faces_detected": 12,
+          "timing": {
+            "frame_extraction_s": 1.18,
+            "detection_s": 2.77,
+            "total_s": 3.95
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.4004298436144988,
+              "std": 0.09861699450406859,
+              "max": 0.5612267255783081
+            },
+            "AU02": {
+              "mean": 0.18332845407227674,
+              "std": 0.06519644329450944,
+              "max": 0.2745557427406311
+            },
+            "AU04": {
+              "mean": 0.4523971229791641,
+              "std": 0.10732782483297477,
+              "max": 0.6027857065200806
+            },
+            "AU05": {
+              "mean": 0.3175237874190013,
+              "std": 0.047979151686300785,
+              "max": 0.3924959897994995
+            },
+            "AU06": {
+              "mean": 0.1186177044486006,
+              "std": 0.06878051074238684,
+              "max": 0.33656883239746094
+            },
+            "AU07": {
+              "mean": 0.0,
+              "std": 0.0,
+              "max": 0.0
+            },
+            "AU09": {
+              "mean": 0.26738593354821205,
+              "std": 0.08588259021035134,
+              "max": 0.37815824151039124
+            },
+            "AU10": {
+              "mean": 0.0577242919322695,
+              "std": 0.09174037828746709,
+              "max": 0.2562524378299713
+            },
+            "AU11": {
+              "mean": 0.5,
+              "std": 0.5,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.07087447292481859,
+              "std": 0.05087928944890626,
+              "max": 0.1983634978532791
+            },
+            "AU14": {
+              "mean": 0.35584208741784096,
+              "std": 0.14898151864665526,
+              "max": 0.6329120397567749
+            },
+            "AU15": {
+              "mean": 0.37246869411319494,
+              "std": 0.1555117388027807,
+              "max": 0.6007698774337769
+            },
+            "AU17": {
+              "mean": 0.37429526696602505,
+              "std": 0.0625481898130449,
+              "max": 0.46740326285362244
+            },
+            "AU20": {
+              "mean": 0.16666666666666666,
+              "std": 0.3726779962499649,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.6274662738045057,
+              "std": 0.12270784978589384,
+              "max": 0.8736010193824768
+            },
+            "AU24": {
+              "mean": 0.4492720353106658,
+              "std": 0.17329543134056638,
+              "max": 0.6992077827453613
+            },
+            "AU25": {
+              "mean": 0.39961377617146354,
+              "std": 0.40849845306049687,
+              "max": 0.9968440532684326
+            },
+            "AU26": {
+              "mean": 0.34879325206081074,
+              "std": 0.18369947789656224,
+              "max": 0.9200783967971802
+            },
+            "AU28": {
+              "mean": 0.17744399917622408,
+              "std": 0.11451221153869559,
+              "max": 0.5023676753044128
+            },
+            "AU43": {
+              "mean": 0.2567991775770982,
+              "std": 0.2661514070757114,
+              "max": 0.9215128421783447
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.25443276824080385,
+              "std": 0.27517105500805755
+            },
+            "disgust": {
+              "mean": 0.0324381615416011,
+              "std": 0.04119707465905986
+            },
+            "fear": {
+              "mean": 0.1529066408863097,
+              "std": 0.24838156711539378
+            },
+            "happiness": {
+              "mean": 0.02800339562963927,
+              "std": 0.03310233817811041
+            },
+            "sadness": {
+              "mean": 0.045419060304993764,
+              "std": 0.03916058291217994
+            },
+            "surprise": {
+              "mean": 0.29799089615698904,
+              "std": 0.3034843842787496
+            },
+            "neutral": {
+              "mean": 0.18880907021230087,
+              "std": 0.2804467763559017
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -10.764946579282936,
+              "std": 7.524300408553364
+            },
+            "Roll": {
+              "mean": -0.5767629456574465,
+              "std": 3.717723840127804
+            },
+            "Yaw": {
+              "mean": 18.894197295386864,
+              "std": 34.354247131345744
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 4,
+            "disgust": 0,
+            "fear": 2,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 4,
+            "neutral": 2
+          }
+        }
       }
     },
     {
@@ -10829,10 +11613,12 @@
       "end": "08:53",
       "statement": "Intuit's assisted tax segment is a $2 billion business growing at 47%.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.039685114188656834,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
@@ -10878,29 +11664,208 @@
         "transcript_text": " The assisted tax segment is a $2 billion business growing at 47%."
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+        "confidence_score": 0.3742,
+        "components": {
+          "composure": 0.6605,
+          "positive_affect": 0.0839,
+          "emotional_stability": 0.4964,
+          "gaze_stability": 0.0673,
+          "neutrality": 0.3876
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 14,
+          "faces_detected": 14,
+          "timing": {
+            "frame_extraction_s": 1.24,
+            "detection_s": 3.19,
+            "total_s": 4.44
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.32962168753147125,
+              "std": 0.09772083945785272,
+              "max": 0.49825894832611084
+            },
+            "AU02": {
+              "mean": 0.1719094536134175,
+              "std": 0.07023568043576466,
+              "max": 0.307328999042511
+            },
+            "AU04": {
+              "mean": 0.5470523951309068,
+              "std": 0.19552775094284305,
+              "max": 0.8596084713935852
+            },
+            "AU05": {
+              "mean": 0.3135333007999829,
+              "std": 0.05845358609525842,
+              "max": 0.42423486709594727
+            },
+            "AU06": {
+              "mean": 0.1534399933048657,
+              "std": 0.14609879286685865,
+              "max": 0.6018418073654175
+            },
+            "AU07": {
+              "mean": 0.21428571428571427,
+              "std": 0.41032590332414487,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.24906530710203306,
+              "std": 0.13601075518005093,
+              "max": 0.5503625869750977
+            },
+            "AU10": {
+              "mean": 0.15070798162196297,
+              "std": 0.27803922042022267,
+              "max": 0.830041766166687
+            },
+            "AU11": {
+              "mean": 0.21428571428571427,
+              "std": 0.41032590332414487,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.10650745267048478,
+              "std": 0.12757617431652482,
+              "max": 0.47544988989830017
+            },
+            "AU14": {
+              "mean": 0.32274871532406124,
+              "std": 0.10150023779568573,
+              "max": 0.5713279247283936
+            },
+            "AU15": {
+              "mean": 0.31007992795535494,
+              "std": 0.12670288843172048,
+              "max": 0.577211856842041
+            },
+            "AU17": {
+              "mean": 0.4032802666936602,
+              "std": 0.07034700532754111,
+              "max": 0.5073322653770447
+            },
+            "AU20": {
+              "mean": 0.2857142857142857,
+              "std": 0.45175395145262565,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.51615381027971,
+              "std": 0.17897947709898607,
+              "max": 0.7933741211891174
+            },
+            "AU24": {
+              "mean": 0.38567922583648134,
+              "std": 0.21039460981668004,
+              "max": 0.7636600732803345
+            },
+            "AU25": {
+              "mean": 0.4135971942118236,
+              "std": 0.35632102142186906,
+              "max": 0.9991301894187927
+            },
+            "AU26": {
+              "mean": 0.30344031751155853,
+              "std": 0.20456168860634122,
+              "max": 0.7839364409446716
+            },
+            "AU28": {
+              "mean": 0.2251462164734091,
+              "std": 0.08721392121579986,
+              "max": 0.4295758605003357
+            },
+            "AU43": {
+              "mean": 0.2806612438123141,
+              "std": 0.2954815491522476,
+              "max": 0.9114854335784912
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.12488263756469158,
+              "std": 0.14029570475653605
+            },
+            "disgust": {
+              "mean": 0.12757235551336116,
+              "std": 0.23191381247540718
+            },
+            "fear": {
+              "mean": 0.024268584458955696,
+              "std": 0.029762298536832724
+            },
+            "happiness": {
+              "mean": 0.03775542330030086,
+              "std": 0.05625303214877032
+            },
+            "sadness": {
+              "mean": 0.010971915575542621,
+              "std": 0.008485888255252913
+            },
+            "surprise": {
+              "mean": 0.3279851765463328,
+              "std": 0.39155211163125275
+            },
+            "neutral": {
+              "mean": 0.34656388725021053,
+              "std": 0.3844361501105456
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -11.638940764177145,
+              "std": 10.011783764597393
+            },
+            "Roll": {
+              "mean": -5.894079736027393,
+              "std": 7.202995908930345
+            },
+            "Yaw": {
+              "mean": 14.759846623049137,
+              "std": 34.43135514644997
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 1,
+            "disgust": 2,
+            "fear": 0,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 5,
+            "neutral": 6
+          }
+        }
       }
     },
     {
       "start": "08:53",
-      "end": "08:56",
+      "end": "08:59",
       "statement": "Intuit's mid-market segment is growing at 40%.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.044160985540905195,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
-        "confidence_score": 0.8283,
+        "confidence_score": 0.8047,
         "components": {
-          "pitch_stability": 0.7105,
-          "speech_rate": 0.9982,
+          "pitch_stability": 0.7104,
+          "speech_rate": 0.96,
           "pause_fluency": 0.7831,
           "filler_control": 1.0,
-          "voice_quality": 0.6048
+          "voice_quality": 0.4854
         },
         "weights": {
           "pitch_stability": 0.2,
@@ -10910,18 +11875,492 @@
           "voice_quality": 0.15
         },
         "features": {
-          "f0_mean": 175.97363014092485,
-          "f0_std": 36.236626930109935,
-          "f0_range": 149.41466442445426,
-          "f0_median": 174.33207383663978,
-          "voiced_fraction": 0.3602693602693603,
-          "jitter": 0.017964363357019248,
-          "shimmer": 0.09106231549075046,
-          "hnr": 12.187487523335193,
-          "energy_mean": 0.014505439437925816,
-          "energy_std": 0.018491597846150398,
-          "energy_range": 0.06506785750389099,
-          "speech_rate_wpm": 151.5151515151515,
+          "f0_mean": 171.22598530859028,
+          "f0_std": 33.08195320950153,
+          "f0_range": 152.98161186227279,
+          "f0_median": 172.99263544745378,
+          "voiced_fraction": 0.35175879396984927,
+          "jitter": 0.01868890420576564,
+          "shimmer": 0.1102277381229029,
+          "hnr": 9.74677281218541,
+          "energy_mean": 0.015063449740409851,
+          "energy_std": 0.016872238367795944,
+          "energy_range": 0.06507200002670288,
+          "speech_rate_wpm": 142.85714285714286,
+          "pause_count": 0,
+          "pause_mean_duration": 0.0,
+          "pause_rate": 0.0,
+          "filler_rate_per_min": 0.0,
+          "articulation_ratio": 1.1944444444444446
+        },
+        "derived": {
+          "pitch_cv": 0.1932,
+          "range_ratio": 0.8934,
+          "pause_rep_factor": 0.0
+        },
+        "transcript_text": " Mid-market is growing at 40%. And we are constructively growing at 40%."
+      },
+      "facial_confidence": {
+        "confidence_score": 0.4166,
+        "components": {
+          "composure": 0.6618,
+          "positive_affect": 0.0375,
+          "emotional_stability": 0.6431,
+          "gaze_stability": 0.3661,
+          "neutrality": 0.1861
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 12,
+          "faces_detected": 12,
+          "timing": {
+            "frame_extraction_s": 0.91,
+            "detection_s": 2.71,
+            "total_s": 3.62
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.3570782293876012,
+              "std": 0.09154942438160514,
+              "max": 0.4761057496070862
+            },
+            "AU02": {
+              "mean": 0.18515429832041264,
+              "std": 0.060234736037793134,
+              "max": 0.29655712842941284
+            },
+            "AU04": {
+              "mean": 0.5271427469948927,
+              "std": 0.18732709429923347,
+              "max": 0.8730146884918213
+            },
+            "AU05": {
+              "mean": 0.3437862495581309,
+              "std": 0.05891819503518297,
+              "max": 0.43483754992485046
+            },
+            "AU06": {
+              "mean": 0.08279083327700694,
+              "std": 0.028776450412781745,
+              "max": 0.15294249355793
+            },
+            "AU07": {
+              "mean": 0.08333333333333333,
+              "std": 0.2763853991962833,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.22370240837335587,
+              "std": 0.04384823741249404,
+              "max": 0.300858736038208
+            },
+            "AU10": {
+              "mean": 0.0984041167491038,
+              "std": 0.18863880316775145,
+              "max": 0.5508726239204407
+            },
+            "AU11": {
+              "mean": 0.25,
+              "std": 0.4330127018922193,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.0515259358411034,
+              "std": 0.029832261711918703,
+              "max": 0.11092816293239594
+            },
+            "AU14": {
+              "mean": 0.4076576034228007,
+              "std": 0.13884821803587405,
+              "max": 0.6567124128341675
+            },
+            "AU15": {
+              "mean": 0.4987069834023714,
+              "std": 0.18983506059501878,
+              "max": 0.7789983749389648
+            },
+            "AU17": {
+              "mean": 0.40831069896618527,
+              "std": 0.06274818024470219,
+              "max": 0.5275884866714478
+            },
+            "AU20": {
+              "mean": 0.08333333333333333,
+              "std": 0.2763853991962833,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.5824713036417961,
+              "std": 0.1355357140178875,
+              "max": 0.8189048767089844
+            },
+            "AU24": {
+              "mean": 0.5354880591233572,
+              "std": 0.1619946863972675,
+              "max": 0.7079959511756897
+            },
+            "AU25": {
+              "mean": 0.24344054303946905,
+              "std": 0.33045897951279807,
+              "max": 0.9908512234687805
+            },
+            "AU26": {
+              "mean": 0.29762708706160385,
+              "std": 0.24341301138668617,
+              "max": 0.8159344792366028
+            },
+            "AU28": {
+              "mean": 0.22449909523129463,
+              "std": 0.13783187213709022,
+              "max": 0.5708686113357544
+            },
+            "AU43": {
+              "mean": 0.186357242676119,
+              "std": 0.15045911955355107,
+              "max": 0.6339089870452881
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.25882180718084175,
+              "std": 0.24666280651148942
+            },
+            "disgust": {
+              "mean": 0.00775386178035357,
+              "std": 0.010236125052080167
+            },
+            "fear": {
+              "mean": 0.05186414054090468,
+              "std": 0.09778297015148782
+            },
+            "happiness": {
+              "mean": 0.007812992173057864,
+              "std": 0.013079041877050803
+            },
+            "sadness": {
+              "mean": 0.020419985516734112,
+              "std": 0.025847260082633213
+            },
+            "surprise": {
+              "mean": 0.447847168892622,
+              "std": 0.32391881437902004
+            },
+            "neutral": {
+              "mean": 0.20548003950777152,
+              "std": 0.26912724555267875
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -11.46029164304028,
+              "std": 3.9478251544267535
+            },
+            "Roll": {
+              "mean": -5.728949736660002,
+              "std": 6.02156752672324
+            },
+            "Yaw": {
+              "mean": 6.8708817226951275,
+              "std": 36.85250684151343
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 3,
+            "disgust": 0,
+            "fear": 0,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 7,
+            "neutral": 2
+          }
+        }
+      }
+    },
+    {
+      "start": "08:56",
+      "end": "09:02",
+      "statement": "Intuit is constructively dissatisfied with its assisted tax share and mid-market penetration.",
+      "speaker_alignment": {
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.03170178025496884,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
+      },
+      "speaker_info": {},
+      "audio_confidence": {
+        "confidence_score": 0.8452,
+        "components": {
+          "pitch_stability": 0.9697,
+          "speech_rate": 0.96,
+          "pause_fluency": 0.7888,
+          "filler_control": 1.0,
+          "voice_quality": 0.4003
+        },
+        "weights": {
+          "pitch_stability": 0.2,
+          "speech_rate": 0.15,
+          "pause_fluency": 0.25,
+          "filler_control": 0.25,
+          "voice_quality": 0.15
+        },
+        "features": {
+          "f0_mean": 169.56487384902104,
+          "f0_std": 42.78379693354649,
+          "f0_range": 505.75267082067523,
+          "f0_median": 166.23668186020308,
+          "voiced_fraction": 0.48911222780569513,
+          "jitter": 0.02315745305157959,
+          "shimmer": 0.12023587998574511,
+          "hnr": 8.809761087226157,
+          "energy_mean": 0.01845640130341053,
+          "energy_std": 0.015280469320714474,
+          "energy_range": 0.05783722549676895,
+          "speech_rate_wpm": 142.85714285714286,
+          "pause_count": 1,
+          "pause_mean_duration": 0.41999999999999993,
+          "pause_rate": 9.523809523809524,
+          "filler_rate_per_min": 0.0,
+          "articulation_ratio": 1.0
+        },
+        "derived": {
+          "pitch_cv": 0.2523,
+          "range_ratio": 2.9826,
+          "pause_rep_factor": 0.3333
+        },
+        "transcript_text": " at 40%. And we are constructively dissatisfied with both. We believe we can do better,"
+      },
+      "facial_confidence": {
+        "confidence_score": 0.4035,
+        "components": {
+          "composure": 0.6828,
+          "positive_affect": 0.0485,
+          "emotional_stability": 0.6604,
+          "gaze_stability": 0.2713,
+          "neutrality": 0.1152
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 12,
+          "faces_detected": 12,
+          "timing": {
+            "frame_extraction_s": 0.88,
+            "detection_s": 2.87,
+            "total_s": 3.75
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.402471383412679,
+              "std": 0.08386255946201422,
+              "max": 0.5541272163391113
+            },
+            "AU02": {
+              "mean": 0.17328522043923536,
+              "std": 0.05237280006437537,
+              "max": 0.28041961789131165
+            },
+            "AU04": {
+              "mean": 0.46540602296590805,
+              "std": 0.10572063263152093,
+              "max": 0.6271488070487976
+            },
+            "AU05": {
+              "mean": 0.3185156012574832,
+              "std": 0.0563003224533936,
+              "max": 0.4090009927749634
+            },
+            "AU06": {
+              "mean": 0.10364502482116222,
+              "std": 0.06134169533717081,
+              "max": 0.26604148745536804
+            },
+            "AU07": {
+              "mean": 0.0,
+              "std": 0.0,
+              "max": 0.0
+            },
+            "AU09": {
+              "mean": 0.25019372006257373,
+              "std": 0.0990382684596702,
+              "max": 0.47345834970474243
+            },
+            "AU10": {
+              "mean": 0.1758733156840814,
+              "std": 0.2989990757125325,
+              "max": 0.8572931289672852
+            },
+            "AU11": {
+              "mean": 0.5,
+              "std": 0.5,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.056837514120464526,
+              "std": 0.061498399406223876,
+              "max": 0.23838990926742554
+            },
+            "AU14": {
+              "mean": 0.3601226819058259,
+              "std": 0.15030111053065065,
+              "max": 0.6362251043319702
+            },
+            "AU15": {
+              "mean": 0.4416682639469703,
+              "std": 0.21598430380916797,
+              "max": 0.8389689326286316
+            },
+            "AU17": {
+              "mean": 0.40189579874277115,
+              "std": 0.0703874166197715,
+              "max": 0.5254925489425659
+            },
+            "AU20": {
+              "mean": 0.08333333333333333,
+              "std": 0.2763853991962833,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.6569462468226751,
+              "std": 0.1389642299178399,
+              "max": 0.8638420701026917
+            },
+            "AU24": {
+              "mean": 0.49999529868364334,
+              "std": 0.1764549630244886,
+              "max": 0.7212973237037659
+            },
+            "AU25": {
+              "mean": 0.3480612527540264,
+              "std": 0.3538327643847848,
+              "max": 0.9921930432319641
+            },
+            "AU26": {
+              "mean": 0.301801065603892,
+              "std": 0.18126873668438082,
+              "max": 0.7756776809692383
+            },
+            "AU28": {
+              "mean": 0.19335649286707243,
+              "std": 0.09180698496612145,
+              "max": 0.39217308163642883
+            },
+            "AU43": {
+              "mean": 0.2302782234425346,
+              "std": 0.107352538455589,
+              "max": 0.37721946835517883
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.2213854127912782,
+              "std": 0.1889076643389692
+            },
+            "disgust": {
+              "mean": 0.027010456453960312,
+              "std": 0.04590446384719755
+            },
+            "fear": {
+              "mean": 0.102473609324079,
+              "std": 0.14497332619368442
+            },
+            "happiness": {
+              "mean": 0.016727706080321997,
+              "std": 0.027130296279841294
+            },
+            "sadness": {
+              "mean": 0.027149309670979466,
+              "std": 0.02643404258600643
+            },
+            "surprise": {
+              "mean": 0.4582423474639654,
+              "std": 0.3147406641309173
+            },
+            "neutral": {
+              "mean": 0.14701113034971058,
+              "std": 0.20843939608416742
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -9.065364052346931,
+              "std": 5.528781376764943
+            },
+            "Roll": {
+              "mean": -2.630901593227961,
+              "std": 5.647832209112966
+            },
+            "Yaw": {
+              "mean": 7.150950339911706,
+              "std": 38.27407004276328
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 4,
+            "disgust": 0,
+            "fear": 1,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 6,
+            "neutral": 1
+          }
+        }
+      }
+    },
+    {
+      "start": "08:27",
+      "end": "08:30",
+      "statement": "Intuit is a talent magnet and has an all-in-one platform.",
+      "speaker_alignment": {
+        "speakerId": "6211befb-d7e7-47bc-9eb7-0734779b873b",
+        "segment_start": 261.0,
+        "segment_end": 542.0,
+        "vector_distance": 0.07567737711552103,
+        "vector_time": "261s-542s",
+        "match_method": "voice_fingerprint_vector_db"
+      },
+      "speaker_info": {},
+      "audio_confidence": {
+        "confidence_score": 0.6173,
+        "components": {
+          "pitch_stability": 0.5168,
+          "speech_rate": 0.0068,
+          "pause_fluency": 0.7831,
+          "filler_control": 1.0,
+          "voice_quality": 0.4479
+        },
+        "weights": {
+          "pitch_stability": 0.2,
+          "speech_rate": 0.15,
+          "pause_fluency": 0.25,
+          "filler_control": 0.25,
+          "voice_quality": 0.15
+        },
+        "features": {
+          "f0_mean": 167.2876239309046,
+          "f0_std": 19.442450903265552,
+          "f0_range": 84.73813220676344,
+          "f0_median": 174.3175773410965,
+          "voiced_fraction": 0.6161616161616161,
+          "jitter": 0.020400516206265734,
+          "shimmer": 0.10636442810847971,
+          "hnr": 8.854024653753909,
+          "energy_mean": 0.02811664529144764,
+          "energy_std": 0.01781703159213066,
+          "energy_range": 0.06353391706943512,
+          "speech_rate_wpm": 229.00763358778627,
           "pause_count": 0,
           "pause_mean_duration": 0.0,
           "pause_rate": 0.0,
@@ -10929,26 +12368,205 @@
           "articulation_ratio": 1.0
         },
         "derived": {
-          "pitch_cv": 0.2059,
-          "range_ratio": 0.8491,
+          "pitch_cv": 0.1162,
+          "range_ratio": 0.5065,
           "pause_rep_factor": 0.0
         },
-        "transcript_text": " Mid-market is growing and growing."
+        "transcript_text": " and talent from the outside, some of the best builders,"
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+        "confidence_score": 0.4168,
+        "components": {
+          "composure": 0.6894,
+          "positive_affect": 0.0532,
+          "emotional_stability": 0.5694,
+          "gaze_stability": 0.2771,
+          "neutrality": 0.3323
+        },
+        "weights": {
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
+        },
+        "features": {
+          "frames_extracted": 6,
+          "faces_detected": 6,
+          "timing": {
+            "frame_extraction_s": 0.42,
+            "detection_s": 1.53,
+            "total_s": 1.95
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.376363605260849,
+              "std": 0.06434807264479697,
+              "max": 0.4539763629436493
+            },
+            "AU02": {
+              "mean": 0.14078246926267943,
+              "std": 0.06420449168970623,
+              "max": 0.26279234886169434
+            },
+            "AU04": {
+              "mean": 0.6213444868723551,
+              "std": 0.08276636637975254,
+              "max": 0.7707714438438416
+            },
+            "AU05": {
+              "mean": 0.32755108674367267,
+              "std": 0.05555638755817122,
+              "max": 0.3762151002883911
+            },
+            "AU06": {
+              "mean": 0.13205281645059586,
+              "std": 0.06324506311286324,
+              "max": 0.22520430386066437
+            },
+            "AU07": {
+              "mean": 0.16666666666666666,
+              "std": 0.372677996249965,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.22199729457497597,
+              "std": 0.07182877198762833,
+              "max": 0.3531225919723511
+            },
+            "AU10": {
+              "mean": 0.17019141867543416,
+              "std": 0.30091018026877303,
+              "max": 0.8402839303016663
+            },
+            "AU11": {
+              "mean": 0.6666666666666666,
+              "std": 0.4714045207910317,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.07023329008370638,
+              "std": 0.0797715478297152,
+              "max": 0.24618123471736908
+            },
+            "AU14": {
+              "mean": 0.3773168722788493,
+              "std": 0.20928441323360555,
+              "max": 0.7223160266876221
+            },
+            "AU15": {
+              "mean": 0.3618226423859596,
+              "std": 0.11100719420955321,
+              "max": 0.49689891934394836
+            },
+            "AU17": {
+              "mean": 0.4072373906771342,
+              "std": 0.04110449637129413,
+              "max": 0.4529564082622528
+            },
+            "AU20": {
+              "mean": 0.0,
+              "std": 0.0,
+              "max": 0.0
+            },
+            "AU23": {
+              "mean": 0.5631355543931326,
+              "std": 0.14953880056802887,
+              "max": 0.7638719081878662
+            },
+            "AU24": {
+              "mean": 0.3775753354032834,
+              "std": 0.1476484694907235,
+              "max": 0.5432954430580139
+            },
+            "AU25": {
+              "mean": 0.5382599532604218,
+              "std": 0.2209681502542749,
+              "max": 0.903022050857544
+            },
+            "AU26": {
+              "mean": 0.4316610246896744,
+              "std": 0.20652440976221842,
+              "max": 0.7070083618164062
+            },
+            "AU28": {
+              "mean": 0.1933947435269753,
+              "std": 0.1455228393548274,
+              "max": 0.3972461223602295
+            },
+            "AU43": {
+              "mean": 0.25270091866453487,
+              "std": 0.21314434206387478,
+              "max": 0.6195152997970581
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.25044587161391973,
+              "std": 0.26298546440684906
+            },
+            "disgust": {
+              "mean": 0.014765331851473698,
+              "std": 0.022325099402065
+            },
+            "fear": {
+              "mean": 0.14644055759223798,
+              "std": 0.2300560748813806
+            },
+            "happiness": {
+              "mean": 0.005338649282445355,
+              "std": 0.006303829638964069
+            },
+            "sadness": {
+              "mean": 0.023583448103939492,
+              "std": 0.02318215507534543
+            },
+            "surprise": {
+              "mean": 0.2282393708398255,
+              "std": 0.23652387801739938
+            },
+            "neutral": {
+              "mean": 0.3311867630497242,
+              "std": 0.33306286436958815
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -8.972292014989845,
+              "std": 5.433024727601359
+            },
+            "Roll": {
+              "mean": -3.138834027354649,
+              "std": 4.621405907040445
+            },
+            "Yaw": {
+              "mean": -8.430214231776015,
+              "std": 28.88195520154083
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 1,
+            "disgust": 0,
+            "fear": 1,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 2,
+            "neutral": 2
+          }
+        }
       }
     },
     {
       "start": "06:48",
       "end": "06:55",
-      "statement": "Intuit was less than $5 billion in size 10 years ago.",
+      "statement": "Intuit was less than $5 billion in size 10 years ago, growing at 8%.",
       "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
+        "speakerId": "e8e9c6d2-3b8d-4038-b333-fab94f0582c6",
+        "segment_start": 269.0,
+        "segment_end": 599.0,
+        "vector_distance": 0.033797456605357934,
+        "vector_time": "269s-599s",
+        "match_method": "voice_fingerprint_vector_db"
       },
       "speaker_info": {},
       "audio_confidence": {
@@ -10994,66 +12612,185 @@
         "transcript_text": " About 10 years ago, we were less than 5 billion in size, growing 8%."
       },
       "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
-      }
-    },
-    {
-      "start": "06:48",
-      "end": "07:06",
-      "statement": "Intuit grew from less than $5 billion to nearly $20 billion in 10 years.",
-      "speaker_alignment": {
-        "speakerId": null,
-        "segment_start": null,
-        "segment_end": null,
-        "overlap_seconds": 0.0
-      },
-      "speaker_info": {},
-      "audio_confidence": {
-        "confidence_score": 0.7641,
+        "confidence_score": 0.3944,
         "components": {
-          "pitch_stability": 0.7116,
-          "speech_rate": 0.6839,
-          "pause_fluency": 0.7805,
-          "filler_control": 1.0,
-          "voice_quality": 0.4939
+          "composure": 0.6637,
+          "positive_affect": 0.0427,
+          "emotional_stability": 0.6194,
+          "gaze_stability": 0.2661,
+          "neutrality": 0.168
         },
         "weights": {
-          "pitch_stability": 0.2,
-          "speech_rate": 0.15,
-          "pause_fluency": 0.25,
-          "filler_control": 0.25,
-          "voice_quality": 0.15
+          "composure": 0.25,
+          "positive_affect": 0.2,
+          "emotional_stability": 0.25,
+          "gaze_stability": 0.15,
+          "neutrality": 0.15
         },
         "features": {
-          "f0_mean": 164.0134290177722,
-          "f0_std": 30.451432477861797,
-          "f0_range": 152.39629007312442,
-          "f0_median": 165.07926687463768,
-          "voiced_fraction": 0.4245965498052309,
-          "jitter": 0.017149269504454473,
-          "shimmer": 0.10955619839655371,
-          "hnr": 9.582426663486439,
-          "energy_mean": 0.017579074949026108,
-          "energy_std": 0.016892779618501663,
-          "energy_range": 0.06485776603221893,
-          "speech_rate_wpm": 128.20512820512823,
-          "pause_count": 1,
-          "pause_mean_duration": 1.2999999999999998,
-          "pause_rate": 3.6630036630036633,
-          "filler_rate_per_min": 0.0,
-          "articulation_ratio": 0.9462759462759462
-        },
-        "derived": {
-          "pitch_cv": 0.1857,
-          "range_ratio": 0.9292,
-          "pause_rep_factor": 0.3333
-        },
-        "transcript_text": " About 10 years ago, we were less than 5 billion in size, growing 8%. Today, we are 4 times that size, nearly 20 billion, growing at double the rate at 16%, with 40% operating margins."
-      },
-      "facial_confidence": {
-        "confidence_score": 0.0,
-        "error": "cannot import name 'binom_test' from 'scipy.stats' (/home/lihe07/miniconda3/envs/hack/lib/python3.10/site-packages/scipy/stats/__init__.py)"
+          "frames_extracted": 14,
+          "faces_detected": 14,
+          "timing": {
+            "frame_extraction_s": 1.28,
+            "detection_s": 3.13,
+            "total_s": 4.41
+          },
+          "au": {
+            "AU01": {
+              "mean": 0.32459323001759394,
+              "std": 0.06743376282572616,
+              "max": 0.4992975890636444
+            },
+            "AU02": {
+              "mean": 0.14122118055820465,
+              "std": 0.05667422906084477,
+              "max": 0.284613698720932
+            },
+            "AU04": {
+              "mean": 0.5177679977246693,
+              "std": 0.13971241776744572,
+              "max": 0.773949146270752
+            },
+            "AU05": {
+              "mean": 0.32142085901328493,
+              "std": 0.036337916272110964,
+              "max": 0.3948250710964203
+            },
+            "AU06": {
+              "mean": 0.10686236646558557,
+              "std": 0.048211311786799466,
+              "max": 0.2102046012878418
+            },
+            "AU07": {
+              "mean": 0.14285714285714285,
+              "std": 0.3499271061118826,
+              "max": 1.0
+            },
+            "AU09": {
+              "mean": 0.24025783953922136,
+              "std": 0.09526792302429433,
+              "max": 0.4631933271884918
+            },
+            "AU10": {
+              "mean": 0.15648202140229323,
+              "std": 0.1928668555067232,
+              "max": 0.5867177844047546
+            },
+            "AU11": {
+              "mean": 0.2857142857142857,
+              "std": 0.45175395145262565,
+              "max": 1.0
+            },
+            "AU12": {
+              "mean": 0.05124306705381189,
+              "std": 0.03883260643237357,
+              "max": 0.14179573953151703
+            },
+            "AU14": {
+              "mean": 0.46004391674484524,
+              "std": 0.19115316449079905,
+              "max": 0.7241550087928772
+            },
+            "AU15": {
+              "mean": 0.45752348005771637,
+              "std": 0.19189487732535093,
+              "max": 0.7351077198982239
+            },
+            "AU17": {
+              "mean": 0.3879946193524769,
+              "std": 0.0695007345277997,
+              "max": 0.5137155055999756
+            },
+            "AU20": {
+              "mean": 0.14285714285714285,
+              "std": 0.3499271061118826,
+              "max": 1.0
+            },
+            "AU23": {
+              "mean": 0.553158588707447,
+              "std": 0.17519846340503648,
+              "max": 0.860177218914032
+            },
+            "AU24": {
+              "mean": 0.5001430149589267,
+              "std": 0.16360625977222576,
+              "max": 0.7319343686103821
+            },
+            "AU25": {
+              "mean": 0.33017329442580895,
+              "std": 0.3123949424117212,
+              "max": 0.9999198913574219
+            },
+            "AU26": {
+              "mean": 0.38627840259245466,
+              "std": 0.22655766654887155,
+              "max": 0.8511244654655457
+            },
+            "AU28": {
+              "mean": 0.23881277229104722,
+              "std": 0.1328629791438191,
+              "max": 0.5304780602455139
+            },
+            "AU43": {
+              "mean": 0.1656627742839711,
+              "std": 0.11514247401847233,
+              "max": 0.519393801689148
+            }
+          },
+          "emotions": {
+            "anger": {
+              "mean": 0.19949817551033838,
+              "std": 0.16219889837459
+            },
+            "disgust": {
+              "mean": 0.040505786833819,
+              "std": 0.054212889699764594
+            },
+            "fear": {
+              "mean": 0.15032470044181018,
+              "std": 0.19486525423839982
+            },
+            "happiness": {
+              "mean": 0.006248443179564285,
+              "std": 0.005540784697066342
+            },
+            "sadness": {
+              "mean": 0.046688698399520945,
+              "std": 0.07481534722992407
+            },
+            "surprise": {
+              "mean": 0.3636301286585097,
+              "std": 0.29341709715241143
+            },
+            "neutral": {
+              "mean": 0.19310405501164496,
+              "std": 0.2427171068067334
+            }
+          },
+          "pose": {
+            "Pitch": {
+              "mean": -14.194669344729032,
+              "std": 5.615246683823227
+            },
+            "Roll": {
+              "mean": -3.726676985590214,
+              "std": 4.489958861561615
+            },
+            "Yaw": {
+              "mean": -13.532746638306435,
+              "std": 28.067602299465968
+            }
+          },
+          "dominant_emotion_counts": {
+            "anger": 4,
+            "disgust": 0,
+            "fear": 2,
+            "happiness": 0,
+            "sadness": 0,
+            "surprise": 6,
+            "neutral": 2
+          }
+        }
       }
     }
   ]

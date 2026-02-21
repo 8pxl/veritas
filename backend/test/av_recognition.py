@@ -1,18 +1,19 @@
 import groq
-import chromadb
 import cv2
 import numpy as np
 import os
 import subprocess
 import json
 import tempfile
+import uuid
 from PIL import Image
 from dotenv import load_dotenv
+from vector_store import VectorStore
 
 load_dotenv()
 
 _groq = groq.Groq(api_key=os.getenv("OPENAI_API_KEY"))
-_chroma = chromadb.PersistentClient(path="./chroma_db")
+_vector_store = VectorStore(path="./chroma_db")
 
 # Lazy-loaded models
 _mtcnn = None
@@ -314,13 +315,6 @@ def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = 
             speaker full names with their appearance times in the video.
     Step 2: Extract face and audio keypoints and add them to a vector database.
     """
-    face_col = _chroma.get_or_create_collection(
-        "faces", metadata={"hnsw:space": "cosine"}
-    )
-    audio_col = _chroma.get_or_create_collection(
-        "audio", metadata={"hnsw:space": "cosine"}
-    )
-
     # ── Get duration ──────────────────────────────────────────
     duration = 0.0
     res = subprocess.run(
@@ -426,6 +420,7 @@ Identify every speaker with their full name and title. Ensure that they are in o
     # ── Extract face + audio embeddings ───────────────────────
     mtcnn, resnet = (None, None) if is_audio else _get_face_models()
     voice_enc = _get_voice_encoder()
+    run_id = uuid.uuid4().hex[:8]
 
     for i, sp in enumerate(speakers):
         speaker_id = sp["speakerId"]
@@ -436,19 +431,16 @@ Identify every speaker with their full name and title. Ensure that they are in o
         display_name = info.get("name", speaker_id)
 
         # Face: multi-frame sampling with outlier rejection
-        if not is_audio:
-            emb = _robust_face_embedding(av_path, t0, t1, mtcnn, resnet)
-            if emb:
-                face_col.add(
-                    embeddings=[emb],
-                    ids=[f"face_{i}"],
-                    metadatas=[meta],
-                )
-                print(f"  + face  {display_name}")
-            else:
-                print(f"  - face  {display_name}  (no single-face frame found)")
-        else:
-            print(f"  . face  {display_name}  (skipped in audio-only mode)")
+        # Save some CPU. Disable this
+        # if not is_audio:
+        #     emb = _robust_face_embedding(av_path, t0, t1, mtcnn, resnet)
+        #     if emb:
+        #         _vector_store.add_face_embedding(f"face_{run_id}_{i}", emb, meta)
+        #         print(f"  + face  {display_name}")
+        #     else:
+        #         print(f"  - face  {display_name}  (no single-face frame found)")
+        # else:
+        #     print(f"  . face  {display_name}  (skipped in audio-only mode)")
 
         # Audio: extract segment and embed voice
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
@@ -475,11 +467,7 @@ Identify every speaker with their full name and title. Ensure that they are in o
         try:
             emb = _embed_voice(wav_path, voice_enc)
             if emb:
-                audio_col.add(
-                    embeddings=[emb],
-                    ids=[f"audio_{i}"],
-                    metadatas=[meta],
-                )
+                _vector_store.add_audio_embedding(f"audio_{run_id}_{i}", emb, meta)
                 print(f"  + audio {display_name}")
         finally:
             os.unlink(wav_path)
@@ -490,9 +478,6 @@ Identify every speaker with their full name and title. Ensure that they are in o
 
 def find_face(image_path: str):
     """Lookup in the database for a face."""
-    face_col = _chroma.get_or_create_collection(
-        "faces", metadata={"hnsw:space": "cosine"}
-    )
     mtcnn, resnet = _get_face_models()
 
     img = np.array(Image.open(image_path).convert("RGB"))
@@ -500,12 +485,15 @@ def find_face(image_path: str):
     if emb is None:
         return [{"error": "No face detected"}]
 
-    res = face_col.query(query_embeddings=[emb], n_results=3)
+    res = _vector_store.query_face_embeddings(emb, n_results=3)
     return [
         {
+            "speakerId": m.get("speakerId", ""),
             **_lookup_speaker(m.get("speakerId", "")),
             "distance": d,
-            "time": f"{m['start']:.0f}s-{m['end']:.0f}s",
+            "start": m.get("start"),
+            "end": m.get("end"),
+            "time": f"{m.get('start', 0):.0f}s-{m.get('end', 0):.0f}s",
         }
         for m, d in zip(res["metadatas"][0], res["distances"][0])
     ]
@@ -513,21 +501,21 @@ def find_face(image_path: str):
 
 def find_audio(audio_path: str):
     """Lookup for the audio."""
-    audio_col = _chroma.get_or_create_collection(
-        "audio", metadata={"hnsw:space": "cosine"}
-    )
     enc = _get_voice_encoder()
 
     emb = _embed_voice(audio_path, enc)
     if emb is None:
         return [{"error": "Could not process audio"}]
 
-    res = audio_col.query(query_embeddings=[emb], n_results=3)
+    res = _vector_store.query_audio_embeddings(emb, n_results=3)
     return [
         {
+            "speakerId": m.get("speakerId", ""),
             **_lookup_speaker(m.get("speakerId", "")),
             "distance": d,
-            "time": f"{m['start']:.0f}s-{m['end']:.0f}s",
+            "start": m.get("start"),
+            "end": m.get("end"),
+            "time": f"{m.get('start', 0):.0f}s-{m.get('end', 0):.0f}s",
         }
         for m, d in zip(res["metadatas"][0], res["distances"][0])
     ]

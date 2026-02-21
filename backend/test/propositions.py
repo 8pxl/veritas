@@ -4,8 +4,8 @@ import base64
 import os
 import time
 from dotenv import load_dotenv
-from openai import (
-    OpenAI,
+from groq import (
+    Groq,
     APIConnectionError,
     APITimeoutError,
     BadRequestError,
@@ -16,9 +16,7 @@ load_dotenv()
 
 EXTRACTION_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct"
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("OPENAI_API_BASE")
-)
+client = Groq(api_key=os.getenv("OPENAI_API_KEY"))
 
 _SYSTEM_PROMPT = """\
 You are an analyst extracting verifiable propositions from corporate video transcripts \
