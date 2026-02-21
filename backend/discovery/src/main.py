@@ -105,7 +105,7 @@ def fetch_company_videos(
                 best = judge_videos_batch(
                     groq_client,
                     raw_videos,
-                    event_name=event["event_name"],
+                    event_name=f"{event["event_name"]} {year}",
                     company_name=company_name,
                 )
                 if best is not None:
