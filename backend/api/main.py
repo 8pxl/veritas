@@ -114,3 +114,44 @@ def search_people(
             )
         )
     return people
+
+# --- Propositions by Person ---
+@app.get("/people/{person_id}/propositions", response_model=List[Proposition])
+def get_propositions_by_person(person_id: str, db: Session = Depends(get_db)):
+    """Get all propositions made by a specific person."""
+    person_db = db.get(PersonDB, person_id)
+    if not person_db:
+        raise HTTPException(status_code=404, detail="Person not found")
+
+    props = db.query(PropositionDB).filter(PropositionDB.speaker_id == person_id).all()
+
+    org_db = db.get(OrganizationDB, person_db.organization_id)
+    person = Person(
+        id=person_db.id,
+        name=person_db.name,
+        position=person_db.position,
+        organization=Organization(
+            id=org_db.id, name=org_db.name, url=org_db.url, logo_url=org_db.logo_url,
+        ),
+    )
+
+    results: List[Proposition] = []
+    for p in props:
+        video_db = db.get(VideoDB, p.video_id)
+        results.append(
+            Proposition(
+                id=p.id,
+                speaker=person,
+                statement=p.statement,
+                verifyAt=p.verify_at,
+                video=Video(
+                    video_id=video_db.video_id,
+                    video_path=video_db.video_path,
+                    title=video_db.title,
+                    description=video_db.description,
+                    video_url=video_db.video_url,
+                    time=video_db.time,
+                ),
+            )
+        )
+    return results
