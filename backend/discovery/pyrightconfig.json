@@ -1,0 +1,24 @@
+{
+  "typeCheckingMode": "strict",
+
+  "reportUnknownMemberType": "warning",
+  "reportUnknownArgumentType": "warning",
+  "reportUnknownVariableType": "warning",
+  "reportUnknownParameterType": "warning",
+
+  "reportMissingTypeStubs": "none",
+
+  "reportAny": "warning",
+  "reportExplicitAny": "none",
+
+  "reportPrivateImportUsage": "none",
+  "reportUnknownMemberType": "none",
+"reportUnknownVariableType": "none",
+
+  "reportUnusedVariable": "warning",
+
+  "useLibraryCodeForTypes": true,
+  "strictListInference": true,
+  "strictDictionaryInference": true,
+  "strictSetInference": true
+}
