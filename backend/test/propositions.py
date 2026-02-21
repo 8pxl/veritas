@@ -2,6 +2,7 @@ import cv2
 import json
 import base64
 import os
+import subprocess
 from dotenv import load_dotenv
 from groq import Groq
 from groq_retry import groq_call_with_retry
@@ -70,8 +71,37 @@ def _timestamp_to_seconds(timestamp: str | float | int) -> float:
     return float(raw)
 
 
-def _grab_frame_b64(video_path: str, timestamp: float) -> str | None:
-    """Extract a frame from the video at the given timestamp, return as base64 JPEG."""
+def _grab_frame_b64_ffmpeg(video_path: str, timestamp: float) -> str | None:
+    ts = max(0.0, float(timestamp))
+    cmd = [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-nostdin",
+        "-ss",
+        f"{ts:.3f}",
+        "-i",
+        video_path,
+        "-frames:v",
+        "1",
+        "-vf",
+        "scale='min(1280,iw)':-2",
+        "-q:v",
+        "3",
+        "-f",
+        "image2pipe",
+        "-vcodec",
+        "mjpeg",
+        "pipe:1",
+    ]
+    res = subprocess.run(cmd, capture_output=True)
+    if res.returncode != 0 or not res.stdout:
+        return None
+    return base64.b64encode(res.stdout).decode("utf-8")
+
+
+def _grab_frame_b64_cv2(video_path: str, timestamp: float) -> str | None:
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_POS_MSEC, timestamp * 1000)
     success, frame = cap.read()
@@ -81,6 +111,15 @@ def _grab_frame_b64(video_path: str, timestamp: float) -> str | None:
     frame = cv2.resize(frame, (1280, 720))
     _, buffer = cv2.imencode(".jpg", frame, [int(cv2.IMWRITE_JPEG_QUALITY), 85])
     return base64.b64encode(buffer).decode("utf-8")
+
+
+def _grab_frame_b64(video_path: str, timestamp: float) -> str | None:
+    """Robust frame extraction for AV1/WebM: ffmpeg first, then OpenCV fallback."""
+    for offset in (0.0, -0.5, 0.5, -1.0, 1.0):
+        b64 = _grab_frame_b64_ffmpeg(video_path, timestamp + offset)
+        if b64:
+            return b64
+    return _grab_frame_b64_cv2(video_path, max(0.0, timestamp))
 
 
 def _chat_completion_with_retry(
