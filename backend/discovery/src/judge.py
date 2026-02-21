@@ -14,7 +14,7 @@ def judge_videos_batch(
     """
     Judge a batch of videos and return the single best match, or None.
 
-    Sends titles, channels, and descriptions to an LLM which picks at most
+    Sends titles, channels, and yt-dlp metadata to an LLM which picks at most
     one video that is a genuine, primary-source recording of the event.
     Returns None when no video in the batch is relevant.
     """
@@ -23,19 +23,26 @@ def judge_videos_batch(
 
     video_entries = []
     for i, v in enumerate(videos):
+        duration_sec = v.get("duration")
+        duration_min = round(duration_sec / 60, 1) if duration_sec else None
+
         video_entries.append(
             {
                 "index": i,
                 "title": v["title"],
                 "channel": v["channel_title"],
-                "description": v["description"][:300],
+                "view_count": v.get("view_count"),
+                "duration_minutes": duration_min,
+                "channel_is_verified": v.get("channel_is_verified", False),
             }
         )
+
+    video_entries_json = json.dumps(video_entries, indent=2)
 
     prompt = f"""You are a strict video relevance judge. You must decide which (if any) of the following YouTube videos is a genuine, primary-source recording of the event "{event_name}" by or about "{company_name}".
 
 Videos:
-{json.dumps(video_entries, indent=2)}
+{video_entries_json}
 
 RULES — read carefully:
 
@@ -53,6 +60,12 @@ RULES — read carefully:
    - Videos about a different company or event
 5. Prefer official company channels, but accept reputable media uploads of the
    actual event footage (e.g. Bloomberg uploading a full keynote).
+6. Use the yt-dlp metadata as signals:
+   - Verified channels are more likely to be official sources
+   - Very short videos (<2 min) are unlikely to be full event recordings
+   - Very high view counts on official channels are a good signal
+   - Duration consistent with the event type matters (e.g. earnings calls ~45-90 min,
+     keynotes ~60-120 min, product launches ~30-90 min)
 
 Return ONLY this JSON (no other text):
 {{
@@ -69,7 +82,7 @@ Return ONLY this JSON (no other text):
                     "content": (
                         "You are an extremely strict video relevance judge. "
                         "You output only valid JSON. "
-                        "You frequently return null when nothing matches. "
+                        "You frequently return chosen_index -1 when nothing matches. "
                         "Quality over quantity."
                     ),
                 },
