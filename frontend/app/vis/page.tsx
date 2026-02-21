@@ -1,4 +1,4 @@
-import Tabbar from "./components/shared/tabbar"
+import Tabbar from "../components/shared/tabbar"
 
 export default function Home() {
   return (
