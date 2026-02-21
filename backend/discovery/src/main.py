@@ -1,6 +1,8 @@
 import csv
 import json
 import os
+import signal
+import sys
 from rag import *
 from judge import judge_videos_batch, deduplicate_videos
 from dotenv import load_dotenv
@@ -14,6 +16,74 @@ from youtube_types import (
     EventVideos,
     CompanyEvent,
 )
+
+# ---------------------------------------------------------------------------
+# Checkpoint helpers
+# ---------------------------------------------------------------------------
+
+CHECKPOINT_FILE = "out/checkpoint.json"
+
+
+def _save_checkpoint(
+    company_data_list: list[CompanyData],
+    completed_symbols: set[str],
+    output_file: str,
+) -> None:
+    """Write the current results and the set of completed symbols to disk."""
+    os.makedirs(os.path.dirname(CHECKPOINT_FILE), exist_ok=True)
+
+    # Save the main output (only fully-completed companies)
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(company_data_list, f, indent=2, ensure_ascii=False)
+
+    # Save lightweight checkpoint metadata
+    with open(CHECKPOINT_FILE, "w", encoding="utf-8") as f:
+        json.dump(
+            {"completed_symbols": sorted(completed_symbols)},
+            f,
+            indent=2,
+        )
+
+
+def _load_checkpoint(
+    output_file: str,
+) -> tuple[list[CompanyData], set[str]]:
+    """Load previous results and completed symbols.  Returns empty defaults
+    if no checkpoint exists."""
+    completed: set[str] = set()
+    data: list[CompanyData] = []
+
+    if os.path.exists(CHECKPOINT_FILE) and os.path.exists(output_file):
+        try:
+            with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+            completed = set(meta.get("completed_symbols", []))
+
+            with open(output_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Defensive: only keep entries whose symbol is in completed set
+            data = [d for d in data if d["symbol"] in completed]
+        except (json.JSONDecodeError, KeyError):
+            completed = set()
+            data = []
+
+    return data, completed
+
+
+# Global flag for graceful shutdown
+_stop_requested = False
+
+
+def _signal_handler(sig, frame):
+    global _stop_requested
+    if _stop_requested:
+        # Second Ctrl+C — force exit
+        print("\nForce quit.")
+        sys.exit(1)
+    _stop_requested = True
+    print("\nStop requested — will save and exit after current company finishes.")
+    print("Press Ctrl+C again to force quit (progress may be lost).")
 
 
 def search_videos(
@@ -74,7 +144,12 @@ def fetch_company_videos(
     # Step 1: Discover events for this company using Groq
     print("  Discovering company events with Groq...")
     discovery_result = discover_company_events(
-        groq_client, company_name, symbol, sector
+        groq_client,
+        company_name,
+        symbol,
+        sector,
+        start_year=years.start,
+        end_year=years.stop - 1,
     )
     discovered_events = discovery_result["events"]
 
@@ -105,7 +180,7 @@ def fetch_company_videos(
                 best = judge_videos_batch(
                     groq_client,
                     raw_videos,
-                    event_name=f"{event["event_name"]} {year}",
+                    event_name=f"{event['event_name']} {year}",
                     company_name=company_name,
                 )
                 if best is not None:
@@ -139,6 +214,7 @@ def fetch_company_videos(
 
 
 def main():
+    global _stop_requested
     load_dotenv()
 
     # Get API key
@@ -191,14 +267,45 @@ def main():
         else:
             companies = companies[:5]  # Default to 5 for testing
 
-    print(f"Processing {len(companies)} companies\n")
+    # Output file
+    output_file = "out/sp500_youtube_videos_groq.json"
+    os.makedirs("out", exist_ok=True)
+
+    # ---- Resume from checkpoint if available ----
+    all_company_data, completed_symbols = _load_checkpoint(output_file)
+
+    if completed_symbols:
+        remaining = [c for c in companies if c["symbol"] not in completed_symbols]
+        print(
+            f"\nResuming: {len(completed_symbols)} companies already done, "
+            f"{len(remaining)} remaining."
+        )
+        resume = input("Resume from checkpoint? (y/n): ").strip().lower()
+        if resume in ("y", "yes"):
+            companies = remaining
+        else:
+            # Start fresh
+            all_company_data = []
+            completed_symbols = set()
+    else:
+        print()
+
+    print(f"Processing {len(companies)} companies")
+    print("(Press Ctrl+C to stop after the current company and save progress)\n")
+
+    # Install signal handler for graceful shutdown
+    original_sigint = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, _signal_handler)
 
     # Fetch videos for each company
-    all_company_data = []
-
     for i, company in enumerate(companies, 1):
+        # Check if stop was requested between companies
+        if _stop_requested:
+            print(f"\nStopping before company {i}/{len(companies)}.")
+            break
+
         print(f"\n{'=' * 60}")
-        print(f"[{i}/{len(companies)}]")
+        print(f"[{i}/{len(companies)}] {company['symbol']} - {company['name']}")
 
         try:
             company_data = fetch_company_videos(
@@ -209,33 +316,51 @@ def main():
                 years,
             )
             all_company_data.append(company_data)
+            completed_symbols.add(company["symbol"])
+
+            # Checkpoint after every company
+            _save_checkpoint(all_company_data, completed_symbols, output_file)
+            print(f"  [checkpoint saved — {len(completed_symbols)} companies done]")
+
         except Exception as e:
             print(f"Error processing {company['name']}: {e}")
             continue
 
-    # Save to JSON file
-    output_file = "out/sp500_youtube_videos_groq.json"
-    os.makedirs("out", exist_ok=True)
+    # Restore original signal handler
+    signal.signal(signal.SIGINT, original_sigint)
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(all_company_data, f, indent=2, ensure_ascii=False)
+    # Final save (same as checkpoint but also clean up checkpoint file if done)
+    _save_checkpoint(all_company_data, completed_symbols, output_file)
+
+    all_done = not _stop_requested
+    if all_done and os.path.exists(CHECKPOINT_FILE):
+        os.remove(CHECKPOINT_FILE)
+        print("\nAll companies processed — checkpoint file removed.")
 
     print(f"\n{'=' * 60}")
     print(f"Results saved to {output_file}")
 
-    # Print summary statistics
-    total_events = sum(len(company["events"]) for company in all_company_data)
-    total_videos = sum(
-        sum(len(event["videos"]) for event in company["events"])
-        for company in all_company_data
-    )
+    if _stop_requested:
+        print("Run again to resume from where you left off.")
 
-    print(f"\nSummary:")
-    print(f"  Companies processed: {len(all_company_data)}")
-    print(f"  Total events discovered: {total_events}")
-    print(f"  Total videos fetched: {total_videos}")
-    print(f"  Average events per company: {total_events / len(all_company_data):.1f}")
-    print(f"  Average videos per company: {total_videos / len(all_company_data):.1f}")
+    # Print summary statistics
+    if all_company_data:
+        total_events = sum(len(company["events"]) for company in all_company_data)
+        total_videos = sum(
+            sum(len(event["videos"]) for event in company["events"])
+            for company in all_company_data
+        )
+
+        print(f"\nSummary:")
+        print(f"  Companies processed: {len(all_company_data)}")
+        print(f"  Total events discovered: {total_events}")
+        print(f"  Total videos fetched: {total_videos}")
+        print(
+            f"  Average events per company: {total_events / len(all_company_data):.1f}"
+        )
+        print(
+            f"  Average videos per company: {total_videos / len(all_company_data):.1f}"
+        )
 
 
 if __name__ == "__main__":

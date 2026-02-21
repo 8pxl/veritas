@@ -26,6 +26,8 @@ RULES — read carefully:
    - Duration consistent with the event type matters (e.g. earnings calls ~45-90 min,
      keynotes ~60-120 min, product launches ~30-90 min)
 7. Please keep the reasoning short, you can only use 300 tokens total in total for the response
+8. Give higher weight to longer videos (30 minutes)
+
 Return ONLY this JSON (no other text):
 {{
   "chosen_index": <integer>,
