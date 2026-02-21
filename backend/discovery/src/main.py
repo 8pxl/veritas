@@ -1,35 +1,32 @@
 import csv
 import json
 import os
-from youtube_types import *
+from rag import *
 from datetime import datetime
-from typing import cast
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
+from groq import Groq
 
-CATEGORIES = {
-    "investor_days": "investor day",
-    "earnings_calls": "earnings call",
-    "press_conferences": "press conference",
-    "product_launches": "product launch",
-    "public_interviews": "interview CEO",
-}
+import sys
 
-# Years to search (adjust as needed)
-years_range = tuple(map(int, input("enter start dates (space seperated): ").split()))
-YEARS = range(years_range[0], years_range[1])
+sys.path.append("src")
+from youtube_types import (
+    SearchListResponse,
+    CompanyData,
+    VideoInfo,
+    EventVideos,
+    CompanyEvent,
+)
 
 
 def parse_iso_date(date_str: str) -> datetime:
     """Parse ISO 8601 date string to datetime object."""
     return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
 
-
 def search_videos(
-    youtube, company_name: str, category: str, year: int, max_results: int = 10
+    youtube, search_query: str, year: int, max_results: int = 10
 ) -> list[VideoInfo]:
-    """Search for videos for a specific company, category, and year."""
-    query = f"{company_name} {category} {year}"
+    """Search for videos for a specific search query and year."""
 
     # Date range for the year
     published_after = f"{year}-01-01T00:00:00Z"
@@ -38,12 +35,12 @@ def search_videos(
     try:
         request = youtube.search().list(
             part="snippet",
-            q=query,
+            q=search_query,
             type="video",
             maxResults=max_results,
             publishedAfter=published_after,
             publishedBefore=published_before,
-            order="date",  # Sort by date
+            order="date",
             relevanceLanguage="en",
         )
         response: SearchListResponse = request.execute()
@@ -74,56 +71,98 @@ def search_videos(
         return videos
 
     except Exception as e:
-        print(f"Error searching for {company_name} - {category} ({year}): {e}")
+        print(f"Error searching for '{search_query}' ({year}): {e}")
         return []
 
 
-def fetch_company_videos(youtube, symbol: str, company_name: str) -> CompanyData:
-    """Fetch all videos for a company across all categories and years."""
-    print(f"Fetching videos for {symbol} - {company_name}")
+def fetch_company_videos(
+    youtube,
+    groq_client: Groq,
+    symbol: str,
+    company_name: str,
+    sector: str,
+    years: range,
+) -> CompanyData:
+    """Fetch all videos for a company using Groq-discovered events."""
+    print(f"\nFetching videos for {symbol} - {company_name}")
 
-    category_videos: CategoryVideos = {
-        "investor_days": [],
-        "earnings_calls": [],
-        "press_conferences": [],
-        "product_launches": [],
-        "public_interviews": [],
-    }
+    # Step 1: Discover events for this company using Groq
+    print("  Discovering company events with Groq...")
+    discovered_events = discover_company_events(
+        groq_client, company_name, symbol, sector
+    )
 
-    for category_key, category_query in CATEGORIES.items():
+    if not discovered_events:
+        print("  No events discovered, skipping company")
+        return CompanyData(symbol=symbol, name=company_name, events=[])
+
+    print(f"  Found {len(discovered_events)} events:")
+    for event in discovered_events:
+        print(f"    - {event['event_name']} ({event['frequency']})")
+
+    # Step 2: Search for videos for each discovered event
+    event_videos_list: list[EventVideos] = []
+
+    for event in discovered_events:
         all_videos = []
 
+        print(f"\n  Searching for: {event['event_name']}")
+
         # Search for each year separately
-        for year in YEARS:
-            videos = search_videos(youtube, company_name, category_query, year)
+        for year in years:
+            videos = search_videos(youtube, event["search_query"], year)
             all_videos.extend(videos)
+            if videos:
+                print(f"    {year}: {len(videos)} videos")
 
         # Sort all videos by date (newest first)
         all_videos.sort(key=lambda v: parse_iso_date(v["published_at"]), reverse=True)
 
-        category_videos[category_key] = all_videos
-        print(f"  {category_key}: {len(all_videos)} videos")
+        event_videos: EventVideos = {
+            "event_name": event["event_name"],
+            "search_query": event["search_query"],
+            "videos": all_videos,
+        }
+
+        event_videos_list.append(event_videos)
+        print(f"    Total: {len(all_videos)} videos")
 
     company_data: CompanyData = {
         "symbol": symbol,
         "name": company_name,
-        "videos": category_videos,
+        "events": event_videos_list,
     }
 
     return company_data
 
 
 def main():
-    """Main function to fetch videos for all SP500 companies."""
     load_dotenv()
-    api_key = os.getenv("YT_KEY")
 
-    if not api_key:
+    # Get API keys
+    yt_api_key = os.getenv("YT_KEY")
+    groq_api_key = os.getenv("GROQ_API_KEY")
+
+    if not yt_api_key:
         print("Error: YT_KEY not found in environment variables")
         return
 
-    youtube = build("youtube", "v3", developerKey=api_key)
+    if not groq_api_key:
+        print("Error: GROQ_API_KEY not found in environment variables")
+        return
 
+    # Initialize API clients
+    youtube = build("youtube", "v3", developerKey=yt_api_key)
+    groq_client = Groq(api_key=groq_api_key)
+
+    # Get year range from user
+    years_input = input("Enter year range (e.g., '2020 2025'): ").split()
+    start_year, end_year = int(years_input[0]), int(years_input[1])
+    years = range(start_year, end_year + 1)
+
+    print(f"Searching for videos from {start_year} to {end_year}")
+
+    # Read SP500 companies from CSV
     companies = []
     csv_path = "data/sp500.csv"
 
@@ -135,38 +174,73 @@ def main():
                     {
                         "symbol": row["Symbol"],
                         "name": row["Shortname"],
+                        "sector": row.get("Sector", ""),
                     }
                 )
     except FileNotFoundError:
         print(f"Error: {csv_path} not found")
         return
 
-    print(f"Found {len(companies)} companies to process\n")
+    print(f"\nFound {len(companies)} companies to process")
+
+    # Optional: limit number of companies for testing
+    limit = (
+        input("Process all companies? (y/n, or enter number to limit): ")
+        .strip()
+        .lower()
+    )
+    if limit != "y" and limit != "yes":
+        if limit.isdigit():
+            companies = companies[: int(limit)]
+        else:
+            companies = companies[:5]  # Default to 5 for testing
+
+    print(f"Processing {len(companies)} companies\n")
 
     # Fetch videos for each company
     all_company_data = []
 
     for i, company in enumerate(companies, 1):
-        if (i >= 2): 
-            break
+        print(f"\n{'=' * 60}")
         print(f"[{i}/{len(companies)}]")
-        company_data = fetch_company_videos(youtube, company["symbol"], company["name"])
-        all_company_data.append(company_data)
-        print()
+
+        try:
+            company_data = fetch_company_videos(
+                youtube,
+                groq_client,
+                company["symbol"],
+                company["name"],
+                company["sector"],
+                years,
+            )
+            all_company_data.append(company_data)
+        except Exception as e:
+            print(f"Error processing {company['name']}: {e}")
+            continue
 
     # Save to JSON file
-    output_file = "out/sp500_youtube_videos.json"
+    output_file = "out/sp500_youtube_videos_groq.json"
+    os.makedirs("out", exist_ok=True)
+
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(all_company_data, f, indent=2, ensure_ascii=False)
 
+    print(f"\n{'=' * 60}")
     print(f"Results saved to {output_file}")
 
     # Print summary statistics
+    total_events = sum(len(company["events"]) for company in all_company_data)
     total_videos = sum(
-        sum(len(videos) for videos in company["videos"].values())
+        sum(len(event["videos"]) for event in company["events"])
         for company in all_company_data
     )
-    print(f"\nTotal videos fetched: {total_videos}")
+
+    print(f"\nSummary:")
+    print(f"  Companies processed: {len(all_company_data)}")
+    print(f"  Total events discovered: {total_events}")
+    print(f"  Total videos fetched: {total_videos}")
+    print(f"  Average events per company: {total_events / len(all_company_data):.1f}")
+    print(f"  Average videos per company: {total_videos / len(all_company_data):.1f}")
 
 
 if __name__ == "__main__":

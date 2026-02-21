@@ -98,14 +98,21 @@ class VideoInfo(TypedDict):
     thumbnail_url: str
 
 
-class CategoryVideos(TypedDict):
-    """Videos for a specific category."""
+class CompanyEvent(TypedDict):
+    """Information about a discovered company event."""
 
-    investor_days: list[VideoInfo]
-    earnings_calls: list[VideoInfo]
-    press_conferences: list[VideoInfo]
-    product_launches: list[VideoInfo]
-    public_interviews: list[VideoInfo]
+    event_name: str
+    search_query: str
+    description: str
+    frequency: str
+
+
+class EventVideos(TypedDict):
+    """Videos for a specific event with metadata."""
+
+    event_name: str
+    search_query: str
+    videos: list[VideoInfo]
 
 
 class CompanyData(TypedDict):
@@ -113,4 +120,4 @@ class CompanyData(TypedDict):
 
     symbol: str
     name: str
-    videos: CategoryVideos
+    events: list[EventVideos]
