@@ -132,7 +132,9 @@ def main():
                     continue
 
         # Step 2: Analyze
-        if not args.skip_analysis:
+        if os.path.exists(output_path) and not args.skip_analysis:
+            print(f"  Analysis already exists: {output_path}, skipping")
+        elif not args.skip_analysis:
             if args.dry_run:
                 print(f"  [dry-run] Would analyze {video_path} -> {output_path}")
             else:
