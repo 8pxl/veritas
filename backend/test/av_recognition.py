@@ -385,7 +385,7 @@ def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = 
     transcript_for_speakers = _compress_transcript_for_speakers(transcript)
 
     # ── Phase 1: tool-use loop — research speakers ────────────
-    messages = [
+    messages: list = [
         {"role": "system", "content": _SYSTEM_PROMPT},
         {
             "role": "user",
@@ -403,9 +403,9 @@ Identify every speaker with their full name and title. Ensure that they are in o
     for i in range(100):
         resp = groq_call_with_retry(
             lambda: _groq.chat.completions.create(
-                model="openai/gpt-oss-20b",
-                messages=messages,
-                tools=_TOOLS,
+                model="llama-3.3-70b-versatile",
+                messages=messages,  # type: ignore[arg-type]
+                tools=_TOOLS,  # type: ignore[arg-type]
                 temperature=0,
             ),
             op_name=f"av_recognition.step1.turn_{i}",
@@ -414,15 +414,15 @@ Identify every speaker with their full name and title. Ensure that they are in o
         msg = resp.choices[0].message
 
         if msg.tool_calls:
-            messages.append(msg)
+            messages.append(msg)  # type: ignore[arg-type]
             _append_tool_results(messages, msg.tool_calls)
 
         else:
             # Model finished researching — append its summary
-            messages.append(msg)
+            messages.append(msg)  # type: ignore[arg-type]
             break
 
-    # ── Phase 2: structured output — continue the same conversation ────────
+    # ── Phase 2: structured JSON output ────────────────────────
     messages.append(
         {
             "role": "user",
@@ -433,44 +433,21 @@ Identify every speaker with their full name and title. Ensure that they are in o
             ),
         }
     )
-    data = {"segments": []}
-    for i in range(20):
-        structured_resp = groq_call_with_retry(
-            lambda: _groq.chat.completions.create(
-                model="openai/gpt-oss-20b",
-                messages=messages,
-                tools=_TOOLS,
-                temperature=0,
-            ),
-            op_name=f"av_recognition.step2.turn_{i}",
-        )
-        structured_msg = structured_resp.choices[0].message
-        if structured_msg.tool_calls:
-            messages.append(structured_msg)
-            _append_tool_results(messages, structured_msg.tool_calls)
-            continue
-        messages.append(structured_msg)
-        raw_content = structured_msg.content or "{}"
-        try:
-            data = json.loads(raw_content)
-            break
-        except json.JSONDecodeError:
-            start = raw_content.find("{")
-            end = raw_content.rfind("}")
-            if start != -1 and end != -1 and end > start:
-                try:
-                    data = json.loads(raw_content[start : end + 1])
-                    break
-                except json.JSONDecodeError:
-                    pass
-            messages.append(
-                {
-                    "role": "user",
-                    "content": (
-                        "Return only valid JSON with key 'segments'. No markdown, no prose."
-                    ),
-                }
-            )
+    data: dict = {"segments": []}
+    structured_resp = groq_call_with_retry(
+        lambda: _groq.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,  # type: ignore[arg-type]
+            temperature=0,
+            response_format={"type": "json_object"},
+        ),
+        op_name="av_recognition.step2",
+    )
+    raw_content = structured_resp.choices[0].message.content or "{}"
+    try:
+        data = json.loads(raw_content)
+    except json.JSONDecodeError:
+        print(f"  Warning: failed to parse JSON response: {raw_content[:200]}")
 
     speakers = data.get("segments", [])
 
