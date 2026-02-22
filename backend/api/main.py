@@ -83,6 +83,50 @@ def _verify_all_unverified():
         db.close()
 
 
+def _dedup_propositions():
+    """Remove duplicate propositions (same speaker_id + statement + video_id), keeping the lowest id."""
+    db = SessionLocal()
+    try:
+        # Find groups with duplicates
+        dupes = (
+            db.query(
+                PropositionDB.speaker_id,
+                PropositionDB.statement,
+                PropositionDB.video_id,
+                func.min(PropositionDB.id).label("keep_id"),
+                func.count(PropositionDB.id).label("cnt"),
+            )
+            .group_by(
+                PropositionDB.speaker_id,
+                PropositionDB.statement,
+                PropositionDB.video_id,
+            )
+            .having(func.count(PropositionDB.id) > 1)
+            .all()
+        )
+        removed = 0
+        for row in dupes:
+            extras = (
+                db.query(PropositionDB)
+                .filter(
+                    PropositionDB.speaker_id == row.speaker_id,
+                    PropositionDB.statement == row.statement,
+                    PropositionDB.video_id == row.video_id,
+                    PropositionDB.id != row.keep_id,
+                )
+                .all()
+            )
+            for p in extras:
+                db.delete(p)
+                removed += 1
+        if removed:
+            db.commit()
+            logger.info(f"Dedup: removed {removed} duplicate propositions")
+        return removed
+    finally:
+        db.close()
+
+
 def _background_verifier(stop_event: threading.Event):
     """Daemon thread that verifies propositions every 10 minutes."""
     while not stop_event.is_set():
@@ -97,6 +141,7 @@ def _background_verifier(stop_event: threading.Event):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _dedup_propositions()
     stop_event = threading.Event()
     t = threading.Thread(target=_background_verifier, args=(stop_event,), daemon=True)
     t.start()
@@ -384,6 +429,19 @@ def create_proposition(prop: PropositionCreate, db: Session = Depends(get_db)):
     video = db.get(VideoDB, prop.video_id)
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
+    # Dedup: return existing proposition if same speaker+statement+video
+    existing = (
+        db.query(PropositionDB)
+        .filter(
+            PropositionDB.speaker_id == prop.speaker_id,
+            PropositionDB.statement == prop.statement,
+            PropositionDB.video_id == prop.video_id,
+        )
+        .first()
+    )
+    if existing:
+        org = db.get(OrganizationDB, speaker.organization_id)
+        return _prop_to_schema(existing, speaker, org, video)
     db_prop = PropositionDB(
         speaker_id=prop.speaker_id,
         statement=prop.statement,
