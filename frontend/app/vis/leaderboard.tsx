@@ -26,9 +26,9 @@ function truthColor(value: number) {
   // Lerp from #BF5864 (0%) to #226F54 (100%)
   //0BBA54
   //EC596A
-  const r = Math.round(0x0B + (0xEC - 0x0B) * value)
-  const g = Math.round(0xBA + (0x59 - 0xBA) * value)
-  const b = Math.round(0x54 + (0x6A - 0x54) * value)
+  const r = Math.round(0x0B + (0xEC - 0x0B) * (Math.min(1, value * 2)))
+  const g = Math.round(0xBA + (0x59 - 0xBA) * (Math.min(1, value * 2)))
+  const b = Math.round(0x54 + (0x6A - 0x54) * (Math.min(1, value * 2)))
   return `rgb(${r}, ${g}, ${b})`
 }
 
