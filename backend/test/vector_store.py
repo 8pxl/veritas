@@ -12,6 +12,17 @@ class VectorStore:
             name, metadata={"hnsw:space": "cosine"}
         )
 
+    def reset_collections(self, names: list[str]):
+        for name in names:
+            try:
+                self._client.delete_collection(name)
+            except Exception:
+                pass
+            self._get_collection(name)
+
+    def reset_face_audio_collections(self):
+        self.reset_collections(["faces", "audio"])
+
     def add_face_embedding(self, embedding_id: str, embedding: list[float], metadata: dict):
         self._get_collection("faces").add(
             embeddings=[embedding], ids=[embedding_id], metadatas=[metadata]

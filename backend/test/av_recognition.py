@@ -358,6 +358,8 @@ def index_face_audio(av_path: str, transcript: str, desc: str, is_audio: bool = 
             speaker full names with their appearance times in the video.
     Step 2: Extract face and audio keypoints and add them to a vector database.
     """
+    _vector_store.reset_face_audio_collections()
+
     # ── Get duration ──────────────────────────────────────────
     duration = 0.0
     res = subprocess.run(
