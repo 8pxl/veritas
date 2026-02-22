@@ -235,7 +235,7 @@ export function VideoPlayer() {
       {/* Video + sidebar — same height via flex stretch */}
       <div className="flex gap-4">
         {/* Video */}
-        <div ref={videoContainerRef} className="relative flex-1 rounded-lg border bg-black aspect-video min-w-0 self-start">
+        <div ref={videoContainerRef} className="relative flex-1 rounded-lg border aspect-video min-w-0 self-start">
           <video
             ref={videoRef}
             key={selectedVideo.video_id}
@@ -264,7 +264,7 @@ export function VideoPlayer() {
           {propositions.length > 0 && (
             <button
               onClick={jumpToNextStatement}
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-black/60 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 transition-colors z-10"
+              className="absolute z-1 bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-black/60 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 transition-colors z-10"
             >
               <SkipForward className="size-3.5" />
               Jump to next statement
@@ -276,7 +276,7 @@ export function VideoPlayer() {
         {sortedPropositions.length > 0 && (
           <div
             ref={sidebarRef}
-            className="w-64 shrink-0 flex flex-col rounded-lg border overflow-hidden self-start"
+            className="w-48 shrink-0 flex flex-col rounded-lg border overflow-hidden self-start"
           >
             <div className="flex-1 overflow-y-auto divide-y divide-border flex flex-col">
               {sortedPropositions.map((prop) => {
