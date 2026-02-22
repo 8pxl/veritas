@@ -402,15 +402,29 @@ Identify every speaker with their full name and title. Ensure that they are in o
 
     print("Identifying speakers (with web search)...")
     for i in range(100):
-        resp = groq_call_with_retry(
-            lambda: _groq.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=messages,  # type: ignore[arg-type]
-                tools=_TOOLS,  # type: ignore[arg-type]
-                temperature=0,
-            ),
-            op_name=f"av_recognition.step1.turn_{i}",
-        )
+        try:
+            resp = groq_call_with_retry(
+                lambda: _groq.chat.completions.create(
+                    model="openai/gpt-oss-20b",
+                    messages=messages,  # type: ignore[arg-type]
+                    tools=_TOOLS,  # type: ignore[arg-type]
+                    temperature=0,
+                ),
+                op_name=f"av_recognition.step1.turn_{i}",
+            )
+        except groq.BadRequestError as e:
+            # Model produced a malformed tool call — nudge it to retry properly
+            body = e.body if hasattr(e, "body") else {}
+            failed = body.get("error", {}).get("failed_generation", "") if isinstance(body, dict) else ""
+            print(f"  Tool call failed, nudging model: {str(e)[:120]}")
+            messages.append({
+                "role": "user",
+                "content": (
+                    f"Your previous tool call was malformed: {failed}\n"
+                    "Please call the tool again using the correct format."
+                ),
+            })
+            continue
 
         msg = resp.choices[0].message
 
@@ -423,7 +437,19 @@ Identify every speaker with their full name and title. Ensure that they are in o
             messages.append(msg)  # type: ignore[arg-type]
             break
 
-    # ── Phase 2: structured JSON output ────────────────────────
+    # ── Phase 2: structured JSON output (use llama-3.3 for reliable json_object) ──
+    # Sanitize messages: strip reasoning fields from gpt-oss-20b assistant messages
+    clean_messages: list = []
+    for m in messages:
+        if hasattr(m, "model_dump"):
+            d = m.model_dump(exclude_none=True)
+            d.pop("reasoning", None)
+            d.pop("function_call", None)
+            clean_messages.append(d)
+        else:
+            clean_messages.append(m)
+    messages = clean_messages
+
     messages.append(
         {
             "role": "user",
