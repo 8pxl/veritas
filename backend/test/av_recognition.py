@@ -214,7 +214,7 @@ def _web_search(query: str, max_results: int = 5) -> str:
 def _lookup_speaker(speaker_id: str) -> dict:
     import requests
 
-    resp = requests.get("http://totsuki.harvey-l.com:7000/people/" + str(speaker_id))
+    resp = requests.get("https://api.totsuki.harvey-l.com/people/" + str(speaker_id))
     return resp.json()
 
 
@@ -225,7 +225,7 @@ def _db_search(query: str, max_results: int = 5) -> str:
     import requests
 
     results = requests.get(
-        "http://totsuki.harvey-l.com:7000/people/search", params={"q": query}
+        "https://api.totsuki.harvey-l.com/people/search", params={"q": query}
     ).json()
     for r in results:
         r["speakerId"] = r["id"]
@@ -236,7 +236,7 @@ def _db_insert(name: str, organization: str, role: str) -> str:
     import requests
 
     resp = requests.post(
-        "http://totsuki.harvey-l.com:7000/people",
+        "https://api.totsuki.harvey-l.com/people",
         json={"name": name, "organization": organization, "role": role},
     ).json()
     resp["speakerId"] = resp["id"]
@@ -415,15 +415,21 @@ Identify every speaker with their full name and title. Ensure that they are in o
         except groq.BadRequestError as e:
             # Model produced a malformed tool call — nudge it to retry properly
             body = e.body if hasattr(e, "body") else {}
-            failed = body.get("error", {}).get("failed_generation", "") if isinstance(body, dict) else ""
+            failed = (
+                body.get("error", {}).get("failed_generation", "")
+                if isinstance(body, dict)
+                else ""
+            )
             print(f"  Tool call failed, nudging model: {str(e)[:120]}")
-            messages.append({
-                "role": "user",
-                "content": (
-                    f"Your previous tool call was malformed: {failed}\n"
-                    "Please call the tool again using the correct format."
-                ),
-            })
+            messages.append(
+                {
+                    "role": "user",
+                    "content": (
+                        f"Your previous tool call was malformed: {failed}\n"
+                        "Please call the tool again using the correct format."
+                    ),
+                }
+            )
             continue
 
         msg = resp.choices[0].message
@@ -460,10 +466,12 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 items = parsed if isinstance(parsed, list) else [parsed]
                 for item in items:
                     if isinstance(item, dict) and item.get("speakerId"):
-                        known_speakers.append({
-                            "speakerId": item["speakerId"],
-                            "name": item.get("name", ""),
-                        })
+                        known_speakers.append(
+                            {
+                                "speakerId": item["speakerId"],
+                                "name": item.get("name", ""),
+                            }
+                        )
             except (json.JSONDecodeError, TypeError):
                 pass
 
