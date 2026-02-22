@@ -136,7 +136,7 @@ export function ExploreBar() {
       console.error(`Failed to fetch propositions for video ${video.video_id}:`, err)
       return []
     })
-    selectVideo(video, person, orgName, propositions as Proposition[])
+    selectVideo(video, person, orgName, propositions as any[])
   }, [personData, selectVideo])
 
   return (
