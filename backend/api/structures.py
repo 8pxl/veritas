@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 # --- 1. Organization ---
@@ -85,3 +85,42 @@ class Proposition(BaseModel):
     verdict: Optional[str] = None
     verdictReasoning: Optional[str] = None
     verifiedAt: Optional[datetime] = None
+
+
+# --- 5. Stats ---
+class VerdictCounts(BaseModel):
+    true: int = 0
+    false: int = 0
+    future: int = 0
+    unverified: int = 0
+
+class OverallStats(BaseModel):
+    total: int
+    verified: int
+    verdictCounts: VerdictCounts
+    truthIndex: Optional[float] = None  # true / (true + false), null if no true/false
+
+class PersonStats(BaseModel):
+    person: Person
+    total: int
+    verdictCounts: VerdictCounts
+    truthIndex: Optional[float] = None
+
+class OrganizationStats(BaseModel):
+    organization: Organization
+    total: int
+    verdictCounts: VerdictCounts
+    truthIndex: Optional[float] = None
+
+class VideoStats(BaseModel):
+    video: Video
+    total: int
+    verdictCounts: VerdictCounts
+    truthIndex: Optional[float] = None
+
+class LeaderboardEntry(BaseModel):
+    person: Person
+    truthIndex: Optional[float] = None
+    total: int
+    trueCount: int
+    falseCount: int

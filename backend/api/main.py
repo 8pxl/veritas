@@ -22,13 +22,27 @@ from structures import (
     Proposition,
     PropositionCreate,
     PropositionUpdate,
+    VerdictCounts,
+    OverallStats,
+    PersonStats,
+    OrganizationStats,
+    VideoStats,
+    LeaderboardEntry,
 )
 from verifier import verify_proposition
-from typing import List
+from typing import List, Optional
 from datetime import datetime
+from sqlalchemy import func, case
 import uuid
 
 logger = logging.getLogger(__name__)
+
+
+def _model_dump(obj, **kwargs):
+    """Pydantic v1/v2 compatible model serialization."""
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump(**kwargs)
+    return obj.dict(**kwargs)
 
 Base.metadata.create_all(bind=engine)
 
@@ -173,7 +187,7 @@ def update_organization(
     org = db.get(OrganizationDB, org_id)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
-    for field, value in data.model_dump(exclude_unset=True).items():
+    for field, value in _model_dump(data, exclude_unset=True).items():
         setattr(org, field, value)
     db.commit()
     db.refresh(org)
@@ -286,7 +300,7 @@ def update_person(person_id: str, data: PersonUpdate, db: Session = Depends(get_
     p = db.get(PersonDB, person_id)
     if not p:
         raise HTTPException(status_code=404, detail="Person not found")
-    updates = data.model_dump(exclude_unset=True)
+    updates = _model_dump(data, exclude_unset=True)
     if "name" in updates:
         p.name = updates["name"]
     if "role" in updates:
@@ -317,7 +331,7 @@ def create_video(video: VideoCreate, db: Session = Depends(get_db)):
     db_video = db.get(VideoDB, video.video_id)
     if db_video:
         return _video_to_schema(db_video)
-    db_video = VideoDB(**video.model_dump())
+    db_video = VideoDB(**_model_dump(video))
     db.add(db_video)
     db.commit()
     db.refresh(db_video)
@@ -342,7 +356,7 @@ def update_video(video_id: str, data: VideoUpdate, db: Session = Depends(get_db)
     v = db.get(VideoDB, video_id)
     if not v:
         raise HTTPException(status_code=404, detail="Video not found")
-    for field, value in data.model_dump(exclude_unset=True).items():
+    for field, value in _model_dump(data, exclude_unset=True).items():
         setattr(v, field, value)
     db.commit()
     db.refresh(v)
@@ -413,7 +427,7 @@ def update_proposition(
     p = db.get(PropositionDB, prop_id)
     if not p:
         raise HTTPException(status_code=404, detail="Proposition not found")
-    updates = data.model_dump(exclude_unset=True)
+    updates = _model_dump(data, exclude_unset=True)
     if "speaker_id" in updates:
         if not db.get(PersonDB, updates["speaker_id"]):
             raise HTTPException(status_code=404, detail="Speaker not found")
@@ -491,3 +505,206 @@ def get_propositions_by_person(person_id: str, db: Session = Depends(get_db)):
         _prop_to_schema(p, person_db, org_db, db.get(VideoDB, p.video_id))
         for p in props
     ]
+
+
+# ========== Stats ==========
+
+
+def _verdict_counts(props) -> VerdictCounts:
+    counts = VerdictCounts()
+    for p in props:
+        if p.verdict == "true":
+            counts.true += 1
+        elif p.verdict == "false":
+            counts.false += 1
+        elif p.verdict == "future":
+            counts.future += 1
+        else:
+            counts.unverified += 1
+    return counts
+
+
+def _truth_index(counts: VerdictCounts) -> Optional[float]:
+    decided = counts.true + counts.false
+    if decided == 0:
+        return None
+    return round(counts.true / decided, 4)
+
+
+@app.get("/stats/overview", response_model=OverallStats)
+def get_overall_stats(db: Session = Depends(get_db)):
+    """Overall truth index and verdict breakdown across all propositions."""
+    props = db.query(PropositionDB).all()
+    counts = _verdict_counts(props)
+    return OverallStats(
+        total=len(props),
+        verified=counts.true + counts.false + counts.future,
+        verdictCounts=counts,
+        truthIndex=_truth_index(counts),
+    )
+
+
+@app.get("/stats/by-person", response_model=List[PersonStats])
+def get_stats_by_person(db: Session = Depends(get_db)):
+    """Truth index per speaker, sorted by number of propositions descending."""
+    rows = (
+        db.query(PropositionDB.speaker_id)
+        .group_by(PropositionDB.speaker_id)
+        .all()
+    )
+    results = []
+    for (speaker_id,) in rows:
+        person = db.get(PersonDB, speaker_id)
+        org = db.get(OrganizationDB, person.organization_id)
+        props = db.query(PropositionDB).filter(
+            PropositionDB.speaker_id == speaker_id
+        ).all()
+        counts = _verdict_counts(props)
+        results.append(
+            PersonStats(
+                person=_person_to_schema(person, org),
+                total=len(props),
+                verdictCounts=counts,
+                truthIndex=_truth_index(counts),
+            )
+        )
+    results.sort(key=lambda s: s.total, reverse=True)
+    return results
+
+
+@app.get("/stats/by-organization", response_model=List[OrganizationStats])
+def get_stats_by_organization(db: Session = Depends(get_db)):
+    """Truth index per organization, sorted by number of propositions descending."""
+    rows = (
+        db.query(PersonDB.organization_id)
+        .join(PropositionDB, PropositionDB.speaker_id == PersonDB.id)
+        .group_by(PersonDB.organization_id)
+        .all()
+    )
+    results = []
+    for (org_id,) in rows:
+        org = db.get(OrganizationDB, org_id)
+        props = (
+            db.query(PropositionDB)
+            .join(PersonDB, PropositionDB.speaker_id == PersonDB.id)
+            .filter(PersonDB.organization_id == org_id)
+            .all()
+        )
+        counts = _verdict_counts(props)
+        results.append(
+            OrganizationStats(
+                organization=_org_to_schema(org),
+                total=len(props),
+                verdictCounts=counts,
+                truthIndex=_truth_index(counts),
+            )
+        )
+    results.sort(key=lambda s: s.total, reverse=True)
+    return results
+
+
+@app.get("/stats/by-video", response_model=List[VideoStats])
+def get_stats_by_video(db: Session = Depends(get_db)):
+    """Truth index per video, sorted by number of propositions descending."""
+    rows = (
+        db.query(PropositionDB.video_id)
+        .group_by(PropositionDB.video_id)
+        .all()
+    )
+    results = []
+    for (video_id,) in rows:
+        video = db.get(VideoDB, video_id)
+        props = db.query(PropositionDB).filter(
+            PropositionDB.video_id == video_id
+        ).all()
+        counts = _verdict_counts(props)
+        results.append(
+            VideoStats(
+                video=_video_to_schema(video),
+                total=len(props),
+                verdictCounts=counts,
+                truthIndex=_truth_index(counts),
+            )
+        )
+    results.sort(key=lambda s: s.total, reverse=True)
+    return results
+
+
+@app.get("/stats/leaderboard", response_model=List[LeaderboardEntry])
+def get_truth_leaderboard(
+    order: str = Query("most_honest", regex="^(most_honest|biggest_liars)$"),
+    min_claims: int = Query(1, ge=1, description="Minimum true+false claims to qualify"),
+    db: Session = Depends(get_db),
+):
+    """Rank speakers by truth index. `most_honest` = highest truth index first,
+    `biggest_liars` = lowest truth index first. Only includes speakers with
+    at least `min_claims` decided (true/false) propositions."""
+    rows = (
+        db.query(PropositionDB.speaker_id)
+        .group_by(PropositionDB.speaker_id)
+        .all()
+    )
+    entries = []
+    for (speaker_id,) in rows:
+        person = db.get(PersonDB, speaker_id)
+        org = db.get(OrganizationDB, person.organization_id)
+        props = db.query(PropositionDB).filter(
+            PropositionDB.speaker_id == speaker_id
+        ).all()
+        counts = _verdict_counts(props)
+        decided = counts.true + counts.false
+        if decided < min_claims:
+            continue
+        ti = _truth_index(counts)
+        entries.append(
+            LeaderboardEntry(
+                person=_person_to_schema(person, org),
+                truthIndex=ti,
+                total=len(props),
+                trueCount=counts.true,
+                falseCount=counts.false,
+            )
+        )
+    reverse = order == "most_honest"
+    entries.sort(key=lambda e: (e.truthIndex or 0, e.total), reverse=reverse)
+    return entries
+
+
+@app.get("/people/{person_id}/stats", response_model=PersonStats)
+def get_person_stats(person_id: str, db: Session = Depends(get_db)):
+    """Truth index and verdict breakdown for a single speaker."""
+    person = db.get(PersonDB, person_id)
+    if not person:
+        raise HTTPException(status_code=404, detail="Person not found")
+    org = db.get(OrganizationDB, person.organization_id)
+    props = db.query(PropositionDB).filter(
+        PropositionDB.speaker_id == person_id
+    ).all()
+    counts = _verdict_counts(props)
+    return PersonStats(
+        person=_person_to_schema(person, org),
+        total=len(props),
+        verdictCounts=counts,
+        truthIndex=_truth_index(counts),
+    )
+
+
+@app.get("/organizations/{org_id}/stats", response_model=OrganizationStats)
+def get_organization_stats(org_id: int, db: Session = Depends(get_db)):
+    """Truth index and verdict breakdown for a single organization."""
+    org = db.get(OrganizationDB, org_id)
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    props = (
+        db.query(PropositionDB)
+        .join(PersonDB, PropositionDB.speaker_id == PersonDB.id)
+        .filter(PersonDB.organization_id == org_id)
+        .all()
+    )
+    counts = _verdict_counts(props)
+    return OrganizationStats(
+        organization=_org_to_schema(org),
+        total=len(props),
+        verdictCounts=counts,
+        truthIndex=_truth_index(counts),
+    )
