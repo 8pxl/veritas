@@ -182,12 +182,22 @@ def _person_to_schema(p: PersonDB, org: OrganizationDB) -> Person:
 
 
 def _video_to_schema(v: VideoDB) -> Video:
+    # transform video url
+    video_url = v.video_url
+    if v.video_url.contains("youtube.com/watch?v="):
+        # https://vid.totsuki.harvey-l.com/<ID>.?
+        exts = ["mp4", "webm", "mkv"]
+        for ext in exts:
+            path = f"/usr/share/vid/{v.video_id}.{ext}"
+            if os.path.exists(path):
+                video_url = "https://vid.totsuki.harvey-l.com/" + v.video_id + "." + ext
+
     return Video(
         video_id=v.video_id,
         video_path=v.video_path,
         title=v.title,
         description=v.description,
-        video_url=v.video_url,
+        video_url=video_url,
         time=v.time,
     )
 
@@ -388,23 +398,6 @@ def create_video(video: VideoCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_video)
     return _video_to_schema(db_video)
-
-
-@app.get("/videos/{video_id}/stream")
-def stream_video(video_id: str):
-    ## Check ext: webm, mp4, mkv
-    exts = ["mp4", "webm", "mkv"]
-    media_types = [
-        "video/mp4",
-        "video/webm",
-        "video/x-matroska",
-    ]
-    for ext, media_type in zip(exts, media_types):
-        path = f"./video_storage/{video_id}.{ext}"
-        if os.path.exists(path):
-            return FileResponse(
-                path, media_type=media_type, filename=f"{video_id}.{ext}"
-            )
 
 
 @app.get("/videos/{video_id}/results")
