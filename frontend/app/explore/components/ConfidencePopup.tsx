@@ -162,11 +162,11 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
         <CardContent className="flex flex-col gap-3">
           {/* Speaker info */}
           <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold">{proposition.speaker?.name ?? "Unknown Speaker"}</span>
+            <span className="text-sm font-semibold truncate">{proposition.speaker?.name ?? "Unknown Speaker"}</span>
             {proposition.speaker?.position ? (
-              <span className="text-xs text-white/50">{proposition.speaker.position}</span>
+              <span className="text-xs text-white/50 truncate">{proposition.speaker.position}</span>
             ) : (
-              <span className="text-xs text-white/30 italic">No position available</span>
+              <span className="text-xs text-white/30 italic truncate">No position available</span>
             )}
           </div>
 
@@ -206,25 +206,75 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
+// ─── Facial Confidence Popup (Bottom Left) ───────────────────────────────────
+
+interface FacialConfidencePopupProps {
+  proposition: PropositionsWithAnalysis
+  visible: boolean
+  controlsVisible?: boolean
+}
+
+export function FacialConfidencePopup({ proposition, visible, controlsVisible = false }: FacialConfidencePopupProps) {
+  const [animState, setAnimState] = useState<"entering" | "visible" | "exiting" | "hidden">("hidden")
+
+  useEffect(() => {
+    if (visible) {
+      setAnimState("entering")
+      const frame = requestAnimationFrame(() => {
+        setAnimState("visible")
+      })
+      return () => cancelAnimationFrame(frame)
+    } else {
+      setAnimState("exiting")
+      const timer = setTimeout(() => {
+        setAnimState("hidden")
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [visible])
+
+  if (animState === "hidden") return null
+
+  const show = animState === "visible"
+  const facial = proposition.facial_confidence
+  const hasFacial = facial && !facial.error
+
+  if (!hasFacial) return null
+
+  const bottomClass = controlsVisible ? "bottom-16" : "bottom-4"
+
+  return (
+    <div className={`absolute left-4 ${bottomClass} z-20 w-80 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+      <Card className="border-white/10 bg-black/25 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-2">
+            <Eye className="size-4 text-white/40" />
+            <CardTitle className="text-sm">Facial Analysis</CardTitle>
+          </div>
+        </CardHeader>
+
+        <CardContent className="flex flex-col gap-3">
           {/* Facial confidence */}
-          {hasFacial && (
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-1.5">
-                <Eye className="size-3 text-white/40" />
-                <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">Facial Confidence</span>
-                <span className="ml-auto text-xs font-semibold text-white/80">{Math.round(facial.confidence_score * 100)}%</span>
-              </div>
-              <ScoreBar value={facial.confidence_score} height="h-1.5" showValue={false} />
-              {facial.components && (
-                <div className="flex flex-col gap-1 pt-0.5 ">
-                  {Object.entries(facial.components).map(([k, v]) => (
-                    <ScoreBar key={k} label={k} value={v as number} />
-                  ))}
-                </div>
-              )}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">Facial Confidence</span>
+              <span className="ml-auto text-xs font-semibold text-white/80">{Math.round(facial.confidence_score * 100)}%</span>
             </div>
-          )}
+            <ScoreBar value={facial.confidence_score} height="h-1.5" showValue={false} />
+            {facial.components && (
+              <div className="flex flex-col gap-1 pt-0.5">
+                {Object.entries(facial.components).map(([k, v]) => (
+                  <ScoreBar key={k} label={k} value={v as number} />
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
