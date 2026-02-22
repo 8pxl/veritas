@@ -2,22 +2,10 @@
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react"
 import { PropositionsWithAnalysis, useExploreStore } from "../stores/useExploreStore"
-import { PropositionPopup, AudioEmotionOverlay } from "./ConfidencePopup"
-import { SkipForward } from "lucide-react"
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-} from "recharts"
-
-const DISMISS_AFTER = 8
-
-function parseTimestamp(verifyAt: string): number {
-  const num = Number(verifyAt)
-  if (!isNaN(num)) return num
-  const parts = verifyAt.split(":").map(Number)
-  if (parts.length === 2) return parts[0] * 60 + parts[1]
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
-  return 0
-}
+import { parseTimestamp, formatTimestamp, DISMISS_AFTER } from "./videoPlayerUtils"
+import { VideoContainer } from "./VideoContainer"
+import { TimestampSidebar } from "./TimestampSidebar"
+import { ConfidenceChart, ChartDataPoint } from "./ConfidenceChart"
 
 export function VideoPlayer() {
   const { selectedVideo, selectedPerson, selectedOrgName, propositions } = useExploreStore()
@@ -34,8 +22,6 @@ export function VideoPlayer() {
   const visibleChartCountRef = useRef(0)
   const [visibleChartCount, setVisibleChartCount] = useState(0)
 
-  // Ref to active sidebar row for auto-scroll
-  const activeRowRef = useRef<HTMLButtonElement | null>(null)
   // Refs for same-height layout
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -56,27 +42,27 @@ export function VideoPlayer() {
 
   const sortedPropositions = useMemo(
     () => [...propositions].sort((a, b) => parseTimestamp(a.start) - parseTimestamp(b.start)),
-    [propositions]
+    [propositions],
   )
   const sortedPropositionsRef = useRef(sortedPropositions)
-  useEffect(() => { sortedPropositionsRef.current = sortedPropositions }, [sortedPropositions])
+  useEffect(() => {
+    sortedPropositionsRef.current = sortedPropositions
+  }, [sortedPropositions])
 
-  const allChartData = useMemo(() =>
-    sortedPropositions.map((prop) => {
-      const ts = parseTimestamp(prop.start)
-      const m = Math.floor(ts / 60)
-      const s = Math.floor(ts % 60)
-      return {
-        label: `${m}:${String(s).padStart(2, "0")}`,
-        audio: prop.audio_confidence?.confidence_score != null
-          ? Math.round(prop.audio_confidence.confidence_score * 100)
-          : null,
-        facial: prop.facial_confidence && !prop.facial_confidence.error
-          ? Math.round(prop.facial_confidence.confidence_score * 100)
-          : null,
-      }
-    }),
-    [sortedPropositions]
+  const allChartData: ChartDataPoint[] = useMemo(
+    () =>
+      sortedPropositions.map((prop) => ({
+        label: formatTimestamp(parseTimestamp(prop.start)),
+        audio:
+          prop.audio_confidence?.confidence_score != null
+            ? Math.round(prop.audio_confidence.confidence_score * 100)
+            : null,
+        facial:
+          prop.facial_confidence && !prop.facial_confidence.error
+            ? Math.round(prop.facial_confidence.confidence_score * 100)
+            : null,
+      })),
+    [sortedPropositions],
   )
 
   // Reset everything on video change
@@ -94,11 +80,6 @@ export function VideoPlayer() {
       dismissTimerRef.current = null
     }
   }, [selectedVideo?.video_id])
-
-  // Auto-scroll the highlighted list item into view
-  useEffect(() => {
-    activeRowRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" })
-  }, [activeProposition?.id])
 
   const updateTimeTracking = useCallback((currentTime: number) => {
     const sorted = sortedPropositionsRef.current
@@ -168,7 +149,6 @@ export function VideoPlayer() {
   }, [])
 
   const handlePause = useCallback(() => {
-    // Cancel auto-dismiss while paused so popup lingers
     if (dismissTimerRef.current) {
       clearTimeout(dismissTimerRef.current)
       dismissTimerRef.current = null
@@ -176,7 +156,6 @@ export function VideoPlayer() {
   }, [])
 
   const handlePlay = useCallback(() => {
-    // Restart dismiss timer if popup is still showing
     if (popupVisibleRef.current) {
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
       dismissTimerRef.current = setTimeout(() => {
@@ -204,7 +183,9 @@ export function VideoPlayer() {
   const jumpToNextStatement = useCallback(() => {
     if (!videoRef.current || propositions.length === 0) return
     const currentTime = videoRef.current.currentTime
-    const next = sortedPropositionsRef.current.find((p) => parseTimestamp(p.start) > currentTime + 0.5)
+    const next = sortedPropositionsRef.current.find(
+      (p) => parseTimestamp(p.start) > currentTime + 0.5,
+    )
     if (next) {
       videoRef.current.currentTime = parseTimestamp(next.start)
       videoRef.current.play()
@@ -228,136 +209,41 @@ export function VideoPlayer() {
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">{selectedVideo.title}</h2>
         <p className="text-sm text-muted-foreground">
-          {selectedPerson?.name ?? ""} &middot; {selectedOrgName ?? ""} &middot; {selectedVideo.time}
+          {selectedPerson?.name ?? ""} &middot; {selectedOrgName ?? ""} &middot;{" "}
+          {selectedVideo.time}
         </p>
       </div>
 
-      {/* Video + sidebar — same height via flex stretch */}
+      {/* Video + sidebar */}
       <div className="flex gap-4">
-        {/* Video */}
-        <div ref={videoContainerRef} className="relative flex-1 rounded-lg border aspect-video min-w-0 self-start">
-          <video
-            ref={videoRef}
-            key={selectedVideo.video_id}
-            src={selectedVideo.video_url}
-            controls
-            className="h-full w-full rounded-lg"
-            disablePictureInPicture
-            onTimeUpdate={handleTimeUpdate}
-            onSeeked={handleSeeked}
-            onPause={handlePause}
-            onPlay={handlePlay}
-          />
-          {activeProposition && (
-            <PropositionPopup
-              proposition={activeProposition}
-              visible={popupVisible}
-              onDismiss={handleDismiss}
-            />
-          )}
-          {activeProposition && (
-            <AudioEmotionOverlay
-              proposition={activeProposition}
-              visible={popupVisible}
-            />
-          )}
-          {propositions.length > 0 && (
-            <button
-              onClick={jumpToNextStatement}
-              className="absolute z-1 bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-black/60 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 transition-colors z-10"
-            >
-              <SkipForward className="size-3.5" />
-              Jump to next statement
-            </button>
-          )}
-        </div>
+        <VideoContainer
+          ref={videoRef}
+          containerRef={videoContainerRef}
+          videoId={selectedVideo.video_id}
+          videoUrl={selectedVideo.video_url}
+          activeProposition={activeProposition}
+          popupVisible={popupVisible}
+          hasPropositions={propositions.length > 0}
+          onTimeUpdate={handleTimeUpdate}
+          onSeeked={handleSeeked}
+          onPause={handlePause}
+          onPlay={handlePlay}
+          onDismiss={handleDismiss}
+          onJumpNext={jumpToNextStatement}
+        />
 
-        {/* Propositions sidebar — height synced to video via ResizeObserver */}
         {sortedPropositions.length > 0 && (
-          <div
+          <TimestampSidebar
             ref={sidebarRef}
-            className="w-48 shrink-0 flex flex-col rounded-lg border overflow-hidden self-start"
-          >
-            <div className="flex-1 overflow-y-auto divide-y divide-border flex flex-col">
-              {sortedPropositions.map((prop) => {
-                const ts = parseTimestamp(prop.start)
-                const minutes = Math.floor(ts / 60)
-                const seconds = Math.floor(ts % 60)
-                const timeLabel = `${minutes}:${String(seconds).padStart(2, "0")}`
-                const verdict = prop.verdict?.toLowerCase()
-                const isActive = prop.start === activeProposition?.start
-                return (
-                  <button
-                    key={`${prop.id}-${prop.start}`}
-                    ref={isActive ? activeRowRef : null}
-                    onClick={() => jumpToProposition(prop)}
-                    className={`flex items-start gap-2 px-3 py-2.5 text-left transition-all shrink-0 ${isActive
-                      ? "bg-accent/15 border-l-4 border-accent pl-2"
-                      : "hover:bg-muted/50 border-l-4 border-transparent pl-2"
-                      }`}
-                  >
-                    <span className={`shrink-0 text-[10px] font-mono w-8 pt-0.5 ${isActive ? "text-accent font-bold" : "text-muted-foreground"}`}>
-                      {timeLabel}
-                    </span>
-                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                      <span className={`text-xs leading-snug line-clamp-2 ${isActive ? "text-accent font-semibold" : "text-foreground"}`}>
-                        {prop.statement}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">{prop.speaker?.name ?? "Unknown"}</span>
-                    </div>
-                    {verdict && (
-                      <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${verdict === "true" ? "bg-green-500/15 text-green-600" :
-                        verdict === "false" ? "bg-red-500/15 text-red-600" :
-                          "bg-yellow-500/15 text-yellow-600"
-                        }`}>
-                        {verdict === "true" ? "✓" : verdict === "false" ? "✗" : "?"}
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+            propositions={sortedPropositions}
+            activeProposition={activeProposition}
+            onJumpTo={jumpToProposition}
+          />
         )}
       </div>
 
       {/* Sliding-window confidence chart */}
-      {allChartData.length > 1 && (
-        <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <ResponsiveContainer width="100%" height={160}>
-            <AreaChart
-              data={visibleChartData}
-              margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="colorAudio" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#894048" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#894048" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="label" hide />
-              <YAxis domain={[0, 100]} hide />
-              <Tooltip
-                contentStyle={{ fontSize: 11, background: "#FFF4E9", border: "1px solid #894048", borderRadius: 6 }}
-                formatter={(v) => [`${v ?? ""}%`]}
-              />
-              <Area
-                type="monotone"
-                dataKey="audio"
-                name="Audio"
-                stroke="#894048"
-                strokeWidth={2}
-                fill="url(#colorAudio)"
-                dot={false}
-                connectNulls
-                isAnimationActive
-                animationDuration={400}
-                animationEasing="ease-out"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+      <ConfidenceChart data={visibleChartData} />
     </div>
   )
 }
