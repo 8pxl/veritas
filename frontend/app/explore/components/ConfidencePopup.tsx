@@ -39,10 +39,10 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   const pct = Math.round(value * 100)
   const color = pct >= 70 ? "bg-green-400" : pct >= 40 ? "bg-yellow-400" : "bg-red-400"
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 transition-all">
       <span className="w-28 shrink-0 text-[10px] text-white/50 truncate capitalize">{label.replace(/_/g, " ")}</span>
       <div className="flex-1 h-1 rounded-full bg-white/10">
-        <div className={`h-1 rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+        <div className={`h-1 rounded-full ${color} transition-all duration-1000`} style={{ width: `${pct}%` }} />
       </div>
       <span className="w-6 text-right text-[10px] text-white/50">{pct}</span>
     </div>
@@ -85,16 +85,16 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
   const verdict = proposition.verdict?.toLowerCase()
   const verdictColor =
     verdict === "true" ? "text-green-400" :
-    verdict === "false" ? "text-red-400" :
-    "text-yellow-400"
+      verdict === "false" ? "text-red-400" :
+        "text-yellow-400"
   const VerdictIcon =
     verdict === "true" ? CheckCircle :
-    verdict === "false" ? XCircle :
-    AlertTriangle
+      verdict === "false" ? XCircle :
+        AlertTriangle
 
   return (
     <div className={`absolute right-4 top-4 z-20 w-80 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"}`}>
-      <Card className="border-white/10 bg-black/70 text-white backdrop-blur-xl shadow-2xl py-4 gap-3">
+      <Card className="border-white/10 bg-black/1 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
         <CardHeader className="pb-0">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
               </div>
               <div className="h-1.5 w-full rounded-full bg-white/10">
                 <div
-                  className={`h-1.5 rounded-full transition-all ${audio.confidence_score >= 0.7 ? "bg-green-400" : audio.confidence_score >= 0.4 ? "bg-yellow-400" : "bg-red-400"}`}
+                  className={`h-1.5 rounded-full transition-all duration-1000 ${audio.confidence_score >= 0.7 ? "bg-green-400" : audio.confidence_score >= 0.4 ? "bg-yellow-400" : "bg-red-400"}`}
                   style={{ width: `${Math.round(audio.confidence_score * 100)}%` }}
                 />
               </div>
@@ -175,7 +175,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
                 />
               </div>
               {facial.components && (
-                <div className="flex flex-col gap-1 pt-0.5">
+                <div className="flex flex-col gap-1 pt-0.5 ">
                   {Object.entries(facial.components).map(([k, v]) => (
                     <ScoreBar key={k} label={k} value={v as number} />
                   ))}
@@ -192,15 +192,15 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
 // ─── Left-side audio / emotion overlay ───────────────────────────────────────
 
 const EMOTION_COLORS: Record<string, string> = {
-  happy:    "#fbbf24",
-  joy:      "#fbbf24",
-  neutral:  "#94a3b8",
-  sad:      "#60a5fa",
-  sadness:  "#60a5fa",
-  angry:    "#f87171",
-  anger:    "#f87171",
-  fear:     "#c084fc",
-  disgust:  "#4ade80",
+  happy: "#fbbf24",
+  joy: "#fbbf24",
+  neutral: "#94a3b8",
+  sad: "#60a5fa",
+  sadness: "#60a5fa",
+  angry: "#f87171",
+  anger: "#f87171",
+  fear: "#c084fc",
+  disgust: "#4ade80",
   surprise: "#fb923c",
 }
 
@@ -217,7 +217,7 @@ function buildWaveformPath(propId: number, f0Std: number, f0Range: number): stri
   const amp = Math.max(Math.min(f0Std / Math.max(f0Range, 1), 0.42), 0.12)
   const ph1 = ((seed * 31) % 1000) / 1000 * Math.PI * 2
   const ph2 = ((seed * 53) % 1000) / 1000 * Math.PI * 2
-  const n   = 48
+  const n = 48
   const pts = Array.from({ length: n }, (_, i) => {
     const t = i / (n - 1)
     const y = 0.5
@@ -260,13 +260,13 @@ export function AudioEmotionOverlay({
     }
   }, [visible])
 
-  const audio  = proposition.audio_confidence
+  const audio = proposition.audio_confidence
   const facial = proposition.facial_confidence
   const hasFacial = facial && !facial.error
 
   const wavePath = useMemo(() => buildWaveformPath(
     proposition.id,
-    audio?.features?.f0_std   ?? 30,
+    audio?.features?.f0_std ?? 30,
     audio?.features?.f0_range ?? 100,
   ), [audio, proposition.id])
 
@@ -278,13 +278,13 @@ export function AudioEmotionOverlay({
     const entries =
       Object.keys(dominantCounts).length > 0
         ? Object.entries(dominantCounts).map(([name, count]) => ({
-            name,
-            value: count as number,
-          }))
+          name,
+          value: count as number,
+        }))
         : Object.entries(emotions).map(([name, val]) => ({
-            name,
-            value: val.mean,
-          }))
+          name,
+          value: val.mean,
+        }))
     const total = entries.reduce((s, e) => s + e.value, 0) || 1
     return entries
       .map((e) => ({ ...e, pct: e.value / total }))
@@ -300,9 +300,8 @@ export function AudioEmotionOverlay({
 
   return (
     <div
-      className={`absolute left-4 top-4 z-20 w-44 transition-all duration-500 ease-in-out ${
-        show ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"
-      }`}
+      className={`absolute left-4 top-4 z-20 w-44 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"
+        }`}
     >
       <div className="rounded-xl border border-white/10 bg-black/75 backdrop-blur-xl shadow-2xl p-3 flex flex-col gap-3">
         {/* Pitch waveform — plain SVG, always visible */}
@@ -316,7 +315,7 @@ export function AudioEmotionOverlay({
           <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="w-full overflow-visible">
             <defs>
               <linearGradient id="wfGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#f472b6" stopOpacity={0.55} />
+                <stop offset="0%" stopColor="#f472b6" stopOpacity={0.55} />
                 <stop offset="100%" stopColor="#894048" stopOpacity={0.03} />
               </linearGradient>
             </defs>

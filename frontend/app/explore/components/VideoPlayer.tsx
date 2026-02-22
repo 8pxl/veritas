@@ -241,7 +241,7 @@ export function VideoPlayer() {
             key={selectedVideo.video_id}
             src={selectedVideo.video_url}
             controls
-            className="h-full w-full"
+            className="h-full w-full rounded-lg"
             disablePictureInPicture
             onTimeUpdate={handleTimeUpdate}
             onSeeked={handleSeeked}
@@ -291,11 +291,10 @@ export function VideoPlayer() {
                     key={`${prop.id}-${prop.start}`}
                     ref={isActive ? activeRowRef : null}
                     onClick={() => jumpToProposition(prop)}
-                    className={`flex items-start gap-2 px-3 py-2.5 text-left transition-all shrink-0 ${
-                      isActive
-                        ? "bg-accent/15 border-l-4 border-accent pl-2"
-                        : "hover:bg-muted/50 border-l-4 border-transparent pl-2"
-                    }`}
+                    className={`flex items-start gap-2 px-3 py-2.5 text-left transition-all shrink-0 ${isActive
+                      ? "bg-accent/15 border-l-4 border-accent pl-2"
+                      : "hover:bg-muted/50 border-l-4 border-transparent pl-2"
+                      }`}
                   >
                     <span className={`shrink-0 text-[10px] font-mono w-8 pt-0.5 ${isActive ? "text-accent font-bold" : "text-muted-foreground"}`}>
                       {timeLabel}
@@ -307,11 +306,10 @@ export function VideoPlayer() {
                       <span className="text-[10px] text-muted-foreground">{prop.speaker?.name ?? "Unknown"}</span>
                     </div>
                     {verdict && (
-                      <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                        verdict === "true" ? "bg-green-500/15 text-green-600" :
+                      <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${verdict === "true" ? "bg-green-500/15 text-green-600" :
                         verdict === "false" ? "bg-red-500/15 text-red-600" :
-                        "bg-yellow-500/15 text-yellow-600"
-                      }`}>
+                          "bg-yellow-500/15 text-yellow-600"
+                        }`}>
                         {verdict === "true" ? "✓" : verdict === "false" ? "✗" : "?"}
                       </span>
                     )}
