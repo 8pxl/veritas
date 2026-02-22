@@ -279,3 +279,106 @@ export const mockCompanies: Company[] = [
     ],
   },
 ];
+
+/* ================================================================
+   Mock data for the Truth-Index running-average graph
+   ================================================================ */
+
+interface MockRunningAvgPoint {
+  date: string
+  truthIndex: number
+  cumulativeTrue: number
+  cumulativeDecided: number
+}
+
+interface MockOrganization {
+  id: number
+  name: string
+}
+
+interface MockOrgRunningAverage {
+  organization: MockOrganization
+  currentTruthIndex: number
+  series: MockRunningAvgPoint[]
+}
+
+export interface MockTopOrgsRunningAvgResponse {
+  topN: number
+  organizations: MockOrgRunningAverage[]
+}
+
+/** Generate a realistic-looking running average series between two dates. */
+function generateRunningAvgSeries(
+  startDate: string,
+  months: number,
+  baseTruth: number,
+  drift: number,
+  noise: number,
+): MockRunningAvgPoint[] {
+  const points: MockRunningAvgPoint[] = []
+  let cumTrue = 0
+  let cumDecided = 0
+  const start = new Date(startDate)
+
+  for (let m = 0; m < months; m++) {
+    // 2-4 data points per month
+    const entries = 2 + Math.floor(Math.random() * 3)
+    for (let e = 0; e < entries; e++) {
+      const d = new Date(start)
+      d.setMonth(d.getMonth() + m)
+      d.setDate(1 + Math.floor(Math.random() * 27))
+
+      // Simulate batch of claims
+      const batchSize = 3 + Math.floor(Math.random() * 8)
+      const trueRate = Math.min(
+        1,
+        Math.max(0, baseTruth + drift * (m / months) + (Math.random() - 0.5) * noise),
+      )
+      const batchTrue = Math.round(batchSize * trueRate)
+      cumTrue += batchTrue
+      cumDecided += batchSize
+
+      points.push({
+        date: d.toISOString().slice(0, 10),
+        truthIndex: cumDecided > 0 ? Math.round((cumTrue / cumDecided) * 10000) / 10000 : 0,
+        cumulativeTrue: cumTrue,
+        cumulativeDecided: cumDecided,
+      })
+    }
+  }
+
+  // Sort by date and deduplicate
+  points.sort((a, b) => a.date.localeCompare(b.date))
+  return points
+}
+
+export const mockGraphData: MockTopOrgsRunningAvgResponse = {
+  topN: 5,
+  organizations: [
+    {
+      organization: { id: 1, name: "TechCorp Inc." },
+      currentTruthIndex: 0.82,
+      series: generateRunningAvgSeries("2023-01-01", 30, 0.80, 0.05, 0.2),
+    },
+    {
+      organization: { id: 2, name: "GlobalMedia Corp" },
+      currentTruthIndex: 0.71,
+      series: generateRunningAvgSeries("2023-03-01", 28, 0.75, -0.08, 0.25),
+    },
+    {
+      organization: { id: 3, name: "FinanceFirst LLC" },
+      currentTruthIndex: 0.65,
+      series: generateRunningAvgSeries("2023-02-01", 29, 0.60, 0.10, 0.3),
+    },
+    {
+      organization: { id: 4, name: "HealthPlus Group" },
+      currentTruthIndex: 0.78,
+      series: generateRunningAvgSeries("2023-04-01", 26, 0.70, 0.12, 0.15),
+    },
+    {
+      organization: { id: 5, name: "EnergyDynamics" },
+      currentTruthIndex: 0.55,
+      series: generateRunningAvgSeries("2023-01-15", 30, 0.65, -0.15, 0.2),
+    },
+  ],
+}
