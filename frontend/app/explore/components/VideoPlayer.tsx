@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react"
 import { PropositionsWithAnalysis, useExploreStore } from "../stores/useExploreStore"
-import { parseTimestamp, formatTimestamp, DISMISS_AFTER } from "./videoPlayerUtils"
+import { parseTimestamp, formatTimestamp, DISMISS_AFTER, lerpChartValue } from "./videoPlayerUtils"
 import { VideoContainer } from "./VideoContainer"
 import { TimestampSidebar } from "./TimestampSidebar"
 import { ConfidenceChart, ChartDataPoint } from "./ConfidenceChart"
@@ -21,6 +21,10 @@ export function VideoPlayer() {
   const [activeSidebarId, setActiveSidebarId] = useState<number | null>(null)
   const visibleChartCountRef = useRef(0)
   const [visibleChartCount, setVisibleChartCount] = useState(0)
+  
+  // Interpolated chart data for smooth transitions
+  const [interpolatedChartData, setInterpolatedChartData] = useState<ChartDataPoint[]>([])
+  const animationFrameRef = useRef<number | null>(null)
 
   // Refs for same-height layout
   const videoContainerRef = useRef<HTMLDivElement>(null)
@@ -75,9 +79,14 @@ export function VideoPlayer() {
     setActiveSidebarId(null)
     visibleChartCountRef.current = 0
     setVisibleChartCount(0)
+    setInterpolatedChartData([])
     if (dismissTimerRef.current) {
       clearTimeout(dismissTimerRef.current)
       dismissTimerRef.current = null
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
     }
   }, [selectedVideo?.video_id])
 
@@ -102,6 +111,83 @@ export function VideoPlayer() {
       setVisibleChartCount(newCount)
     }
   }, [])
+
+  // Interpolate chart data based on current video time
+  const updateInterpolatedChartData = useCallback(() => {
+    if (!videoRef.current || allChartData.length === 0) return
+
+    const currentTime = videoRef.current.currentTime
+    const sorted = sortedPropositionsRef.current
+
+    // Find current and next proposition indices
+    let currentIndex = -1
+    let nextIndex = -1
+
+    for (let i = 0; i < sorted.length; i++) {
+      const startTime = parseTimestamp(sorted[i].start)
+      if (startTime <= currentTime) {
+        currentIndex = i
+      } else if (nextIndex === -1) {
+        nextIndex = i
+        break
+      }
+    }
+
+    // Build interpolated data
+    const newData: ChartDataPoint[] = []
+
+    // Add all points up to current
+    for (let i = 0; i <= currentIndex; i++) {
+      newData.push(allChartData[i])
+    }
+
+    // If there's a next point, interpolate between current and next
+    if (currentIndex >= 0 && nextIndex >= 0 && nextIndex < sorted.length) {
+      const currentProp = sorted[currentIndex]
+      const nextProp = sorted[nextIndex]
+      const currentStart = parseTimestamp(currentProp.start)
+      const nextStart = parseTimestamp(nextProp.start)
+
+      // Calculate interpolation factor (0 to 1)
+      const timeProgress = (currentTime - currentStart) / (nextStart - currentStart)
+      const t = Math.max(0, Math.min(1, timeProgress))
+
+      // Interpolate the next point
+      const currentData = allChartData[currentIndex]
+      const nextData = allChartData[nextIndex]
+
+      const interpolatedPoint: ChartDataPoint = {
+        label: nextData.label,
+        audio: lerpChartValue(currentData.audio, nextData.audio, t),
+        facial: lerpChartValue(currentData.facial, nextData.facial, t),
+      }
+
+      newData.push(interpolatedPoint)
+    }
+
+    setInterpolatedChartData(newData)
+  }, [allChartData])
+
+  // Animation loop for smooth interpolation
+  useEffect(() => {
+    if (!videoRef.current || !selectedVideo) return
+
+    const animate = () => {
+      if (videoRef.current && !videoRef.current.paused) {
+        updateInterpolatedChartData()
+      }
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+    }
+  }, [selectedVideo, updateInterpolatedChartData])
 
   const handleTimeUpdate = useCallback(() => {
     if (!videoRef.current || !selectedVideo || propositions.length === 0) return
@@ -194,6 +280,9 @@ export function VideoPlayer() {
 
   // Sliding window: only show points up to current seek position
   const visibleChartData = allChartData.slice(0, visibleChartCount)
+  
+  // Use interpolated data if available, otherwise fall back to visible data
+  const chartData = interpolatedChartData.length > 0 ? interpolatedChartData : visibleChartData
 
   if (!selectedVideo) {
     return (
@@ -243,7 +332,7 @@ export function VideoPlayer() {
       </div>
 
       {/* Sliding-window confidence chart */}
-      <ConfidenceChart data={visibleChartData} />
+      <ConfidenceChart data={chartData} />
     </div>
   )
 }

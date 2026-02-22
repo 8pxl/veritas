@@ -3,7 +3,8 @@
 import { forwardRef, type RefObject } from "react"
 import { SkipForward } from "lucide-react"
 import { PropositionsWithAnalysis } from "../stores/useExploreStore"
-import { PropositionPopup, AudioEmotionOverlay } from "./ConfidencePopup"
+import { PropositionPopup } from "./ConfidencePopup"
+import { AudioEmotionOverlay } from "./AudioEmotionOverlay"
 
 interface VideoContainerProps {
   containerRef?: RefObject<HTMLDivElement | null>
@@ -63,6 +64,7 @@ export const VideoContainer = forwardRef<HTMLVideoElement, VideoContainerProps>(
           <AudioEmotionOverlay
             proposition={activeProposition}
             visible={popupVisible}
+            videoRef={ref as React.RefObject<HTMLVideoElement>}
           />
         )}
         {hasPropositions && (

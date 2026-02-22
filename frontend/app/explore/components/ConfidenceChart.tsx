@@ -2,6 +2,7 @@
 
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  CartesianGrid,
 } from "recharts"
 
 export interface ChartDataPoint {
@@ -26,12 +27,13 @@ export function ConfidenceChart({ data }: ConfidenceChartProps) {
         >
           <defs>
             <linearGradient id="colorAudio" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#894048" stopOpacity={0.35} />
+              <stop offset="5%" stopColor="#91dc6e" stopOpacity={0.35} />
               <stop offset="95%" stopColor="#894048" stopOpacity={0} />
             </linearGradient>
           </defs>
+          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
           <XAxis dataKey="label" hide />
-          <YAxis domain={[0, 100]} hide />
+          {/* <YAxis domain={[0, 100]} hide /> */}
           <Tooltip
             contentStyle={{
               fontSize: 11,
@@ -45,14 +47,12 @@ export function ConfidenceChart({ data }: ConfidenceChartProps) {
             type="monotone"
             dataKey="audio"
             name="Audio"
-            stroke="#894048"
+            stroke="#91dc6e"
             strokeWidth={2}
             fill="url(#colorAudio)"
             dot={false}
             connectNulls
-            isAnimationActive
-            animationDuration={400}
-            animationEasing="ease-out"
+            isAnimationActive={false}
           />
         </AreaChart>
       </ResponsiveContainer>

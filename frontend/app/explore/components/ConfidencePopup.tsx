@@ -56,7 +56,7 @@ interface ScoreBarProps {
   showValue?: boolean
 }
 
-function ScoreBar({
+export function ScoreBar({
   label,
   value,
   barColor,
@@ -246,15 +246,15 @@ const EMOTION_COLORS: Record<string, string> = {
   surprise: "#fb923c",
 }
 
-function emotionColor(name: string) {
+export function emotionColor(name: string) {
   return EMOTION_COLORS[name.toLowerCase()] ?? "#e2e8f0"
 }
 
-const W = 160
-const H = 44
+export const W = 160
+export const H = 44
 
 /** Build an SVG path string for a pseudo-waveform */
-function buildWaveformPath(propId: number, f0Std: number, f0Range: number): string {
+export function buildWaveformPath(propId: number, f0Std: number, f0Range: number): string {
   const seed = propId * 9301 + 49297
   const amp = Math.max(Math.min(f0Std / Math.max(f0Range, 1), 0.42), 0.12)
   const ph1 = ((seed * 31) % 1000) / 1000 * Math.PI * 2

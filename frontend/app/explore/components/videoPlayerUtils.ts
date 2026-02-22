@@ -17,3 +17,20 @@ export function formatTimestamp(seconds: number): string {
   const s = Math.floor(seconds % 60)
   return `${m}:${String(s).padStart(2, "0")}`
 }
+
+/** Linear interpolation between two values */
+export function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t
+}
+
+/** Interpolate a chart data point value (handles null values) */
+export function lerpChartValue(
+  start: number | null,
+  end: number | null,
+  t: number
+): number | null {
+  if (start === null && end === null) return null
+  if (start === null) return end
+  if (end === null) return start
+  return Math.round(lerp(start, end, t))
+}
