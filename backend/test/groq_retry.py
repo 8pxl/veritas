@@ -4,6 +4,12 @@ from typing import Callable, TypeVar
 
 T = TypeVar("T")
 
+# Error codes from Groq that will never succeed on retry with the same input.
+_NON_RETRYABLE_CODES = frozenset({
+    "tool_use_failed",
+    "json_validate_failed",
+})
+
 
 def groq_call_with_retry(
     fn: Callable[[], T],
@@ -18,6 +24,13 @@ def groq_call_with_retry(
         try:
             return fn()
         except Exception as e:
+            # Don't retry errors that will always fail with the same input
+            code = ""
+            if hasattr(e, "body") and isinstance(e.body, dict):
+                code = e.body.get("error", {}).get("code", "")
+            if code in _NON_RETRYABLE_CODES:
+                raise
+
             if attempt == max_retries - 1:
                 raise
             print(
