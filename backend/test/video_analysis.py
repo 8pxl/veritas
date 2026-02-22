@@ -15,7 +15,7 @@ _detector = None
 def _get_detector():
     global _detector
     if _detector is None:
-        _detector = Detector(device="cpu")
+        _detector = Detector(device="cpu", n_jobs=16)
     return _detector
 
 

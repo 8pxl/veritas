@@ -389,13 +389,6 @@ def run_pipeline(input_path: str, description: str = "") -> dict:
         "has_video_stream": has_video,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "transcription_raw": transcription,
-        "transcript_for_llm": transcript_text,
-        "step2_chunking": {
-            "chunk_seconds": 1200,
-            "chunk_count": len(chunked_transcripts),
-            "av_index_mode": "single_pass_compressed_transcript",
-            "chunks": chunk_meta,
-        },
         "speaker_segments": speaker_segments,
         "propositions": propositions,
         "statement_analyses": statement_analyses,
