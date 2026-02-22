@@ -49,7 +49,7 @@ export default function F0Vis({ mean = 0, stdev = 1, videoRef }: F0VisProps) {
         smoothValue = recentValues.reduce((sum, v) => sum + v.value, 0) / recentValues.length;
 
         // Shift the data for smooth scrolling
-        setData(prev => [...prev.slice(1), { value: smoothValue * 3 }]);
+        setData(prev => [...prev.slice(1), { value: smoothValue }]);
       }
 
       animationFrame = requestAnimationFrame(update);
@@ -64,7 +64,7 @@ export default function F0Vis({ mean = 0, stdev = 1, videoRef }: F0VisProps) {
     <LineChart width={140} height={60} data={data.slice(-100)}>
       {/* <CartesianGrid stroke="#eee" strokeDasharray="5 5" /> */}
       <XAxis hide />
-      <YAxis domain={[-3 * stdev, 3 * stdev]} hide />
+      <YAxis key={stdev} domain={[-3 * stdev, 3 * stdev]} hide />
       <Line
         type="monotone"
         dataKey="value"
