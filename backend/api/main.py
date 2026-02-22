@@ -4,6 +4,7 @@ import time
 import logging
 
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text as sql_text
 from database import engine, get_db, SessionLocal, Base
@@ -93,6 +94,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],        # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],        # Allow all HTTP methods
+    allow_headers=["*"],        # Allow all headers
+)
 
 
 # --- Helpers ---
