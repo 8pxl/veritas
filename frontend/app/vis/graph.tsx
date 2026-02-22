@@ -230,7 +230,7 @@ export default function Graph() {
   }
 
   return (
-    <Card className="w-full mx-auto max-w-5xl">
+    <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-center text-lg">
           Truth Index — Top {response.topN} Organizations (Running Average)
