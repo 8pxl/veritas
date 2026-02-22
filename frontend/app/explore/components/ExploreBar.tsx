@@ -58,7 +58,6 @@ export function ExploreBar() {
       try {
         setLoading(true)
         const response = await listPeoplePeopleGet()
-        console.log(response)
         const people = response.data ?? []
 
         // Group people by organization id
