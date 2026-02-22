@@ -96,6 +96,16 @@ export function VideoPlayer() {
     )
   }
 
+  const transformedUrl = () => {
+    if (selectedVideo.video_url.includes("youtube.com") || selectedVideo.video_url.includes("youtu.be")) {
+      // https://vid.totsuki.harvey-l.com/<VIDEO_ID>.webm or .mp4
+      return `https://vid.totsuki.harvey-l.com/${selectedVideo.video_id}.webm`
+    }
+    return selectedVideo.video_url
+  }
+
+  console.log("Transformed video URL:", transformedUrl())
+
   return (
     <div className="flex flex-1 flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -104,7 +114,7 @@ export function VideoPlayer() {
       </div>
 
       <div className="relative w-full overflow-hidden rounded-lg border bg-black aspect-video">
-        <video ref={videoRef} key={selectedVideo.video_id} src={selectedVideo.video_url} controls className="h-full w-full" disablePictureInPicture onTimeUpdate={handleTimeUpdate} onSeeked={handleSeeked} />
+        <video ref={videoRef} key={selectedVideo.video_id} src={transformedUrl()} controls className="h-full w-full" disablePictureInPicture onTimeUpdate={handleTimeUpdate} onSeeked={handleSeeked} />
 
         {activeProposition && (
           <PropositionPopup

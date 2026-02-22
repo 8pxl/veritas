@@ -408,13 +408,34 @@ def stream_video(video_id: str):
 
 
 @app.get("/videos/{video_id}/results")
-def stream_json(video_id: str):
-    storage_path = f"./video_storage/{video_id}.json"
-    return FileResponse(
-        storage_path,
-        media_type="application/json",
-        content_disposition_type="inline",
+def stream_json(video_id: str, db: Session = Depends(get_db)):
+    import json
+
+    storage_path = f"/usr/share/vid/{video_id}.json"
+    res = []
+
+    db_propositions = (
+        db.query(PropositionDB).filter(PropositionDB.video_id == video_id).all()
     )
+
+    with open(storage_path) as f:
+        data = json.load(f)
+        data = data["statement_analyses"]
+        for e in data:
+            # find the exact match
+            db_prop = None
+            for p in db_propositions:
+                if p.statement == e["statement"]:
+                    db_prop = p
+                    break
+            e["verifyAt"] = db_prop.verify_at.isoformat() if db_prop else None
+            e["verdict"] = db_prop.verdict if db_prop else None
+            e["verdictReasoning"] = db_prop.verdict_reasoning if db_prop else None
+            e["verifiedAt"] = db_prop.verified_at.isoformat() if db_prop else None
+
+            res.append(e)
+
+    return res
 
 
 @app.get("/videos", response_model=List[Video])
@@ -742,7 +763,7 @@ def get_truth_leaderboard(
 
     # -- gather per-speaker counts in a single pass --
     rows = db.query(PropositionDB.speaker_id).group_by(PropositionDB.speaker_id).all()
-    speaker_data: list[tuple] = []          # (speaker_id, counts, decided)
+    speaker_data: list[tuple] = []  # (speaker_id, counts, decided)
     global_true_sum = 0
     global_decided_sum = 0
 
@@ -760,8 +781,8 @@ def get_truth_leaderboard(
     num_speakers = len(speaker_data)
     if num_speakers == 0 or global_decided_sum == 0:
         return []
-    C = global_decided_sum / num_speakers          # avg decided claims per speaker
-    m = global_true_sum / global_decided_sum        # global truth ratio
+    C = global_decided_sum / num_speakers  # avg decided claims per speaker
+    m = global_true_sum / global_decided_sum  # global truth ratio
 
     # -- build leaderboard entries --
     entries: list[LeaderboardEntry] = []
@@ -826,7 +847,9 @@ def get_organization_stats(org_id: int, db: Session = Depends(get_db)):
 
 @app.get("/stats/top-orgs-running-avg", response_model=TopOrgsRunningAvgResponse)
 def get_top_orgs_running_avg(
-    top_n: int = Query(5, ge=1, le=50, description="Number of top organizations to return"),
+    top_n: int = Query(
+        5, ge=1, le=50, description="Number of top organizations to return"
+    ),
     db: Session = Depends(get_db),
 ):
     """Return the running-average truth index for the top N organizations.
