@@ -314,7 +314,10 @@ def delete_person(person_id: str, db: Session = Depends(get_db)):
 
 @app.post("/videos", response_model=Video)
 def create_video(video: VideoCreate, db: Session = Depends(get_db)):
-    db_video = VideoDB(**video.dict())
+    db_video = db.get(VideoDB, video.video_id)
+    if db_video:
+        return _video_to_schema(db_video)
+    db_video = VideoDB(**video.model_dump())
     db.add(db_video)
     db.commit()
     db.refresh(db_video)
