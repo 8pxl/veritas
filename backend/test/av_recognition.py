@@ -450,12 +450,44 @@ Identify every speaker with their full name and title. Ensure that they are in o
             clean_messages.append(m)
     messages = clean_messages
 
+    # Build a lookup of speaker UUIDs from tool results so Phase 2 has them explicitly
+    known_speakers: list[dict] = []
+    for m in messages:
+        if isinstance(m, dict) and m.get("role") == "tool":
+            try:
+                parsed = json.loads(m.get("content", ""))
+                # db_insert returns a single dict, db_search returns a list
+                items = parsed if isinstance(parsed, list) else [parsed]
+                for item in items:
+                    if isinstance(item, dict) and item.get("speakerId"):
+                        known_speakers.append({
+                            "speakerId": item["speakerId"],
+                            "name": item.get("name", ""),
+                        })
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+    # Deduplicate by speakerId
+    seen_ids: set[str] = set()
+    unique_speakers: list[dict] = []
+    for sp in known_speakers:
+        if sp["speakerId"] not in seen_ids:
+            seen_ids.add(sp["speakerId"])
+            unique_speakers.append(sp)
+
+    speaker_table = "\n".join(
+        f"  - {sp['name']}: {sp['speakerId']}" for sp in unique_speakers
+    )
+
     messages.append(
         {
             "role": "user",
             "content": (
+                "Here are the speakers found in our database with their exact UUIDs:\n"
+                f"{speaker_table}\n\n"
                 "Now output ONLY a JSON object with key 'segments' containing an array. "
-                "Each element must have: speakerId (from our DB), start (M:SS), end (M:SS). "
+                "Each element must have: speakerId (the exact UUID string from above), "
+                "start (M:SS), end (M:SS). "
                 "Merge consecutive segments for the same speaker. Order by appearance time."
             ),
         }

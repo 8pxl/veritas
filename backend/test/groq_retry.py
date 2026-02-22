@@ -26,8 +26,9 @@ def groq_call_with_retry(
         except Exception as e:
             # Don't retry errors that will always fail with the same input
             code = ""
-            if hasattr(e, "body") and isinstance(e.body, dict):
-                code = e.body.get("error", {}).get("code", "")
+            body = getattr(e, "body", None)
+            if isinstance(body, dict):
+                code = body.get("error", {}).get("code", "")
             if code in _NON_RETRYABLE_CODES:
                 raise
 
