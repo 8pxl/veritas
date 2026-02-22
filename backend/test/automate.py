@@ -29,6 +29,11 @@ def download_video(video_id: str, download_dir: str) -> str:
         "no_warnings": True,
     }
 
+    # Use cookies if available
+    cookie_file = "./cookies.txt"
+    if os.path.exists(cookie_file):
+        ydl_opts["cookiefile"] = cookie_file
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(
             f"https://www.youtube.com/watch?v={video_id}", download=True
@@ -38,10 +43,11 @@ def download_video(video_id: str, download_dir: str) -> str:
 
 def find_downloaded(video_id: str, download_dir: str) -> str | None:
     """Find an already-downloaded file for this video_id."""
-    for f in os.listdir(download_dir):
-        name, _ = os.path.splitext(f)
-        if name == video_id:
-            return os.path.join(download_dir, f)
+    extensions = [".mp4", ".mkv", ".webm", ".mov", ".avi"]
+    for ext in extensions:
+        path = os.path.join(download_dir, f"{video_id}{ext}")
+        if os.path.exists(path):
+            return path
     return None
 
 
@@ -120,7 +126,7 @@ def main():
         if not video_path and not args.skip_analysis:
             if args.dry_run:
                 print(f"  [dry-run] Would download {video_id}")
-                video_path = os.path.join(args.download_dir, f"{video_id}.webm")
+                video_path = os.path.join(args.download_dir, f"{video_id}.mp4")
             else:
                 print(f"  Downloading {video_id}...")
                 try:
