@@ -10,13 +10,31 @@ from feat import Detector
 
 # Lazy-load detector on first use
 _detector = None
+_fast_face_cascade = None
+FACE_SCORE_THRESHOLD = 0.7
+MAX_ANALYSIS_FRAMES = 16
+_DETECTOR_CONFIG = {
+    "face_model": "faceboxes",
+    "landmark_model": "pfld",
+    "au_model": "svm",
+    "emotion_model": "svm",
+    "facepose_model": "img2pose-c",
+}
 
 
 def _get_detector():
     global _detector
     if _detector is None:
-        _detector = Detector(device="cpu", n_jobs=16)
+        _detector = Detector(device="cpu", n_jobs=16, **_DETECTOR_CONFIG)
     return _detector
+
+
+def _get_fast_face_cascade():
+    global _fast_face_cascade
+    if _fast_face_cascade is None:
+        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        _fast_face_cascade = cv2.CascadeClassifier(cascade_path)
+    return _fast_face_cascade
 
 
 # --- AU / Emotion column names ---
@@ -54,27 +72,27 @@ EMOTION_COLS = [
 POSE_COLS = ["Pitch", "Roll", "Yaw"]
 
 
-def extract_frames(video_path, fps=2, max_width=640):
+def extract_frames(video_path, fps=2, max_width=480):
     """Extract frames from video at target FPS, downscaled for speed.
 
     Returns list of (timestamp_sec, temp_jpg_path).
     """
     cap = cv2.VideoCapture(video_path)
     video_fps = cap.get(cv2.CAP_PROP_FPS) or 30
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    duration = total_frames / video_fps
-
-    step = 1.0 / fps
-    timestamps = np.arange(0, duration, step)
+    frame_step = max(1, int(round(video_fps / max(fps, 0.1))))
 
     tmpdir = tempfile.mkdtemp(prefix="vidanalysis_")
     results = []
+    frame_idx = 0
 
-    for ts in timestamps:
-        cap.set(cv2.CAP_PROP_POS_MSEC, ts * 1000)
+    while True:
         ok, frame = cap.read()
         if not ok:
+            break
+        if frame_idx % frame_step != 0:
+            frame_idx += 1
             continue
+        ts = frame_idx / video_fps
         h, w = frame.shape[:2]
         if w > max_width:
             scale = max_width / w
@@ -82,6 +100,7 @@ def extract_frames(video_path, fps=2, max_width=640):
         path = os.path.join(tmpdir, f"f_{ts:.2f}.jpg")
         cv2.imwrite(path, frame)
         results.append((ts, path))
+        frame_idx += 1
 
     cap.release()
     return results, tmpdir
@@ -98,17 +117,153 @@ def detect_faces(frame_paths, batch_size=8):
     return result
 
 
-def extract_video_features(video_path, fps=2):
+def detect_fast_face_bboxes(
+    video_path, fps=15, max_width=320, min_neighbors=8, min_face_size=28
+):
+    """Fast bbox-only detector for dense per-frame face presence tracking."""
+    cascade = _get_fast_face_cascade()
+    cap = cv2.VideoCapture(video_path)
+    video_fps = cap.get(cv2.CAP_PROP_FPS) or 30
+    frame_step = max(1, int(round(video_fps / max(fps, 0.1))))
+    frame_idx = 0
+    out = []
+
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        if frame_idx % frame_step != 0:
+            frame_idx += 1
+            continue
+
+        ts = frame_idx / video_fps
+        h, w = frame.shape[:2]
+        if w > max_width:
+            scale = max_width / w
+            frame = cv2.resize(frame, (max_width, int(h * scale)))
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=min_neighbors,
+            minSize=(min_face_size, min_face_size),
+        )
+        bboxes = []
+        frame_area = float(max(gray.shape[0] * gray.shape[1], 1))
+        for x, y, wb, hb in faces:
+            if (wb * hb) / frame_area < 0.01:
+                continue
+            bboxes.append(
+                {"x": float(x), "y": float(y), "w": float(wb), "h": float(hb)}
+            )
+        out.append(
+            {"timestamp": float(ts), "face_count": len(bboxes), "bboxes": bboxes}
+        )
+        frame_idx += 1
+
+    cap.release()
+    return out
+
+
+def _per_frame_face_bboxes(frame_paths, detections):
+    """Build per-frame face bbox records, including frames with zero faces."""
+    frame_map = {
+        path: {"timestamp": float(ts), "face_count": 0, "bboxes": []}
+        for ts, path in frame_paths
+    }
+    required_cols = {"FaceRectX", "FaceRectY", "FaceRectWidth", "FaceRectHeight"}
+    if len(detections) > 0 and required_cols.issubset(set(detections.columns)):
+        for _, row in detections.iterrows():
+            key = row.get("input")
+            record = frame_map.get(key)
+            if record is None:
+                continue
+            x = float(row["FaceRectX"])
+            y = float(row["FaceRectY"])
+            w = float(row["FaceRectWidth"])
+            h = float(row["FaceRectHeight"])
+            if np.isnan(x) or np.isnan(y) or np.isnan(w) or np.isnan(h):
+                continue
+            if w <= 0 or h <= 0:
+                continue
+            bbox = {
+                "x": round(x, 2),
+                "y": round(y, 2),
+                "w": round(w, 2),
+                "h": round(h, 2),
+            }
+            record["bboxes"].append(bbox)
+
+    out = []
+    for ts, path in frame_paths:
+        r = frame_map[path]
+        r["face_count"] = len(r["bboxes"])
+        out.append(r)
+    return out
+
+
+def _has_face_near_timestamp(face_timestamps, ts, tolerance=0.12):
+    for fts in face_timestamps:
+        if abs(fts - ts) <= tolerance:
+            return True
+    return False
+
+
+def _downsample_frames(frames, max_frames=MAX_ANALYSIS_FRAMES):
+    if len(frames) <= max_frames:
+        return frames
+    step = max(1, int(np.ceil(len(frames) / max_frames)))
+    return frames[::step][:max_frames]
+
+
+def _filter_detections_with_face_threshold(detections, threshold=FACE_SCORE_THRESHOLD):
+    if len(detections) == 0:
+        return detections
+    required_cols = ["FaceRectX", "FaceRectY", "FaceRectWidth", "FaceRectHeight"]
+    mask = np.ones(len(detections), dtype=bool)
+    for col in required_cols:
+        if col in detections.columns:
+            vals = detections[col].astype(float).values
+            mask &= np.isfinite(vals)
+    if "FaceRectWidth" in detections.columns:
+        mask &= detections["FaceRectWidth"].astype(float).values > 0
+    if "FaceRectHeight" in detections.columns:
+        mask &= detections["FaceRectHeight"].astype(float).values > 0
+    if "FaceScore" in detections.columns:
+        mask &= detections["FaceScore"].fillna(0).astype(float).values >= threshold
+    return detections.loc[mask]
+
+
+def extract_video_features(
+    video_path, analysis_fps=2, bbox_fps=15, face_score_threshold=FACE_SCORE_THRESHOLD
+):
     """Full pipeline: extract frames → detect → aggregate features.
 
     Returns dict of per-frame AU/emotion data and summary statistics.
     """
     t0 = time.time()
-    frames, tmpdir = extract_frames(video_path, fps=fps)
+    per_frame_boxes = detect_fast_face_bboxes(video_path, fps=bbox_fps)
+    t_bbox = time.time() - t0
+    frames_with_faces = sum(1 for f in per_frame_boxes if f["face_count"] > 0)
+    no_face_frames = len(per_frame_boxes) - frames_with_faces
+    face_timestamps = [f["timestamp"] for f in per_frame_boxes if f["face_count"] > 0]
+
+    t0 = time.time()
+    frames, tmpdir = extract_frames(video_path, fps=analysis_fps)
+    frames_for_analysis = [
+        (ts, p) for ts, p in frames if _has_face_near_timestamp(face_timestamps, ts)
+    ]
+    frames_for_analysis = _downsample_frames(frames_for_analysis, MAX_ANALYSIS_FRAMES)
     t_extract = time.time() - t0
 
     t0 = time.time()
-    detections = detect_faces(frames)
+    detections = (
+        detect_faces(frames_for_analysis, batch_size=16) if frames_for_analysis else []
+    )
+    if len(detections):
+        detections = _filter_detections_with_face_threshold(
+            detections, threshold=face_score_threshold
+        )
     t_detect = time.time() - t0
 
     # Clean up temp files
@@ -122,10 +277,27 @@ def extract_video_features(video_path, fps=2):
     except OSError:
         pass
 
-    # Parse per-frame AU & emotion values
-    n = len(detections)
+    n = len(detections) if hasattr(detections, "__len__") else 0
     if n == 0:
-        return {"error": "No faces detected", "frames_extracted": len(frames)}
+        return {
+            "error": "No faces detected",
+            "frames_extracted": len(per_frame_boxes),
+            "analysis_frames_extracted": len(frames),
+            "analysis_frames_selected": len(frames_for_analysis),
+            "bbox_fps": bbox_fps,
+            "analysis_fps": analysis_fps,
+            "face_score_threshold": face_score_threshold,
+            "frames_with_faces": frames_with_faces,
+            "no_face_frames": no_face_frames,
+            "faces_detected": 0,
+            "per_frame_face_bboxes": per_frame_boxes,
+            "timing": {
+                "bbox_detection_s": round(t_bbox, 2),
+                "frame_extraction_s": round(t_extract, 2),
+                "detection_s": round(t_detect, 2),
+                "total_s": round(t_bbox + t_extract + t_detect, 2),
+            },
+        }
 
     au_data = {}
     for col in AU_COLS:
@@ -158,12 +330,21 @@ def extract_video_features(video_path, fps=2):
     emotion_counts = {e: dominant_per_frame.count(e) for e in EMOTION_COLS}
 
     return {
-        "frames_extracted": len(frames),
+        "frames_extracted": len(per_frame_boxes),
+        "analysis_frames_extracted": len(frames),
+        "analysis_frames_selected": len(frames_for_analysis),
+        "bbox_fps": bbox_fps,
+        "analysis_fps": analysis_fps,
+        "face_score_threshold": face_score_threshold,
+        "frames_with_faces": frames_with_faces,
+        "no_face_frames": no_face_frames,
         "faces_detected": n,
+        "per_frame_face_bboxes": per_frame_boxes,
         "timing": {
+            "bbox_detection_s": round(t_bbox, 2),
             "frame_extraction_s": round(t_extract, 2),
             "detection_s": round(t_detect, 2),
-            "total_s": round(t_extract + t_detect, 2),
+            "total_s": round(t_bbox + t_extract + t_detect, 2),
         },
         "au": au_data,
         "emotions": emotion_data,
@@ -196,9 +377,18 @@ def compute_facial_confidence(video_path, fps=2):
       - gaze_stability  (0.15): steady head pose (low yaw/pitch variance)
       - neutrality      (0.15): high neutral emotion ratio
     """
-    features = extract_video_features(video_path, fps=fps)
+    features = extract_video_features(
+        video_path,
+        analysis_fps=fps,
+        bbox_fps=15,
+        face_score_threshold=FACE_SCORE_THRESHOLD,
+    )
     if "error" in features:
-        return {"confidence_score": 0.0, "error": features["error"]}
+        return {
+            "confidence_score": 0.0,
+            "error": features["error"],
+            "features": features,
+        }
 
     au = features["au"]
     emo = features["emotions"]
@@ -289,11 +479,14 @@ def _print_result(label, result):
     feats = result["features"]
     print(
         f"  Timing: {feats['timing']['total_s']:.1f}s "
-        f"(extract: {feats['timing']['frame_extraction_s']:.1f}s, "
+        f"(bbox: {feats['timing'].get('bbox_detection_s', 0.0):.1f}s, "
+        f"extract: {feats['timing']['frame_extraction_s']:.1f}s, "
         f"detect: {feats['timing']['detection_s']:.1f}s)"
     )
     print(
         f"  Frames: {feats['frames_extracted']} extracted, "
+        f"{feats['frames_with_faces']} with faces, "
+        f"{feats['no_face_frames']} without faces, "
         f"{feats['faces_detected']} faces detected"
     )
 
@@ -327,7 +520,7 @@ if __name__ == "__main__":
     results = {}
     for video_path in files:
         print(f"\nAnalyzing: {video_path} ...")
-        results[video_path] = compute_facial_confidence(video_path, fps=2)
+        results[video_path] = compute_facial_confidence(video_path, fps=5)
         _print_result(video_path, results[video_path])
 
     if len(results) > 1:
