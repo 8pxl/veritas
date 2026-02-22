@@ -346,8 +346,8 @@ Your task:
    self-introductions, and speaker transitions.
 3. For EACH speaker, use db_search to check if it is already in our database.
 4. If a speaker is missing, infer best-effort name/title from transcript context and insert with db_insert.
-5. Return only the segments that you are ABSOLUTELY certain is said by the speaker. As many as possible, but don't have to be exaustive. \
-   Ignore short or ambiguous sentences like "Thank you".
+5. Return only the segments that you are certain is said by the speaker. As many as possible, but don't have to be exaustive. \
+   Ignore ambiguous sentences like "Thank you".
 6. Ensure all the people are either already existing in the db, or inserted with db_insert.
 """
 
