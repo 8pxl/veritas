@@ -7,7 +7,7 @@ import logging
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import text as sql_text
 from database import engine, get_db, SessionLocal, Base
 from models import OrganizationDB, PersonDB, VideoDB, PropositionDB
@@ -408,7 +408,10 @@ def stream_json(video_id: str, db: Session = Depends(get_db)):
     res = []
 
     db_propositions = (
-        db.query(PropositionDB).filter(PropositionDB.video_id == video_id).all()
+        db.query(PropositionDB)
+        .filter(PropositionDB.video_id == video_id)
+        .options(joinedload(PropositionDB.speaker).joinedload(PersonDB.organization))
+        .all()
     )
 
     with open(storage_path) as f:
@@ -421,10 +424,30 @@ def stream_json(video_id: str, db: Session = Depends(get_db)):
                 if p.statement == e["statement"]:
                     db_prop = p
                     break
-            e["verifyAt"] = db_prop.verify_at.isoformat() if db_prop else None
-            e["verdict"] = db_prop.verdict if db_prop else None
-            e["verdictReasoning"] = db_prop.verdict_reasoning if db_prop else None
-            e["verifiedAt"] = db_prop.verified_at.isoformat() if db_prop else None
+
+            if db_prop:
+                e["speaker"] = _model_dump(
+                    _person_to_schema(db_prop.speaker, db_prop.speaker.organization)
+                )
+                e["verifyAt"] = (
+                    db_prop.verify_at.isoformat() if db_prop.verify_at else None
+                )
+                e["verdict"] = db_prop.verdict
+                e["verdictReasoning"] = db_prop.verdict_reasoning
+                e["verifiedAt"] = (
+                    db_prop.verified_at.isoformat() if db_prop.verified_at else None
+                )
+            else:
+                e["verifyAt"] = None
+                e["verdict"] = None
+                e["verdictReasoning"] = None
+                e["verifiedAt"] = None
+
+            # del keys speaker_alignment, speaker_info
+            if "speaker_alignment" in e:
+                del e["speaker_alignment"]
+            if "speaker_info" in e:
+                del e["speaker_info"]
 
             res.append(e)
 

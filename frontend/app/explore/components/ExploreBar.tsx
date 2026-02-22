@@ -30,7 +30,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useExploreStore } from "../stores/useExploreStore"
-import { listPeoplePeopleGet, getPropositionsByPersonPeoplePersonIdPropositionsGet } from "@/lib/client/sdk.gen"
+import { listPeoplePeopleGet, getPropositionsByPersonPeoplePersonIdPropositionsGet, streamJsonVideosVideoIdResultsGet } from "@/lib/client/sdk.gen"
 import type { Person, Proposition, Video, Organization } from "@/lib/client/types.gen"
 
 interface OrgGroup {
@@ -126,12 +126,17 @@ export function ExploreBar() {
     }
   }, [personData])
 
-  const handleVideoClick = useCallback((video: Video, person: Person, orgName: string, personId: string) => {
+  const handleVideoClick = useCallback(async (video: Video, person: Person, orgName: string, personId: string) => {
     const data = personData[personId]
     if (!data) return
-    // Filter propositions that belong to this video
-    const videoPropositions = data.propositions.filter((p) => p.video.video_id === video.video_id)
-    selectVideo(video, person, orgName, videoPropositions)
+    // Fetch api /videos/<VIDEO_ID>/results
+    const propositions = await streamJsonVideosVideoIdResultsGet({
+      path: { video_id: video.video_id },
+    }).then(res => res.data ?? []).catch(err => {
+      console.error(`Failed to fetch propositions for video ${video.video_id}:`, err)
+      return []
+    })
+    selectVideo(video, person, orgName, propositions as Proposition[])
   }, [personData, selectVideo])
 
   return (

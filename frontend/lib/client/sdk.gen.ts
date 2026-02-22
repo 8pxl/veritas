@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateOrganizationOrganizationsPostData, CreateOrganizationOrganizationsPostErrors, CreateOrganizationOrganizationsPostResponses, CreatePersonPeoplePostData, CreatePersonPeoplePostErrors, CreatePersonPeoplePostResponses, CreatePropositionPropositionsPostData, CreatePropositionPropositionsPostErrors, CreatePropositionPropositionsPostResponses, CreateVideoVideosPostData, CreateVideoVideosPostErrors, CreateVideoVideosPostResponses, DeleteOrganizationOrganizationsOrgIdDeleteData, DeleteOrganizationOrganizationsOrgIdDeleteErrors, DeleteOrganizationOrganizationsOrgIdDeleteResponses, DeletePersonPeoplePersonIdDeleteData, DeletePersonPeoplePersonIdDeleteErrors, DeletePersonPeoplePersonIdDeleteResponses, DeletePropositionPropositionsPropIdDeleteData, DeletePropositionPropositionsPropIdDeleteErrors, DeletePropositionPropositionsPropIdDeleteResponses, DeleteVideoVideosVideoIdDeleteData, DeleteVideoVideosVideoIdDeleteErrors, DeleteVideoVideosVideoIdDeleteResponses, GetOrganizationOrganizationsOrgIdGetData, GetOrganizationOrganizationsOrgIdGetErrors, GetOrganizationOrganizationsOrgIdGetResponses, GetOrganizationStatsOrganizationsOrgIdStatsGetData, GetOrganizationStatsOrganizationsOrgIdStatsGetErrors, GetOrganizationStatsOrganizationsOrgIdStatsGetResponses, GetOverallStatsStatsOverviewGetData, GetOverallStatsStatsOverviewGetResponses, GetPersonPeoplePersonIdGetData, GetPersonPeoplePersonIdGetErrors, GetPersonPeoplePersonIdGetResponses, GetPersonStatsPeoplePersonIdStatsGetData, GetPersonStatsPeoplePersonIdStatsGetErrors, GetPersonStatsPeoplePersonIdStatsGetResponses, GetPropositionPropositionsPropIdGetData, GetPropositionPropositionsPropIdGetErrors, GetPropositionPropositionsPropIdGetResponses, GetPropositionsByPersonPeoplePersonIdPropositionsGetData, GetPropositionsByPersonPeoplePersonIdPropositionsGetErrors, GetPropositionsByPersonPeoplePersonIdPropositionsGetResponses, GetStatsByOrganizationStatsByOrganizationGetData, GetStatsByOrganizationStatsByOrganizationGetResponses, GetStatsByPersonStatsByPersonGetData, GetStatsByPersonStatsByPersonGetResponses, GetStatsByVideoStatsByVideoGetData, GetStatsByVideoStatsByVideoGetResponses, GetTruthLeaderboardStatsLeaderboardGetData, GetTruthLeaderboardStatsLeaderboardGetErrors, GetTruthLeaderboardStatsLeaderboardGetResponses, GetVideoVideosVideoIdGetData, GetVideoVideosVideoIdGetErrors, GetVideoVideosVideoIdGetResponses, ListOrganizationsOrganizationsGetData, ListOrganizationsOrganizationsGetResponses, ListPeoplePeopleGetData, ListPeoplePeopleGetResponses, ListPropositionsPropositionsGetData, ListPropositionsPropositionsGetResponses, ListVideosVideosGetData, ListVideosVideosGetResponses, SearchPeoplePeopleSearchGetData, SearchPeoplePeopleSearchGetErrors, SearchPeoplePeopleSearchGetResponses, UpdateOrganizationOrganizationsOrgIdPutData, UpdateOrganizationOrganizationsOrgIdPutErrors, UpdateOrganizationOrganizationsOrgIdPutResponses, UpdatePersonPeoplePersonIdPutData, UpdatePersonPeoplePersonIdPutErrors, UpdatePersonPeoplePersonIdPutResponses, UpdatePropositionPropositionsPropIdPutData, UpdatePropositionPropositionsPropIdPutErrors, UpdatePropositionPropositionsPropIdPutResponses, UpdateVideoVideosVideoIdPutData, UpdateVideoVideosVideoIdPutErrors, UpdateVideoVideosVideoIdPutResponses, VerifyAllPropositionsPropositionsVerifyAllPostData, VerifyAllPropositionsPropositionsVerifyAllPostResponses, VerifySinglePropositionPropositionsPropIdVerifyPostData, VerifySinglePropositionPropositionsPropIdVerifyPostErrors, VerifySinglePropositionPropositionsPropIdVerifyPostResponses } from './types.gen';
+import type { CreateOrganizationOrganizationsPostData, CreateOrganizationOrganizationsPostErrors, CreateOrganizationOrganizationsPostResponses, CreatePersonPeoplePostData, CreatePersonPeoplePostErrors, CreatePersonPeoplePostResponses, CreatePropositionPropositionsPostData, CreatePropositionPropositionsPostErrors, CreatePropositionPropositionsPostResponses, CreateVideoVideosPostData, CreateVideoVideosPostErrors, CreateVideoVideosPostResponses, DeleteOrganizationOrganizationsOrgIdDeleteData, DeleteOrganizationOrganizationsOrgIdDeleteErrors, DeleteOrganizationOrganizationsOrgIdDeleteResponses, DeletePersonPeoplePersonIdDeleteData, DeletePersonPeoplePersonIdDeleteErrors, DeletePersonPeoplePersonIdDeleteResponses, DeletePropositionPropositionsPropIdDeleteData, DeletePropositionPropositionsPropIdDeleteErrors, DeletePropositionPropositionsPropIdDeleteResponses, DeleteVideoVideosVideoIdDeleteData, DeleteVideoVideosVideoIdDeleteErrors, DeleteVideoVideosVideoIdDeleteResponses, GetOrganizationOrganizationsOrgIdGetData, GetOrganizationOrganizationsOrgIdGetErrors, GetOrganizationOrganizationsOrgIdGetResponses, GetOrganizationStatsOrganizationsOrgIdStatsGetData, GetOrganizationStatsOrganizationsOrgIdStatsGetErrors, GetOrganizationStatsOrganizationsOrgIdStatsGetResponses, GetOverallStatsStatsOverviewGetData, GetOverallStatsStatsOverviewGetResponses, GetPersonPeoplePersonIdGetData, GetPersonPeoplePersonIdGetErrors, GetPersonPeoplePersonIdGetResponses, GetPersonStatsPeoplePersonIdStatsGetData, GetPersonStatsPeoplePersonIdStatsGetErrors, GetPersonStatsPeoplePersonIdStatsGetResponses, GetPropositionPropositionsPropIdGetData, GetPropositionPropositionsPropIdGetErrors, GetPropositionPropositionsPropIdGetResponses, GetPropositionsByPersonPeoplePersonIdPropositionsGetData, GetPropositionsByPersonPeoplePersonIdPropositionsGetErrors, GetPropositionsByPersonPeoplePersonIdPropositionsGetResponses, GetStatsByOrganizationStatsByOrganizationGetData, GetStatsByOrganizationStatsByOrganizationGetResponses, GetStatsByPersonStatsByPersonGetData, GetStatsByPersonStatsByPersonGetResponses, GetStatsByVideoStatsByVideoGetData, GetStatsByVideoStatsByVideoGetResponses, GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetData, GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetErrors, GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponses, GetTruthLeaderboardStatsLeaderboardGetData, GetTruthLeaderboardStatsLeaderboardGetErrors, GetTruthLeaderboardStatsLeaderboardGetResponses, GetVideoVideosVideoIdGetData, GetVideoVideosVideoIdGetErrors, GetVideoVideosVideoIdGetResponses, ListOrganizationsOrganizationsGetData, ListOrganizationsOrganizationsGetResponses, ListPeoplePeopleGetData, ListPeoplePeopleGetResponses, ListPropositionsPropositionsGetData, ListPropositionsPropositionsGetResponses, ListVideosVideosGetData, ListVideosVideosGetResponses, SearchPeoplePeopleSearchGetData, SearchPeoplePeopleSearchGetErrors, SearchPeoplePeopleSearchGetResponses, StreamJsonVideosVideoIdResultsGetData, StreamJsonVideosVideoIdResultsGetErrors, StreamJsonVideosVideoIdResultsGetResponses, UpdateOrganizationOrganizationsOrgIdPutData, UpdateOrganizationOrganizationsOrgIdPutErrors, UpdateOrganizationOrganizationsOrgIdPutResponses, UpdatePersonPeoplePersonIdPutData, UpdatePersonPeoplePersonIdPutErrors, UpdatePersonPeoplePersonIdPutResponses, UpdatePropositionPropositionsPropIdPutData, UpdatePropositionPropositionsPropIdPutErrors, UpdatePropositionPropositionsPropIdPutResponses, UpdateVideoVideosVideoIdPutData, UpdateVideoVideosVideoIdPutErrors, UpdateVideoVideosVideoIdPutResponses, VerifyAllPropositionsPropositionsVerifyAllPostData, VerifyAllPropositionsPropositionsVerifyAllPostResponses, VerifySinglePropositionPropositionsPropIdVerifyPostData, VerifySinglePropositionPropositionsPropIdVerifyPostErrors, VerifySinglePropositionPropositionsPropIdVerifyPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -121,6 +121,11 @@ export const createVideoVideosPost = <ThrowOnError extends boolean = false>(opti
 });
 
 /**
+ * Stream Json
+ */
+export const streamJsonVideosVideoIdResultsGet = <ThrowOnError extends boolean = false>(options: Options<StreamJsonVideosVideoIdResultsGetData, ThrowOnError>) => (options.client ?? client).get<StreamJsonVideosVideoIdResultsGetResponses, StreamJsonVideosVideoIdResultsGetErrors, ThrowOnError>({ url: '/videos/{video_id}/results', ...options });
+
+/**
  * Delete Video
  */
 export const deleteVideoVideosVideoIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteVideoVideosVideoIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteVideoVideosVideoIdDeleteResponses, DeleteVideoVideosVideoIdDeleteErrors, ThrowOnError>({ url: '/videos/{video_id}', ...options });
@@ -227,9 +232,25 @@ export const getStatsByVideoStatsByVideoGet = <ThrowOnError extends boolean = fa
 /**
  * Get Truth Leaderboard
  *
- * Rank speakers by truth index. `most_honest` = highest truth index first,
- * `biggest_liars` = lowest truth index first. Only includes speakers with
- * at least `min_claims` decided (true/false) propositions.
+ * Rank speakers by truth index using a **Bayesian average**.
+ *
+ * The Bayesian truth index shrinks each speaker's raw true-ratio toward
+ * the global mean, weighted by how many decided claims they have
+ * relative to the average speaker:
+ *
+ * bayesian_truth_index = (C * m + true_count) / (C + decided)
+ *
+ * where
+ * C = mean number of decided claims across *all* speakers
+ * m = global true ratio   (sum of true / sum of decided)
+ *
+ * Speakers with few claims are pulled toward the global average,
+ * while speakers with many claims are dominated by their own ratio.
+ *
+ * `most_honest` = highest truth index first,
+ * `biggest_liars` = lowest truth index first.
+ * Only includes speakers with at least `min_claims` decided (true/false)
+ * propositions.
  */
 export const getTruthLeaderboardStatsLeaderboardGet = <ThrowOnError extends boolean = false>(options?: Options<GetTruthLeaderboardStatsLeaderboardGetData, ThrowOnError>) => (options?.client ?? client).get<GetTruthLeaderboardStatsLeaderboardGetResponses, GetTruthLeaderboardStatsLeaderboardGetErrors, ThrowOnError>({ url: '/stats/leaderboard', ...options });
 
@@ -246,3 +267,18 @@ export const getPersonStatsPeoplePersonIdStatsGet = <ThrowOnError extends boolea
  * Truth index and verdict breakdown for a single organization.
  */
 export const getOrganizationStatsOrganizationsOrgIdStatsGet = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationStatsOrganizationsOrgIdStatsGetData, ThrowOnError>) => (options.client ?? client).get<GetOrganizationStatsOrganizationsOrgIdStatsGetResponses, GetOrganizationStatsOrganizationsOrgIdStatsGetErrors, ThrowOnError>({ url: '/organizations/{org_id}/stats', ...options });
+
+/**
+ * Get Top Orgs Running Avg
+ *
+ * Return the running-average truth index for the top N organizations.
+ *
+ * 1. Determine each organization's truth index over the **last year** using
+ * only decided (true / false) propositions whose `verify_at` falls within
+ * the past 365 days.
+ * 2. Pick the top `top_n` organizations by that recent truth index.
+ * 3. For each selected organization, compute the **running average** truth
+ * index from the earliest proposition date to the latest, emitting one
+ * data-point per calendar day that has at least one decided proposition.
+ */
+export const getTopOrgsRunningAvgStatsTopOrgsRunningAvgGet = <ThrowOnError extends boolean = false>(options?: Options<GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetData, ThrowOnError>) => (options?.client ?? client).get<GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponses, GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetErrors, ThrowOnError>({ url: '/stats/top-orgs-running-avg', ...options });

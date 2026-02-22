@@ -38,6 +38,21 @@ export type LeaderboardEntry = {
 };
 
 /**
+ * OrgRunningAverage
+ */
+export type OrgRunningAverage = {
+    organization: Organization;
+    /**
+     * Currenttruthindex
+     */
+    currentTruthIndex: number;
+    /**
+     * Series
+     */
+    series: Array<RunningAvgPoint>;
+};
+
+/**
  * Organization
  */
 export type Organization = {
@@ -287,6 +302,42 @@ export type PropositionUpdate = {
      * Verifiedat
      */
     verifiedAt?: string;
+};
+
+/**
+ * RunningAvgPoint
+ */
+export type RunningAvgPoint = {
+    /**
+     * Date
+     */
+    date: string;
+    /**
+     * Truthindex
+     */
+    truthIndex: number;
+    /**
+     * Cumulativetrue
+     */
+    cumulativeTrue: number;
+    /**
+     * Cumulativedecided
+     */
+    cumulativeDecided: number;
+};
+
+/**
+ * TopOrgsRunningAvgResponse
+ */
+export type TopOrgsRunningAvgResponse = {
+    /**
+     * Topn
+     */
+    topN: number;
+    /**
+     * Organizations
+     */
+    organizations: Array<OrgRunningAverage>;
 };
 
 /**
@@ -776,6 +827,34 @@ export type CreateVideoVideosPostResponses = {
 
 export type CreateVideoVideosPostResponse = CreateVideoVideosPostResponses[keyof CreateVideoVideosPostResponses];
 
+export type StreamJsonVideosVideoIdResultsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Video Id
+         */
+        video_id: string;
+    };
+    query?: never;
+    url: '/videos/{video_id}/results';
+};
+
+export type StreamJsonVideosVideoIdResultsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StreamJsonVideosVideoIdResultsGetError = StreamJsonVideosVideoIdResultsGetErrors[keyof StreamJsonVideosVideoIdResultsGetErrors];
+
+export type StreamJsonVideosVideoIdResultsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type DeleteVideoVideosVideoIdDeleteData = {
     body?: never;
     path: {
@@ -1238,3 +1317,35 @@ export type GetOrganizationStatsOrganizationsOrgIdStatsGetResponses = {
 };
 
 export type GetOrganizationStatsOrganizationsOrgIdStatsGetResponse = GetOrganizationStatsOrganizationsOrgIdStatsGetResponses[keyof GetOrganizationStatsOrganizationsOrgIdStatsGetResponses];
+
+export type GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Top N
+         *
+         * Number of top organizations to return
+         */
+        top_n?: number;
+    };
+    url: '/stats/top-orgs-running-avg';
+};
+
+export type GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetError = GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetErrors[keyof GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetErrors];
+
+export type GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: TopOrgsRunningAvgResponse;
+};
+
+export type GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponse = GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponses[keyof GetTopOrgsRunningAvgStatsTopOrgsRunningAvgGetResponses];
