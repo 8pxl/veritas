@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import {
   Building2,
   ChevronRight,
   User,
   Video as VideoIcon,
   Loader2,
+  Search,
 } from "lucide-react"
 
 import {
@@ -29,6 +30,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { Input } from "@/components/ui/input"
 import { useExploreStore } from "../stores/useExploreStore"
 import { listPeoplePeopleGet, getPropositionsByPersonPeoplePersonIdPropositionsGet, streamJsonVideosVideoIdResultsGet } from "@/lib/client/sdk.gen"
 import type { Person, Proposition, Video, Organization } from "@/lib/client/types.gen"
@@ -51,6 +53,25 @@ export function ExploreBar() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [personData, setPersonData] = useState<Record<string, PersonPropositions>>({})
+  const [search, setSearch] = useState("")
+
+  const filteredOrgGroups = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return orgGroups
+    return orgGroups
+      .map((group) => ({
+        ...group,
+        people: group.people.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.position ?? "").toLowerCase().includes(q)
+        ),
+      }))
+      .filter(
+        (group) =>
+          group.org.name.toLowerCase().includes(q) || group.people.length > 0
+      )
+  }, [orgGroups, search])
 
   // Fetch all people on mount and group by organization
   useEffect(() => {
@@ -162,6 +183,17 @@ export function ExploreBar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Organizations</SidebarGroupLabel>
+          <div className="px-2 pb-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-sidebar-foreground/50 pointer-events-none" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                className="h-7 pl-7 text-xs bg-white/10 border-sidebar-border text-sidebar-foreground placeholder:text-sidebar-foreground/40 focus-visible:ring-sidebar-foreground/30"
+              />
+            </div>
+          </div>
           <SidebarGroupContent>
             {loading ? (
               <div className="flex items-center justify-center py-8">
@@ -173,7 +205,7 @@ export function ExploreBar() {
               <div className="px-3 py-4 text-sm text-muted-foreground">No data available</div>
             ) : (
               <SidebarMenu>
-                {orgGroups.map((group) => (
+                {filteredOrgGroups.map((group) => (
                   <Collapsible key={group.org.id} asChild defaultOpen>
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>

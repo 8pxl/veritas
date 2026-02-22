@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react"
 import { PropositionsWithAnalysis, useExploreStore } from "../stores/useExploreStore"
-import { PropositionPopup } from "./ConfidencePopup"
+import { PropositionPopup, AudioEmotionOverlay } from "./ConfidencePopup"
 import { SkipForward } from "lucide-react"
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -24,6 +24,7 @@ export function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [activeProposition, setActiveProposition] = useState<PropositionsWithAnalysis | null>(null)
   const [popupVisible, setPopupVisible] = useState(false)
+  const popupVisibleRef = useRef(false)
   const triggeredRef = useRef<Set<number>>(new Set())
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -83,6 +84,7 @@ export function VideoPlayer() {
     triggeredRef.current.clear()
     setActiveProposition(null)
     setPopupVisible(false)
+    popupVisibleRef.current = false
     activeSidebarIdRef.current = null
     setActiveSidebarId(null)
     visibleChartCountRef.current = 0
@@ -134,8 +136,12 @@ export function VideoPlayer() {
         triggeredRef.current.add(prop.id)
         setActiveProposition(prop)
         setPopupVisible(true)
+        popupVisibleRef.current = true
         if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
-        dismissTimerRef.current = setTimeout(() => setPopupVisible(false), DISMISS_AFTER * 1000)
+        dismissTimerRef.current = setTimeout(() => {
+          setPopupVisible(false)
+          popupVisibleRef.current = false
+        }, DISMISS_AFTER * 1000)
         break
       }
     }
@@ -154,9 +160,29 @@ export function VideoPlayer() {
 
   const handleDismiss = useCallback(() => {
     setPopupVisible(false)
+    popupVisibleRef.current = false
     if (dismissTimerRef.current) {
       clearTimeout(dismissTimerRef.current)
       dismissTimerRef.current = null
+    }
+  }, [])
+
+  const handlePause = useCallback(() => {
+    // Cancel auto-dismiss while paused so popup lingers
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current)
+      dismissTimerRef.current = null
+    }
+  }, [])
+
+  const handlePlay = useCallback(() => {
+    // Restart dismiss timer if popup is still showing
+    if (popupVisibleRef.current) {
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+      dismissTimerRef.current = setTimeout(() => {
+        setPopupVisible(false)
+        popupVisibleRef.current = false
+      }, DISMISS_AFTER * 1000)
     }
   }, [])
 
@@ -167,8 +193,12 @@ export function VideoPlayer() {
     videoRef.current.play()
     setActiveProposition(prop)
     setPopupVisible(true)
+    popupVisibleRef.current = true
     if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
-    dismissTimerRef.current = setTimeout(() => setPopupVisible(false), DISMISS_AFTER * 1000)
+    dismissTimerRef.current = setTimeout(() => {
+      setPopupVisible(false)
+      popupVisibleRef.current = false
+    }, DISMISS_AFTER * 1000)
   }, [])
 
   const jumpToNextStatement = useCallback(() => {
@@ -215,12 +245,20 @@ export function VideoPlayer() {
             disablePictureInPicture
             onTimeUpdate={handleTimeUpdate}
             onSeeked={handleSeeked}
+            onPause={handlePause}
+            onPlay={handlePlay}
           />
           {activeProposition && (
             <PropositionPopup
               proposition={activeProposition}
               visible={popupVisible}
               onDismiss={handleDismiss}
+            />
+          )}
+          {activeProposition && (
+            <AudioEmotionOverlay
+              proposition={activeProposition}
+              visible={popupVisible}
             />
           )}
           {propositions.length > 0 && (
@@ -303,7 +341,7 @@ export function VideoPlayer() {
               <YAxis domain={[0, 100]} hide />
               <Tooltip
                 contentStyle={{ fontSize: 11, background: "#FFF4E9", border: "1px solid #894048", borderRadius: 6 }}
-                formatter={(v: number) => [`${v}%`]}
+                formatter={(v) => [`${v ?? ""}%`]}
               />
               <Area
                 type="monotone"
