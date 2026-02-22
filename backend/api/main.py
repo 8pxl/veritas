@@ -184,7 +184,7 @@ def _person_to_schema(p: PersonDB, org: OrganizationDB) -> Person:
 def _video_to_schema(v: VideoDB) -> Video:
     # transform video url
     video_url = v.video_url
-    if v.video_url.contains("youtube.com/watch?v="):
+    if "youtube.com/watch?v=" in video_url:
         # https://vid.totsuki.harvey-l.com/<ID>.?
         exts = ["mp4", "webm", "mkv"]
         for ext in exts:
