@@ -54,9 +54,13 @@ def find_downloaded(video_id: str, download_dir: str) -> str | None:
 def run_pipeline(video_path: str, description: str, output_path: str) -> int:
     """Run main.py analysis pipeline. Returns the process exit code."""
     cmd = [
-        sys.executable, "./main.py", video_path,
-        "--description", description,
-        "--output", output_path,
+        sys.executable,
+        "./main.py",
+        video_path,
+        "--description",
+        description,
+        "--output",
+        output_path,
     ]
     result = subprocess.run(cmd)
     return result.returncode
@@ -65,9 +69,13 @@ def run_pipeline(video_path: str, description: str, output_path: str) -> int:
 def push_to_db(pipeline_json: str, tasks_json: str, video_id: str) -> int:
     """Run push_db.py to upload results. Returns the process exit code."""
     cmd = [
-        sys.executable, "./push_db.py", pipeline_json,
-        "--video-meta", tasks_json,
-        "--video-id", video_id,
+        sys.executable,
+        "./push_db.py",
+        pipeline_json,
+        "--video-meta",
+        tasks_json,
+        "--video-id",
+        video_id,
     ]
     result = subprocess.run(cmd)
     return result.returncode
@@ -78,20 +86,35 @@ def main():
         description="Download, analyze, and push videos to the database.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("tasks_json",
-                        help="JSON file with list of video task objects")
-    parser.add_argument("--download-dir", default="./downloads",
-                        help="Directory for downloaded videos (default: ./downloads)")
-    parser.add_argument("--output-dir", default="./results",
-                        help="Directory for pipeline output JSONs (default: ./results)")
-    parser.add_argument("--skip-download", action="store_true",
-                        help="Skip downloading, use existing files in download-dir")
-    parser.add_argument("--skip-analysis", action="store_true",
-                        help="Skip analysis, use existing output JSONs in output-dir")
-    parser.add_argument("--skip-push", action="store_true",
-                        help="Skip pushing to database")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Print what would be done without executing")
+    parser.add_argument("tasks_json", help="JSON file with list of video task objects")
+    parser.add_argument(
+        "--download-dir",
+        default="./downloads",
+        help="Directory for downloaded videos (default: ./downloads)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="./results",
+        help="Directory for pipeline output JSONs (default: ./results)",
+    )
+    parser.add_argument(
+        "--skip-download",
+        action="store_true",
+        help="Skip downloading, use existing files in download-dir",
+    )
+    parser.add_argument(
+        "--skip-analysis",
+        action="store_true",
+        help="Skip analysis, use existing output JSONs in output-dir",
+    )
+    parser.add_argument(
+        "--skip-push", action="store_true", help="Skip pushing to database"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print what would be done without executing",
+    )
 
     args = parser.parse_args()
 
@@ -111,14 +134,13 @@ def main():
         description = title
         output_path = os.path.join(args.output_dir, f"{video_id}.json")
 
-        print(f"\n{'='*60}")
-        print(f"[{i+1}/{total}] {video_id} - {title}")
-        print(f"{'='*60}")
+        print(f"\n{'=' * 60}")
+        print(f"[{i + 1}/{total}] {video_id} - {title}")
+        print(f"{'=' * 60}")
 
         # Step 1: Download
-        video_path = None
+        video_path = find_downloaded(video_id, args.download_dir)
         if args.skip_download or args.skip_analysis:
-            video_path = find_downloaded(video_id, args.download_dir)
             if video_path:
                 print(f"  Using existing: {video_path}")
             elif not args.skip_analysis:
@@ -153,8 +175,10 @@ def main():
                 print(f"  Analysis output: {output_path}")
         else:
             if not os.path.exists(output_path):
-                print(f"  No analysis output found at {output_path}, skipping",
-                      file=sys.stderr)
+                print(
+                    f"  No analysis output found at {output_path}, skipping",
+                    file=sys.stderr,
+                )
                 failed.append((video_id, "analysis output not found"))
                 continue
             print(f"  Using existing analysis: {output_path}")
@@ -174,7 +198,7 @@ def main():
 
         succeeded += 1
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Finished: {succeeded}/{total} succeeded")
     if failed:
         print(f"Failed ({len(failed)}):")
