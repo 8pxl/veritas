@@ -465,10 +465,10 @@ Identify every speaker with their full name and title. Ensure that they are in o
                 # db_insert returns a single dict, db_search returns a list
                 items = parsed if isinstance(parsed, list) else [parsed]
                 for item in items:
-                    if isinstance(item, dict) and item.get("speakerId"):
+                    if isinstance(item, dict) and item.get("id"):
                         known_speakers.append(
                             {
-                                "speakerId": item["speakerId"],
+                                "speakerId": item["id"],
                                 "name": item.get("name", ""),
                             }
                         )
@@ -486,6 +486,8 @@ Identify every speaker with their full name and title. Ensure that they are in o
     speaker_table = "\n".join(
         f"  - {sp['name']}: {sp['speakerId']}" for sp in unique_speakers
     )
+
+    print(f"\nKnown speakers from DB tools ({len(unique_speakers)}):\n{speaker_table}")
 
     messages.append(
         {
