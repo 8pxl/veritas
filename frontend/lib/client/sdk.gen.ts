@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateOrganizationOrganizationsPostData, CreateOrganizationOrganizationsPostErrors, CreateOrganizationOrganizationsPostResponses, CreatePersonPeoplePostData, CreatePersonPeoplePostErrors, CreatePersonPeoplePostResponses, CreatePropositionPropositionsPostData, CreatePropositionPropositionsPostErrors, CreatePropositionPropositionsPostResponses, CreateVideoVideosPostData, CreateVideoVideosPostErrors, CreateVideoVideosPostResponses, DeleteOrganizationOrganizationsOrgIdDeleteData, DeleteOrganizationOrganizationsOrgIdDeleteErrors, DeleteOrganizationOrganizationsOrgIdDeleteResponses, DeletePersonPeoplePersonIdDeleteData, DeletePersonPeoplePersonIdDeleteErrors, DeletePersonPeoplePersonIdDeleteResponses, DeletePropositionPropositionsPropIdDeleteData, DeletePropositionPropositionsPropIdDeleteErrors, DeletePropositionPropositionsPropIdDeleteResponses, DeleteVideoVideosVideoIdDeleteData, DeleteVideoVideosVideoIdDeleteErrors, DeleteVideoVideosVideoIdDeleteResponses, GetOrganizationOrganizationsOrgIdGetData, GetOrganizationOrganizationsOrgIdGetErrors, GetOrganizationOrganizationsOrgIdGetResponses, GetPersonPeoplePersonIdGetData, GetPersonPeoplePersonIdGetErrors, GetPersonPeoplePersonIdGetResponses, GetPropositionPropositionsPropIdGetData, GetPropositionPropositionsPropIdGetErrors, GetPropositionPropositionsPropIdGetResponses, GetPropositionsByPersonPeoplePersonIdPropositionsGetData, GetPropositionsByPersonPeoplePersonIdPropositionsGetErrors, GetPropositionsByPersonPeoplePersonIdPropositionsGetResponses, GetVideoVideosVideoIdGetData, GetVideoVideosVideoIdGetErrors, GetVideoVideosVideoIdGetResponses, ListOrganizationsOrganizationsGetData, ListOrganizationsOrganizationsGetResponses, ListPeoplePeopleGetData, ListPeoplePeopleGetResponses, ListPropositionsPropositionsGetData, ListPropositionsPropositionsGetResponses, ListVideosVideosGetData, ListVideosVideosGetResponses, SearchPeoplePeopleSearchGetData, SearchPeoplePeopleSearchGetErrors, SearchPeoplePeopleSearchGetResponses, UpdateOrganizationOrganizationsOrgIdPutData, UpdateOrganizationOrganizationsOrgIdPutErrors, UpdateOrganizationOrganizationsOrgIdPutResponses, UpdatePersonPeoplePersonIdPutData, UpdatePersonPeoplePersonIdPutErrors, UpdatePersonPeoplePersonIdPutResponses, UpdatePropositionPropositionsPropIdPutData, UpdatePropositionPropositionsPropIdPutErrors, UpdatePropositionPropositionsPropIdPutResponses, UpdateVideoVideosVideoIdPutData, UpdateVideoVideosVideoIdPutErrors, UpdateVideoVideosVideoIdPutResponses } from './types.gen';
+import type { CreateOrganizationOrganizationsPostData, CreateOrganizationOrganizationsPostErrors, CreateOrganizationOrganizationsPostResponses, CreatePersonPeoplePostData, CreatePersonPeoplePostErrors, CreatePersonPeoplePostResponses, CreatePropositionPropositionsPostData, CreatePropositionPropositionsPostErrors, CreatePropositionPropositionsPostResponses, CreateVideoVideosPostData, CreateVideoVideosPostErrors, CreateVideoVideosPostResponses, DeleteOrganizationOrganizationsOrgIdDeleteData, DeleteOrganizationOrganizationsOrgIdDeleteErrors, DeleteOrganizationOrganizationsOrgIdDeleteResponses, DeletePersonPeoplePersonIdDeleteData, DeletePersonPeoplePersonIdDeleteErrors, DeletePersonPeoplePersonIdDeleteResponses, DeletePropositionPropositionsPropIdDeleteData, DeletePropositionPropositionsPropIdDeleteErrors, DeletePropositionPropositionsPropIdDeleteResponses, DeleteVideoVideosVideoIdDeleteData, DeleteVideoVideosVideoIdDeleteErrors, DeleteVideoVideosVideoIdDeleteResponses, GetOrganizationOrganizationsOrgIdGetData, GetOrganizationOrganizationsOrgIdGetErrors, GetOrganizationOrganizationsOrgIdGetResponses, GetOrganizationStatsOrganizationsOrgIdStatsGetData, GetOrganizationStatsOrganizationsOrgIdStatsGetErrors, GetOrganizationStatsOrganizationsOrgIdStatsGetResponses, GetOverallStatsStatsOverviewGetData, GetOverallStatsStatsOverviewGetResponses, GetPersonPeoplePersonIdGetData, GetPersonPeoplePersonIdGetErrors, GetPersonPeoplePersonIdGetResponses, GetPersonStatsPeoplePersonIdStatsGetData, GetPersonStatsPeoplePersonIdStatsGetErrors, GetPersonStatsPeoplePersonIdStatsGetResponses, GetPropositionPropositionsPropIdGetData, GetPropositionPropositionsPropIdGetErrors, GetPropositionPropositionsPropIdGetResponses, GetPropositionsByPersonPeoplePersonIdPropositionsGetData, GetPropositionsByPersonPeoplePersonIdPropositionsGetErrors, GetPropositionsByPersonPeoplePersonIdPropositionsGetResponses, GetStatsByOrganizationStatsByOrganizationGetData, GetStatsByOrganizationStatsByOrganizationGetResponses, GetStatsByPersonStatsByPersonGetData, GetStatsByPersonStatsByPersonGetResponses, GetStatsByVideoStatsByVideoGetData, GetStatsByVideoStatsByVideoGetResponses, GetTruthLeaderboardStatsLeaderboardGetData, GetTruthLeaderboardStatsLeaderboardGetErrors, GetTruthLeaderboardStatsLeaderboardGetResponses, GetVideoVideosVideoIdGetData, GetVideoVideosVideoIdGetErrors, GetVideoVideosVideoIdGetResponses, ListOrganizationsOrganizationsGetData, ListOrganizationsOrganizationsGetResponses, ListPeoplePeopleGetData, ListPeoplePeopleGetResponses, ListPropositionsPropositionsGetData, ListPropositionsPropositionsGetResponses, ListVideosVideosGetData, ListVideosVideosGetResponses, SearchPeoplePeopleSearchGetData, SearchPeoplePeopleSearchGetErrors, SearchPeoplePeopleSearchGetResponses, UpdateOrganizationOrganizationsOrgIdPutData, UpdateOrganizationOrganizationsOrgIdPutErrors, UpdateOrganizationOrganizationsOrgIdPutResponses, UpdatePersonPeoplePersonIdPutData, UpdatePersonPeoplePersonIdPutErrors, UpdatePersonPeoplePersonIdPutResponses, UpdatePropositionPropositionsPropIdPutData, UpdatePropositionPropositionsPropIdPutErrors, UpdatePropositionPropositionsPropIdPutResponses, UpdateVideoVideosVideoIdPutData, UpdateVideoVideosVideoIdPutErrors, UpdateVideoVideosVideoIdPutResponses, VerifyAllPropositionsPropositionsVerifyAllPostData, VerifyAllPropositionsPropositionsVerifyAllPostResponses, VerifySinglePropositionPropositionsPropIdVerifyPostData, VerifySinglePropositionPropositionsPropIdVerifyPostErrors, VerifySinglePropositionPropositionsPropIdVerifyPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -182,6 +182,67 @@ export const updatePropositionPropositionsPropIdPut = <ThrowOnError extends bool
 });
 
 /**
+ * Verify Single Proposition
+ */
+export const verifySinglePropositionPropositionsPropIdVerifyPost = <ThrowOnError extends boolean = false>(options: Options<VerifySinglePropositionPropositionsPropIdVerifyPostData, ThrowOnError>) => (options.client ?? client).post<VerifySinglePropositionPropositionsPropIdVerifyPostResponses, VerifySinglePropositionPropositionsPropIdVerifyPostErrors, ThrowOnError>({ url: '/propositions/{prop_id}/verify', ...options });
+
+/**
+ * Verify All Propositions
+ */
+export const verifyAllPropositionsPropositionsVerifyAllPost = <ThrowOnError extends boolean = false>(options?: Options<VerifyAllPropositionsPropositionsVerifyAllPostData, ThrowOnError>) => (options?.client ?? client).post<VerifyAllPropositionsPropositionsVerifyAllPostResponses, unknown, ThrowOnError>({ url: '/propositions/verify-all', ...options });
+
+/**
  * Get Propositions By Person
  */
 export const getPropositionsByPersonPeoplePersonIdPropositionsGet = <ThrowOnError extends boolean = false>(options: Options<GetPropositionsByPersonPeoplePersonIdPropositionsGetData, ThrowOnError>) => (options.client ?? client).get<GetPropositionsByPersonPeoplePersonIdPropositionsGetResponses, GetPropositionsByPersonPeoplePersonIdPropositionsGetErrors, ThrowOnError>({ url: '/people/{person_id}/propositions', ...options });
+
+/**
+ * Get Overall Stats
+ *
+ * Overall truth index and verdict breakdown across all propositions.
+ */
+export const getOverallStatsStatsOverviewGet = <ThrowOnError extends boolean = false>(options?: Options<GetOverallStatsStatsOverviewGetData, ThrowOnError>) => (options?.client ?? client).get<GetOverallStatsStatsOverviewGetResponses, unknown, ThrowOnError>({ url: '/stats/overview', ...options });
+
+/**
+ * Get Stats By Person
+ *
+ * Truth index per speaker, sorted by number of propositions descending.
+ */
+export const getStatsByPersonStatsByPersonGet = <ThrowOnError extends boolean = false>(options?: Options<GetStatsByPersonStatsByPersonGetData, ThrowOnError>) => (options?.client ?? client).get<GetStatsByPersonStatsByPersonGetResponses, unknown, ThrowOnError>({ url: '/stats/by-person', ...options });
+
+/**
+ * Get Stats By Organization
+ *
+ * Truth index per organization, sorted by number of propositions descending.
+ */
+export const getStatsByOrganizationStatsByOrganizationGet = <ThrowOnError extends boolean = false>(options?: Options<GetStatsByOrganizationStatsByOrganizationGetData, ThrowOnError>) => (options?.client ?? client).get<GetStatsByOrganizationStatsByOrganizationGetResponses, unknown, ThrowOnError>({ url: '/stats/by-organization', ...options });
+
+/**
+ * Get Stats By Video
+ *
+ * Truth index per video, sorted by number of propositions descending.
+ */
+export const getStatsByVideoStatsByVideoGet = <ThrowOnError extends boolean = false>(options?: Options<GetStatsByVideoStatsByVideoGetData, ThrowOnError>) => (options?.client ?? client).get<GetStatsByVideoStatsByVideoGetResponses, unknown, ThrowOnError>({ url: '/stats/by-video', ...options });
+
+/**
+ * Get Truth Leaderboard
+ *
+ * Rank speakers by truth index. `most_honest` = highest truth index first,
+ * `biggest_liars` = lowest truth index first. Only includes speakers with
+ * at least `min_claims` decided (true/false) propositions.
+ */
+export const getTruthLeaderboardStatsLeaderboardGet = <ThrowOnError extends boolean = false>(options?: Options<GetTruthLeaderboardStatsLeaderboardGetData, ThrowOnError>) => (options?.client ?? client).get<GetTruthLeaderboardStatsLeaderboardGetResponses, GetTruthLeaderboardStatsLeaderboardGetErrors, ThrowOnError>({ url: '/stats/leaderboard', ...options });
+
+/**
+ * Get Person Stats
+ *
+ * Truth index and verdict breakdown for a single speaker.
+ */
+export const getPersonStatsPeoplePersonIdStatsGet = <ThrowOnError extends boolean = false>(options: Options<GetPersonStatsPeoplePersonIdStatsGetData, ThrowOnError>) => (options.client ?? client).get<GetPersonStatsPeoplePersonIdStatsGetResponses, GetPersonStatsPeoplePersonIdStatsGetErrors, ThrowOnError>({ url: '/people/{person_id}/stats', ...options });
+
+/**
+ * Get Organization Stats
+ *
+ * Truth index and verdict breakdown for a single organization.
+ */
+export const getOrganizationStatsOrganizationsOrgIdStatsGet = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationStatsOrganizationsOrgIdStatsGetData, ThrowOnError>) => (options.client ?? client).get<GetOrganizationStatsOrganizationsOrgIdStatsGetResponses, GetOrganizationStatsOrganizationsOrgIdStatsGetErrors, ThrowOnError>({ url: '/organizations/{org_id}/stats', ...options });
