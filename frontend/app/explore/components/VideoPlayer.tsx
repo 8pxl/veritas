@@ -1,29 +1,23 @@
 "use client"
 
-import { useRef, useState, useCallback, useEffect } from "react"
+import { useRef, useState, useCallback, useEffect, useMemo } from "react"
 import { PropositionsWithAnalysis, useExploreStore } from "../stores/useExploreStore"
 import { PropositionPopup } from "./ConfidencePopup"
 import { SkipForward } from "lucide-react"
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts"
 
-const TRIGGER_WINDOW = 1.5 // seconds — how close to a timestamp before triggering
-const DISMISS_AFTER = 8 // seconds — auto-dismiss if not manually closed
+const DISMISS_AFTER = 8
 
 function parseTimestamp(verifyAt: string): number {
-  // Try raw number first
   const num = Number(verifyAt)
   if (!isNaN(num)) return num
-
-  // Try MM:SS or HH:MM:SS
   const parts = verifyAt.split(":").map(Number)
   if (parts.length === 2) return parts[0] * 60 + parts[1]
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
-
   return 0
 }
-
 
 export function VideoPlayer() {
   const { selectedVideo, selectedPerson, selectedOrgName, propositions } = useExploreStore()
@@ -33,58 +27,130 @@ export function VideoPlayer() {
   const triggeredRef = useRef<Set<number>>(new Set())
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Reset triggered set when video changes
+  // Sidebar highlight + chart sliding window
+  const activeSidebarIdRef = useRef<number | null>(null)
+  const [activeSidebarId, setActiveSidebarId] = useState<number | null>(null)
+  const visibleChartCountRef = useRef(0)
+  const [visibleChartCount, setVisibleChartCount] = useState(0)
+
+  // Ref to active sidebar row for auto-scroll
+  const activeRowRef = useRef<HTMLButtonElement | null>(null)
+  // Refs for same-height layout
+  const videoContainerRef = useRef<HTMLDivElement>(null)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+
+  // Sync sidebar height to video container height
+  useEffect(() => {
+    function onResize() {
+      const el = videoContainerRef.current
+      if (!el) return
+      if (sidebarRef.current) {
+        sidebarRef.current.style.maxHeight = `${el.offsetHeight}px`
+      }
+    }
+    window.addEventListener("resize", onResize)
+    onResize()
+    return () => window.removeEventListener("resize", onResize)
+  })
+
+  const sortedPropositions = useMemo(
+    () => [...propositions].sort((a, b) => parseTimestamp(a.start) - parseTimestamp(b.start)),
+    [propositions]
+  )
+  const sortedPropositionsRef = useRef(sortedPropositions)
+  useEffect(() => { sortedPropositionsRef.current = sortedPropositions }, [sortedPropositions])
+
+  const allChartData = useMemo(() =>
+    sortedPropositions.map((prop) => {
+      const ts = parseTimestamp(prop.start)
+      const m = Math.floor(ts / 60)
+      const s = Math.floor(ts % 60)
+      return {
+        label: `${m}:${String(s).padStart(2, "0")}`,
+        audio: prop.audio_confidence?.confidence_score != null
+          ? Math.round(prop.audio_confidence.confidence_score * 100)
+          : null,
+        facial: prop.facial_confidence && !prop.facial_confidence.error
+          ? Math.round(prop.facial_confidence.confidence_score * 100)
+          : null,
+      }
+    }),
+    [sortedPropositions]
+  )
+
+  // Reset everything on video change
   useEffect(() => {
     triggeredRef.current.clear()
     setActiveProposition(null)
     setPopupVisible(false)
+    activeSidebarIdRef.current = null
+    setActiveSidebarId(null)
+    visibleChartCountRef.current = 0
+    setVisibleChartCount(0)
     if (dismissTimerRef.current) {
       clearTimeout(dismissTimerRef.current)
       dismissTimerRef.current = null
     }
   }, [selectedVideo?.video_id])
 
+  // Auto-scroll the highlighted list item into view
+  useEffect(() => {
+    activeRowRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+  }, [activeProposition?.id])
+
+  const updateTimeTracking = useCallback((currentTime: number) => {
+    const sorted = sortedPropositionsRef.current
+    let newActiveId: number | null = null
+    let newCount = 0
+    for (const prop of sorted) {
+      if (parseTimestamp(prop.start) <= currentTime) {
+        newActiveId = prop.id
+        newCount++
+      } else {
+        break
+      }
+    }
+    if (newActiveId !== activeSidebarIdRef.current) {
+      activeSidebarIdRef.current = newActiveId
+      setActiveSidebarId(newActiveId)
+    }
+    if (newCount !== visibleChartCountRef.current) {
+      visibleChartCountRef.current = newCount
+      setVisibleChartCount(newCount)
+    }
+  }, [])
+
   const handleTimeUpdate = useCallback(() => {
     if (!videoRef.current || !selectedVideo || propositions.length === 0) return
     const currentTime = videoRef.current.currentTime
+
+    updateTimeTracking(currentTime)
 
     for (const prop of propositions) {
       const ts = parseTimestamp(prop.start)
       const end = parseTimestamp(prop.end)
       if (triggeredRef.current.has(prop.id)) continue
-
       if (currentTime >= ts && currentTime <= end) {
-        console.log(prop)
         triggeredRef.current.add(prop.id)
-        console.log(`Triggering proposition ${prop} at time ${currentTime}s (timestamp: ${ts}s - ${end}s)`)
         setActiveProposition(prop)
         setPopupVisible(true)
-
-        // Clear any existing dismiss timer
-        if (dismissTimerRef.current) {
-          clearTimeout(dismissTimerRef.current)
-        }
-        dismissTimerRef.current = setTimeout(() => {
-          setPopupVisible(false)
-        }, DISMISS_AFTER * 1000)
-
+        if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+        dismissTimerRef.current = setTimeout(() => setPopupVisible(false), DISMISS_AFTER * 1000)
         break
       }
     }
-  }, [selectedVideo, propositions])
+  }, [selectedVideo, propositions, updateTimeTracking])
 
-  // Allow re-triggering when user seeks backward past a proposition
   const handleSeeked = useCallback(() => {
-    if (!videoRef.current || propositions.length === 0) return
+    if (!videoRef.current) return
     const currentTime = videoRef.current.currentTime
-
-    for (const prop of propositions) {
-      const ts = parseTimestamp(prop.start)
-      if (currentTime < ts) {
+    for (const prop of sortedPropositionsRef.current) {
+      if (parseTimestamp(prop.start) > currentTime) {
         triggeredRef.current.delete(prop.id)
       }
     }
-  }, [propositions])
+    updateTimeTracking(currentTime)
+  }, [updateTimeTracking])
 
   const handleDismiss = useCallback(() => {
     setPopupVisible(false)
@@ -96,12 +162,9 @@ export function VideoPlayer() {
 
   const jumpToProposition = useCallback((prop: PropositionsWithAnalysis) => {
     if (!videoRef.current) return
-    const ts = parseTimestamp(prop.start)
-    // Clear triggered state so the popup can fire again
     triggeredRef.current.delete(prop.id)
-    videoRef.current.currentTime = ts
+    videoRef.current.currentTime = parseTimestamp(prop.start)
     videoRef.current.play()
-    // Show popup immediately
     setActiveProposition(prop)
     setPopupVisible(true)
     if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
@@ -111,34 +174,15 @@ export function VideoPlayer() {
   const jumpToNextStatement = useCallback(() => {
     if (!videoRef.current || propositions.length === 0) return
     const currentTime = videoRef.current.currentTime
-    const sorted = [...propositions].sort((a, b) => parseTimestamp(a.start) - parseTimestamp(b.start))
-    const next = sorted.find((p) => parseTimestamp(p.start) > currentTime + 0.5)
+    const next = sortedPropositionsRef.current.find((p) => parseTimestamp(p.start) > currentTime + 0.5)
     if (next) {
       videoRef.current.currentTime = parseTimestamp(next.start)
       videoRef.current.play()
     }
   }, [propositions])
 
-  const sortedPropositions = [...propositions].sort(
-    (a, b) => parseTimestamp(a.start) - parseTimestamp(b.start)
-  )
-
-  // Build smoothed chart data from sorted propositions
-  const chartData = sortedPropositions.map((prop) => {
-    const ts = parseTimestamp(prop.start)
-    const m = Math.floor(ts / 60)
-    const s = Math.floor(ts % 60)
-    const label = `${m}:${String(s).padStart(2, "0")}`
-    return {
-      label,
-      audio: prop.audio_confidence?.confidence_score != null
-        ? Math.round(prop.audio_confidence.confidence_score * 100)
-        : null,
-      facial: prop.facial_confidence && !prop.facial_confidence.error
-        ? Math.round(prop.facial_confidence.confidence_score * 100)
-        : null,
-    }
-  })
+  // Sliding window: only show points up to current seek position
+  const visibleChartData = allChartData.slice(0, visibleChartCount)
 
   if (!selectedVideo) {
     return (
@@ -148,11 +192,9 @@ export function VideoPlayer() {
     )
   }
 
-
-
   return (
     <div className="flex flex-1 flex-col gap-4">
-      {/* Title row */}
+      {/* Title */}
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">{selectedVideo.title}</h2>
         <p className="text-sm text-muted-foreground">
@@ -160,10 +202,10 @@ export function VideoPlayer() {
         </p>
       </div>
 
-      {/* Video + sidebar */}
-      <div className="flex gap-4 items-start">
+      {/* Video + sidebar — same height via flex stretch */}
+      <div className="flex gap-4">
         {/* Video */}
-        <div className="relative flex-1 rounded-lg border bg-black aspect-video min-w-0">
+        <div ref={videoContainerRef} className="relative flex-1 rounded-lg border bg-black aspect-video min-w-0 self-start">
           <video
             ref={videoRef}
             key={selectedVideo.video_id}
@@ -174,7 +216,6 @@ export function VideoPlayer() {
             onTimeUpdate={handleTimeUpdate}
             onSeeked={handleSeeked}
           />
-
           {activeProposition && (
             <PropositionPopup
               proposition={activeProposition}
@@ -182,7 +223,6 @@ export function VideoPlayer() {
               onDismiss={handleDismiss}
             />
           )}
-
           {propositions.length > 0 && (
             <button
               onClick={jumpToNextStatement}
@@ -194,30 +234,46 @@ export function VideoPlayer() {
           )}
         </div>
 
-        {/* Propositions sidebar */}
+        {/* Propositions sidebar — height synced to video via ResizeObserver */}
         {sortedPropositions.length > 0 && (
-          <div className="flex flex-col gap-2 w-64 shrink-0">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Statements</h3>
-            <div className="flex flex-col divide-y divide-border rounded-lg border max-h-[calc(100vh-16rem)] overflow-y-auto">
+          <div
+            ref={sidebarRef}
+            className="w-64 shrink-0 flex flex-col rounded-lg border overflow-hidden self-start"
+          >
+            <div className="flex-1 overflow-y-auto divide-y divide-border flex flex-col">
               {sortedPropositions.map((prop) => {
                 const ts = parseTimestamp(prop.start)
                 const minutes = Math.floor(ts / 60)
                 const seconds = Math.floor(ts % 60)
                 const timeLabel = `${minutes}:${String(seconds).padStart(2, "0")}`
                 const verdict = prop.verdict?.toLowerCase()
+                const isActive = prop.start === activeProposition?.start
                 return (
                   <button
                     key={`${prop.id}-${prop.start}`}
+                    ref={isActive ? activeRowRef : null}
                     onClick={() => jumpToProposition(prop)}
-                    className="flex items-start gap-2 px-3 py-2.5 text-left hover:bg-muted/50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                    className={`flex items-start gap-2 px-3 py-2.5 text-left transition-all shrink-0 ${
+                      isActive
+                        ? "bg-accent/15 border-l-4 border-accent pl-2"
+                        : "hover:bg-muted/50 border-l-4 border-transparent pl-2"
+                    }`}
                   >
-                    <span className="shrink-0 text-[10px] font-mono text-muted-foreground w-8 pt-0.5">{timeLabel}</span>
+                    <span className={`shrink-0 text-[10px] font-mono w-8 pt-0.5 ${isActive ? "text-accent font-bold" : "text-muted-foreground"}`}>
+                      {timeLabel}
+                    </span>
                     <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                      <span className="text-xs text-foreground leading-snug line-clamp-2">{prop.statement}</span>
+                      <span className={`text-xs leading-snug line-clamp-2 ${isActive ? "text-accent font-semibold" : "text-foreground"}`}>
+                        {prop.statement}
+                      </span>
                       <span className="text-[10px] text-muted-foreground">{prop.speaker?.name ?? "Unknown"}</span>
                     </div>
                     {verdict && (
-                      <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${verdict === "true" ? "bg-green-500/15 text-green-600" : verdict === "false" ? "bg-red-500/15 text-red-600" : "bg-yellow-500/15 text-yellow-600"}`}>
+                      <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                        verdict === "true" ? "bg-green-500/15 text-green-600" :
+                        verdict === "false" ? "bg-red-500/15 text-red-600" :
+                        "bg-yellow-500/15 text-yellow-600"
+                      }`}>
                         {verdict === "true" ? "✓" : verdict === "false" ? "✗" : "?"}
                       </span>
                     )}
@@ -229,39 +285,40 @@ export function VideoPlayer() {
         )}
       </div>
 
-      {/* Confidence chart */}
-      {chartData.length > 1 && (
+      {/* Sliding-window confidence chart */}
+      {allChartData.length > 1 && (
         <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Statement Confidence Over Time</h3>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} unit="%" />
+            <AreaChart
+              data={visibleChartData}
+              margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorAudio" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#894048" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#894048" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="label" hide />
+              <YAxis domain={[0, 100]} hide />
               <Tooltip
-                contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 6, fontSize: 11 }}
-                formatter={(v: number | undefined) => v != null ? [`${v}%`] : ["-"]}
+                contentStyle={{ fontSize: 11, background: "#FFF4E9", border: "1px solid #894048", borderRadius: 6 }}
+                formatter={(v: number) => [`${v}%`]}
               />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="audio"
                 name="Audio"
-                stroke="#60a5fa"
+                stroke="#894048"
                 strokeWidth={2}
-                dot={{ r: 3 }}
+                fill="url(#colorAudio)"
+                dot={false}
                 connectNulls
+                isAnimationActive
+                animationDuration={400}
+                animationEasing="ease-out"
               />
-              <Line
-                type="monotone"
-                dataKey="facial"
-                name="Facial"
-                stroke="#f472b6"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                connectNulls
-              />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       )}
