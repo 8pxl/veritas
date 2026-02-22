@@ -4,11 +4,13 @@ import { useRef, useLayoutEffect, useState, useCallback } from "react"
 import Tabbar from "../components/shared/tabbar"
 import Leaderboard from "./leaderboard"
 import Graph from "./graph"
+import NetworkGraph from "./NetworkGraph"
 import Logo from "../components/shared/logo"
 
 const views = [
   { label: "graph" },
   { label: "leaderboard" },
+  { label: "network" },
 ]
 
 export default function VisPage() {
@@ -90,7 +92,11 @@ export default function VisPage() {
         </div>
 
 
-        {activeIndex === 0 ? <Graph /> : <Leaderboard />}
+        <div className="mt-8">
+          {activeIndex === 0 && <Graph />}
+          {activeIndex === 1 && <Leaderboard />}
+          {activeIndex === 2 && <NetworkGraph />}
+        </div>
 
       </div>
 
