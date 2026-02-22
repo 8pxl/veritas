@@ -224,11 +224,12 @@ def _db_search(query: str, max_results: int = 5) -> str:
     """
     import requests
 
-    resp = requests.get(
+    results = requests.get(
         "http://totsuki.harvey-l.com:7000/people/search", params={"q": query}
     ).json()
-    resp["speakerId"] = resp["id"]
-    return json.dumps(resp)
+    for r in results:
+        r["speakerId"] = r["id"]
+    return json.dumps(results)
 
 
 def _db_insert(name: str, organization: str, role: str) -> str:
@@ -444,8 +445,10 @@ Identify every speaker with their full name and title. Ensure that they are in o
         op_name="av_recognition.step2",
     )
     raw_content = structured_resp.choices[0].message.content or "{}"
+    print(f"  Phase 2 raw response ({len(raw_content)} chars): {raw_content[:500]}")
     try:
         data = json.loads(raw_content)
+        print(f"  Phase 2 parsed keys: {list(data.keys())}")
     except json.JSONDecodeError:
         print(f"  Warning: failed to parse JSON response: {raw_content[:200]}")
 
