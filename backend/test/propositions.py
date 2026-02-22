@@ -4,7 +4,7 @@ import base64
 import os
 import subprocess
 from dotenv import load_dotenv
-from groq import Groq
+from groq import Groq, BadRequestError
 from groq_retry import groq_call_with_retry
 
 load_dotenv()
@@ -60,7 +60,7 @@ _TOOLS = [
                         "description": 'Timestamp in MM:SS format, e.g. "06:48".',
                     }
                 },
-                "required": ["timestamp"],
+                "required": [],
             },
         },
     }
@@ -143,6 +143,7 @@ def _chat_completion_with_retry(
     }
     if tools is not None:
         kwargs["tools"] = tools
+        kwargs["tool_choice"] = "auto"
     if response_format is not None:
         kwargs["response_format"] = response_format
     return groq_call_with_retry(
@@ -150,6 +151,25 @@ def _chat_completion_with_retry(
         max_retries=max_retries,
         op_name="propositions.chat_completion",
     )
+
+
+def _parse_json_payload(raw: str) -> dict | None:
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else None
+    except json.JSONDecodeError:
+        start = raw.find("{")
+        end = raw.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            return None
+        try:
+            data = json.loads(raw[start : end + 1])
+            return data if isinstance(data, dict) else None
+        except json.JSONDecodeError:
+            return None
 
 
 def extract_propositions(
@@ -188,7 +208,31 @@ def extract_propositions(
     # ── Phase 1: multi-turn tool-use loop ────────────────────────────────────
     frame_images_sent = 0
     for _ in range(max_turns):
-        response = _chat_completion_with_retry(messages, tools=_TOOLS)
+        response = None
+        for turn_retry in range(4):
+            try:
+                response = _chat_completion_with_retry(messages, tools=_TOOLS, max_retries=2)
+                break
+            except BadRequestError as e:
+                code = getattr(e, "body", {}).get("error", {}).get("code")
+                if code != "tool_use_failed":
+                    raise
+                print(
+                    f"  tool_use_failed in propositions turn; retrying ({turn_retry + 1}/4)"
+                )
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            "If you need visual context, call get_frame with function arguments "
+                            '{"timestamp":"MM:SS"}. Do not output pseudo tool calls.'
+                        ),
+                    }
+                )
+                if turn_retry == 3:
+                    response = _chat_completion_with_retry(messages, max_retries=2)
+        if response is None:
+            response = _chat_completion_with_retry(messages, max_retries=2)
         msg = response.choices[0].message
 
         if not msg.tool_calls:
@@ -263,16 +307,34 @@ def extract_propositions(
         }
     )
 
-    final_response = _chat_completion_with_retry(
-        messages, response_format={"type": "json_object"}
-    )
-    content = final_response.choices[0].message.content or "{}"
-    try:
-        data = json.loads(content)
-        return data.get("propositions", [])
-    except json.JSONDecodeError:
-        print(f"Warning: could not parse JSON:\n{content}")
-        return []
+    for _ in range(6):
+        try:
+            final_response = _chat_completion_with_retry(messages, max_retries=2)
+        except Exception:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "Retry and return ONLY valid JSON object with key 'propositions'."
+                    ),
+                }
+            )
+            continue
+        content = final_response.choices[0].message.content or ""
+        data = _parse_json_payload(content)
+        if data is not None and isinstance(data.get("propositions", []), list):
+            return data.get("propositions", [])
+        messages.append(
+            {
+                "role": "user",
+                "content": (
+                    "Your previous output was not valid JSON. Return ONLY valid JSON object with "
+                    "key 'propositions' and no extra text."
+                ),
+            }
+        )
+    print("Warning: could not parse propositions JSON after retries.")
+    return []
 
 
 if __name__ == "__main__":
