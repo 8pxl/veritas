@@ -9,8 +9,11 @@ import {
   flexRender,
   type SortingState,
 } from "@tanstack/react-table"
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { getTruthLeaderboardStatsLeaderboardGet } from "@/lib/client/sdk.gen"
 import type { LeaderboardEntry } from "@/lib/client/types.gen"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import {
   Table,
   TableBody,
@@ -22,49 +25,92 @@ import {
 
 const columnHelper = createColumnHelper<LeaderboardEntry>()
 
-function truthColor(value: number) {
-  // Lerp from #BF5864 (0%) to #226F54 (100%)
-  //0BBA54
-  //EC596A
-  const r = Math.round(0x0B + (0xEC - 0x0B) * (Math.min(1, value * 2)))
-  const g = Math.round(0xBA + (0x59 - 0xBA) * (Math.min(1, value * 2)))
-  const b = Math.round(0x54 + (0x6A - 0x54) * (Math.min(1, value * 2)))
-  return `rgb(${r}, ${g}, ${b})`
+function getTruthLabel(value: number) {
+  if (value >= 0.75) return { label: "High", variant: "default" as const }
+  if (value >= 0.5) return { label: "Medium", variant: "secondary" as const }
+  return { label: "Low", variant: "destructive" as const }
 }
 
 const columns = [
   columnHelper.display({
     id: "rank",
     header: "#",
-    cell: (info) => info.row.index + 1,
+    enableSorting: false,
+    cell: (info) => {
+      const rank = info.row.index + 1
+
+      if (rank === 1) {
+        return <Badge className="min-w-14 justify-center">🥇 {rank}</Badge>
+      }
+      if (rank === 2) {
+        return (
+          <Badge variant="secondary" className="min-w-14 justify-center">
+            🥈 {rank}
+          </Badge>
+        )
+      }
+      if (rank === 3) {
+        return (
+          <Badge variant="outline" className="min-w-14 justify-center">
+            🥉 {rank}
+          </Badge>
+        )
+      }
+
+      return <span className="font-medium tabular-nums">{rank}</span>
+    },
   }),
   columnHelper.accessor((row) => row.person.name, {
     id: "name",
     header: "Name",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <span
+        className="block max-w-[180px] truncate font-medium"
+        title={info.getValue()}
+      >
+        {info.getValue()}
+      </span>
+    ),
   }),
   columnHelper.accessor((row) => row.person.position, {
     id: "position",
     header: "Position",
-    cell: (info) => info.getValue() ?? "—",
+    cell: (info) => (
+      <span
+        className="block max-w-[160px] truncate"
+        title={info.getValue() ?? "—"}
+      >
+        {info.getValue() ?? "—"}
+      </span>
+    ),
   }),
   columnHelper.accessor((row) => row.person.organization.name, {
     id: "organization",
     header: "Organization",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <span
+        className="block max-w-[180px] truncate"
+        title={info.getValue()}
+      >
+        {info.getValue()}
+      </span>
+    ),
   }),
   columnHelper.accessor("truthIndex", {
+    id: "truthIndex",
     header: "Truth Index",
     cell: (info) => {
       const value = info.getValue()
       if (value == null) return "—"
+
+      const percentage = Math.max(0, Math.min(100, value * 100))
       return (
-        <span
-          className="font-semibold"
-          style={{ color: truthColor(1 - value) }}
-        >
-          {(value * 100).toFixed(1)}%
-        </span>
+        <div className="min-w-36 space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-semibold tabular-nums">{percentage.toFixed(1)}%</span>
+          </div>
+          <Progress value={percentage} />
+        </div>
       )
     },
   }),
@@ -85,15 +131,25 @@ const columns = [
 export default function Leaderboard() {
   const [data, setData] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [error, setError] = useState<string | null>(null)
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "truthIndex", desc: true },
+  ])
 
   useEffect(() => {
     async function fetchLeaderboard() {
       setLoading(true)
-      const response = await getTruthLeaderboardStatsLeaderboardGet()
-      setData(response.data ?? [])
-      setLoading(false)
+      setError(null)
+      try {
+        const response = await getTruthLeaderboardStatsLeaderboardGet()
+        setData(response.data ?? [])
+      } catch {
+        setError("Could not load leaderboard right now.")
+      } finally {
+        setLoading(false)
+      }
     }
+
     fetchLeaderboard()
   }, [])
 
@@ -106,10 +162,24 @@ export default function Leaderboard() {
     getSortedRowModel: getSortedRowModel(),
   })
 
+  const isNumericColumn = (columnId: string) => {
+    return ["truthIndex", "trueCount", "falseCount", "total", "rank"].includes(
+      columnId
+    )
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12 text-muted-foreground">
         Loading leaderboard...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-12 text-muted-foreground">
+        {error}
       </div>
     )
   }
@@ -125,32 +195,47 @@ export default function Leaderboard() {
   const rows = table.getRowModel().rows
 
   return (
-    <div className="w-full overflow-y-auto rounded-lg border bg-card" style={{ maxHeight: "70vh" }}>
+    <div
+      className="w-full overflow-y-auto rounded-lg border bg-card"
+      style={{ maxHeight: "70vh" }}
+    >
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
                   className={
-                    header.column.getCanSort()
-                      ? "cursor-pointer select-none"
-                      : ""
+                    [
+                      header.column.getCanSort() ? "select-none" : "",
+                      isNumericColumn(header.column.id) ? "text-right" : "text-left",
+                    ].join(" ")
                   }
-                  onClick={header.column.getToggleSortingHandler()}
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  {header.column.getIsSorted() === "asc"
-                    ? " ↑"
-                    : header.column.getIsSorted() === "desc"
-                      ? " ↓"
-                      : ""}
+                  {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                    <button
+                      type="button"
+                      className="inline-flex w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-left hover:bg-muted/60"
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      <span>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </span>
+                      {header.column.getIsSorted() === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+                      ) : header.column.getIsSorted() === "desc" ? (
+                        <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      ) : (
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </button>
+                  ) : (
+                    flexRender(header.column.columnDef.header, header.getContext())
+                  )}
                 </TableHead>
               ))}
             </TableRow>
@@ -158,9 +243,16 @@ export default function Leaderboard() {
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.id} className="odd:bg-muted/20">
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell
+                  key={cell.id}
+                  className={
+                    isNumericColumn(cell.column.id)
+                      ? "text-right tabular-nums"
+                      : "text-left"
+                  }
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}
