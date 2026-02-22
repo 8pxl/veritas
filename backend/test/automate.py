@@ -23,7 +23,7 @@ def download_video(video_id: str, download_dir: str) -> str:
 
     output_template = os.path.join(download_dir, f"{video_id}.%(ext)s")
     ydl_opts = {
-        "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
+        "format": "bestvideo[height<=?720]+bestaudio/best",
         "outtmpl": output_template,
         "quiet": True,
         "no_warnings": True,
@@ -173,6 +173,14 @@ def main():
                     failed.append((video_id, f"analysis: exit code {rc}"))
                     continue
                 print(f"  Analysis output: {output_path}")
+
+                print(f"  Pushing to database...")
+                rc = push_to_db(output_path, args.tasks_json, video_id)
+                if rc != 0:
+                    print(f"  Push failed (exit code {rc})", file=sys.stderr)
+                    failed.append((video_id, f"push: exit code {rc}"))
+                    continue
+                print(f"  Push complete.")
         else:
             if not os.path.exists(output_path):
                 print(
@@ -182,19 +190,6 @@ def main():
                 failed.append((video_id, "analysis output not found"))
                 continue
             print(f"  Using existing analysis: {output_path}")
-
-        # Step 3: Push to DB
-        if not args.skip_push:
-            if args.dry_run:
-                print(f"  [dry-run] Would push {output_path} to DB")
-            else:
-                print(f"  Pushing to database...")
-                rc = push_to_db(output_path, args.tasks_json, video_id)
-                if rc != 0:
-                    print(f"  Push failed (exit code {rc})", file=sys.stderr)
-                    failed.append((video_id, f"push: exit code {rc}"))
-                    continue
-                print(f"  Push complete.")
 
         succeeded += 1
 
