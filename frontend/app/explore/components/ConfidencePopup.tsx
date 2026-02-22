@@ -35,16 +35,68 @@ function Typewriter({ text, speed = 25 }: { text: string; speed?: number }) {
   )
 }
 
-function ScoreBar({ label, value }: { label: string; value: number }) {
+interface ScoreBarProps {
+  /** Optional label shown to the left of the bar */
+  label?: string
+  /** 0-1 score value */
+  value: number
+  /** Override bar color (hex). When omitted, auto-picks green/yellow/red. */
+  barColor?: string
+  /** Tailwind height class for the bar track + fill, e.g. "h-1.5" (default "h-0.75") */
+  height?: string
+  /** Tailwind width class for the label, e.g. "w-14" (default "w-28") */
+  labelWidth?: string
+  /** Label color as hex string for inline style. Falls back to white/50 when omitted. */
+  labelColor?: string
+  /** Font-size class for label (default "text-[10px]") */
+  labelSize?: string
+  /** Font-size class for the percentage number (default "text-[10px]") */
+  valueSize?: string
+  /** Whether to show the numeric percentage (default true) */
+  showValue?: boolean
+}
+
+function ScoreBar({
+  label,
+  value,
+  barColor,
+  height = "h-0.75",
+  labelWidth = "w-28",
+  labelColor,
+  labelSize = "text-[10px]",
+  valueSize = "text-[10px]",
+  showValue = true,
+}: ScoreBarProps) {
   const pct = Math.round(value * 100)
-  const color = pct >= 70 ? "bg-green-400" : pct >= 40 ? "bg-yellow-400" : "bg-red-400"
+
+  // Derive colour — explicit hex wins, otherwise threshold-based class
+  const autoHex = pct >= 70 ? "#4ade80" : pct >= 40 ? "#facc15" : "#f87171"
+  const hex = barColor ?? autoHex
+  const autoClass = pct >= 70 ? "bg-green-400" : pct >= 40 ? "bg-yellow-400" : "bg-red-400"
+
   return (
     <div className="flex items-center gap-2 transition-all">
-      <span className="w-28 shrink-0 text-[10px] text-white/50 truncate capitalize">{label.replace(/_/g, " ")}</span>
-      <div className="flex-1 h-1 rounded-full bg-white/10">
-        <div className={`h-1 rounded-full ${color} transition-all duration-1000`} style={{ width: `${pct}%` }} />
+      {label !== undefined && (
+        <span
+          className={`${labelWidth} shrink-0 ${labelSize} truncate capitalize ${labelColor ? "" : "text-white/50"}`}
+          style={labelColor ? { color: labelColor } : undefined}
+        >
+          {label.replace(/_/g, " ")}
+        </span>
+      )}
+      <div className={`flex-1 ${height} rounded-full bg-white/10`}>
+        <div
+          className={`${height} rounded-full transition-all duration-1000 ${barColor ? "" : autoClass}`}
+          style={{
+            width: `${pct}%`,
+            ...(barColor ? { backgroundColor: hex } : {}),
+            boxShadow: `0 0 4px 1px ${hex}90`,
+          }}
+        />
       </div>
-      <span className="w-6 text-right text-[10px] text-white/50">{pct}</span>
+      {showValue && (
+        <span className={`w-6 text-right ${valueSize} text-white/50 shrink-0`}>{pct}</span>
+      )}
     </div>
   )
 }
@@ -94,7 +146,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
 
   return (
     <div className={`absolute right-4 top-4 z-20 w-80 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"}`}>
-      <Card className="border-white/10 bg-black/1 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
+      <Card className="border-white/10 bg-black/25 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
         <CardHeader className="pb-0">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -144,12 +196,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
                 <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">Audio Confidence</span>
                 <span className="ml-auto text-xs font-semibold text-white/80">{Math.round(audio.confidence_score * 100)}%</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-white/10">
-                <div
-                  className={`h-1.5 rounded-full transition-all duration-1000 ${audio.confidence_score >= 0.7 ? "bg-green-400" : audio.confidence_score >= 0.4 ? "bg-yellow-400" : "bg-red-400"}`}
-                  style={{ width: `${Math.round(audio.confidence_score * 100)}%` }}
-                />
-              </div>
+              <ScoreBar value={audio.confidence_score} height="h-1.5" showValue={false} />
               {audio.components && (
                 <div className="flex flex-col gap-1 pt-0.5">
                   {Object.entries(audio.components).map(([k, v]) => (
@@ -168,12 +215,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
                 <span className="text-[10px] uppercase tracking-wide text-white/40 font-medium">Facial Confidence</span>
                 <span className="ml-auto text-xs font-semibold text-white/80">{Math.round(facial.confidence_score * 100)}%</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-white/10">
-                <div
-                  className={`h-1.5 rounded-full transition-all ${facial.confidence_score >= 0.7 ? "bg-green-400" : facial.confidence_score >= 0.4 ? "bg-yellow-400" : "bg-red-400"}`}
-                  style={{ width: `${Math.round(facial.confidence_score * 100)}%` }}
-                />
-              </div>
+              <ScoreBar value={facial.confidence_score} height="h-1.5" showValue={false} />
               {facial.components && (
                 <div className="flex flex-col gap-1 pt-0.5 ">
                   {Object.entries(facial.components).map(([k, v]) => (
@@ -338,27 +380,17 @@ export function AudioEmotionOverlay({
           <div className="flex flex-col gap-1.5">
             <span className="text-[9px] uppercase tracking-widest text-white/30 font-medium">Affect</span>
             {topEmotions.map(({ name, pct }) => (
-              <div key={name} className="flex items-center gap-2">
-                <span
-                  className="w-14 shrink-0 text-[10px] capitalize truncate"
-                  style={{ color: emotionColor(name) }}
-                >
-                  {name}
-                </span>
-                <div className="flex-1 h-[3px] rounded-full bg-white/10">
-                  <div
-                    className="h-[3px] rounded-full transition-all duration-700"
-                    style={{
-                      width: `${Math.round(pct * 100)}%`,
-                      backgroundColor: emotionColor(name),
-                      boxShadow: `0 0 4px ${emotionColor(name)}90`,
-                    }}
-                  />
-                </div>
-                <span className="text-[9px] text-white/30 w-5 text-right shrink-0">
-                  {Math.round(pct * 100)}
-                </span>
-              </div>
+              <ScoreBar
+                key={name}
+                label={name}
+                value={pct}
+                barColor={emotionColor(name)}
+                height="h-[3px]"
+                labelWidth="w-14"
+                labelColor={emotionColor(name)}
+                labelSize="text-[10px]"
+                valueSize="text-[9px]"
+              />
             ))}
           </div>
         )}
