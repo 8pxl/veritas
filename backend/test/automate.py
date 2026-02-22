@@ -23,7 +23,7 @@ def download_video(video_id: str, download_dir: str) -> str:
 
     output_template = os.path.join(download_dir, f"{video_id}.%(ext)s")
     ydl_opts = {
-        "format": "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=webm]/best",
+        "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
         "outtmpl": output_template,
         "quiet": True,
         "no_warnings": True,
