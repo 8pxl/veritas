@@ -231,7 +231,10 @@ def create_organization(org: OrganizationCreate, db: Session = Depends(get_db)):
 
 @app.get("/organizations", response_model=List[Organization])
 def list_organizations(db: Session = Depends(get_db)):
-    return [_org_to_schema(o) for o in db.query(OrganizationDB).all()]
+    return [
+        _org_to_schema(o)
+        for o in db.query(OrganizationDB).filter(OrganizationDB.name != "Unknown").all()
+    ]
 
 
 @app.get("/organizations/{org_id}", response_model=Organization)
