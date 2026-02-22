@@ -66,7 +66,7 @@ export function AudioEmotionOverlay({
 
   return (
     <div
-      className={`absolute left-4 top-4 z-20 w-44 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"
+      className={`absolute left-4 top-4 z-20 w-44 transition-all duration-500 ease-in-out ${show ? "backdrop-blur-sm translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"
         }`}
     >
       <div className="rounded-xl border border-white/10 bg-black/25 backdrop-blur-sm shadow-2xl p-3 flex flex-col gap-3">

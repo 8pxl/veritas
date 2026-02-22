@@ -145,7 +145,7 @@ export function PropositionPopup({ proposition, visible, onDismiss }: Propositio
         AlertTriangle
 
   return (
-    <div className={`absolute right-4 top-4 z-20 w-80 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"}`}>
+    <div className={`absolute right-4 top-4 z-20 w-80 transition-all duration-500 ease-in-out ${show ? "backdrop-blur-sm translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"}`}>
       <Card className="border-white/10 bg-black/25 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
         <CardHeader className="pb-0">
           <div className="flex items-start justify-between">
@@ -250,7 +250,7 @@ export function FacialConfidencePopup({ proposition, visible, controlsVisible = 
   const bottomClass = controlsVisible ? "bottom-16" : "bottom-4"
 
   return (
-    <div className={`absolute left-4 ${bottomClass} z-20 w-80 transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+    <div className={`absolute left-4 ${bottomClass} z-20 w-80 transition-all duration-500 ease-in-out ${show ? "backdrop-blur-sm translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
       <Card className="border-white/10 bg-black/25 text-white backdrop-blur-sm shadow-2xl py-4 gap-3">
         <CardHeader className="pb-0">
           <div className="flex items-center gap-2">
