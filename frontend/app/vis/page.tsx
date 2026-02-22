@@ -4,6 +4,7 @@ import { useRef, useLayoutEffect, useState, useCallback } from "react"
 import Tabbar from "../components/shared/tabbar"
 import Leaderboard from "./leaderboard"
 import Graph from "./graph"
+import Logo from "../components/shared/logo"
 
 const views = [
   { label: "graph" },
@@ -55,43 +56,44 @@ export default function VisPage() {
   return (
     <main className="min-h-screen px-6 pt-20 pb-12">
       <Tabbar />
+      <Logo />
 
-      <div className="mx-auto max-w-5xl">
+      <div className="w-full">
+
+        <div className="mb-8 flex justify-center">
+          <div
+            ref={navRef}
+            className="relative flex items-center gap-1 rounded-full bg-foreground/5 p-1 backdrop-blur-sm"
+          >
+            <div
+              data-bubble
+              className="absolute top-1 bottom-1 rounded-full bg-accent transition-all duration-600 ease-in-out"
+              style={{
+                left: bubbleStyle.left,
+                width: bubbleStyle.width,
+              }}
+            />
+            {views.map((view, i) => (
+              <button
+                key={view.label}
+                data-tab
+                onClick={() => handleClick(i)}
+                className={`relative z-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-300 ${i === activeIndex
+                  ? "text-background"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {view.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
 
         {activeIndex === 0 ? <Graph /> : <Leaderboard />}
 
-        {/* Toggle */}
-
       </div>
 
-      <div className="mb-8 flex justify-center">
-        <div
-          ref={navRef}
-          className="relative flex items-center gap-1 rounded-full bg-foreground/5 p-1 backdrop-blur-sm"
-        >
-          <div
-            data-bubble
-            className="absolute top-1 bottom-1 rounded-full bg-accent transition-all duration-600 ease-in-out"
-            style={{
-              left: bubbleStyle.left,
-              width: bubbleStyle.width,
-            }}
-          />
-          {views.map((view, i) => (
-            <button
-              key={view.label}
-              data-tab
-              onClick={() => handleClick(i)}
-              className={`relative z-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-300 ${i === activeIndex
-                ? "text-background"
-                : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              {view.label}
-            </button>
-          ))}
-        </div>
-      </div>
     </main>
   )
 }

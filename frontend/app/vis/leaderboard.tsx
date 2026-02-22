@@ -22,6 +22,16 @@ import {
 
 const columnHelper = createColumnHelper<LeaderboardEntry>()
 
+function truthColor(value: number) {
+  // Lerp from #BF5864 (0%) to #226F54 (100%)
+  //0BBA54
+  //EC596A
+  const r = Math.round(0x0B + (0xEC - 0x0B) * value)
+  const g = Math.round(0xBA + (0x59 - 0xBA) * value)
+  const b = Math.round(0x54 + (0x6A - 0x54) * value)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 const columns = [
   columnHelper.display({
     id: "rank",
@@ -48,7 +58,14 @@ const columns = [
     cell: (info) => {
       const value = info.getValue()
       if (value == null) return "—"
-      return `${(value * 100).toFixed(1)}%`
+      return (
+        <span
+          className="font-semibold"
+          style={{ color: truthColor(1 - value) }}
+        >
+          {(value * 100).toFixed(1)}%
+        </span>
+      )
     },
   }),
   columnHelper.accessor("trueCount", {
@@ -105,8 +122,10 @@ export default function Leaderboard() {
     )
   }
 
+  const rows = table.getRowModel().rows
+
   return (
-    <div className="w-full rounded-lg border bg-card">
+    <div className="w-full overflow-y-auto rounded-lg border bg-card" style={{ maxHeight: "70vh" }}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -124,9 +143,9 @@ export default function Leaderboard() {
                   {header.isPlaceholder
                     ? null
                     : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                   {header.column.getIsSorted() === "asc"
                     ? " ↑"
                     : header.column.getIsSorted() === "desc"
@@ -138,7 +157,7 @@ export default function Leaderboard() {
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
+          {rows.map((row) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
