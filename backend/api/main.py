@@ -1,7 +1,12 @@
+from contextlib import asynccontextmanager
+import threading
+import time
+import logging
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import text as sql_text
-from database import engine, get_db, Base
+from database import engine, get_db, SessionLocal, Base
 from models import OrganizationDB, PersonDB, VideoDB, PropositionDB
 from structures import (
     Organization,
@@ -17,12 +22,77 @@ from structures import (
     PropositionCreate,
     PropositionUpdate,
 )
+from verifier import verify_proposition
 from typing import List
+from datetime import datetime
 import uuid
+
+logger = logging.getLogger(__name__)
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+
+# --- Background verification job ---
+def _verify_all_unverified():
+    """Verify all propositions with verdict IS NULL."""
+    db = SessionLocal()
+    try:
+        props = db.query(PropositionDB).filter(PropositionDB.verdict.is_(None)).all()
+        if not props:
+            return 0
+        count = 0
+        for p in props:
+            try:
+                speaker = db.get(PersonDB, p.speaker_id)
+                org = db.get(OrganizationDB, speaker.organization_id)
+                video = db.get(VideoDB, p.video_id)
+                result = verify_proposition(
+                    statement=p.statement,
+                    speaker_name=speaker.name,
+                    speaker_org=org.name,
+                    video_title=video.title,
+                    date_stated=video.time,
+                    verify_at=p.verify_at,
+                )
+                p.verdict = result["verdict"]
+                p.verdict_reasoning = result["reasoning"]
+                p.verified_at = datetime.utcnow()
+                db.commit()
+                count += 1
+                logger.info(f"Verified proposition {p.id}: {result['verdict']}")
+            except Exception:
+                logger.exception(f"Failed to verify proposition {p.id}")
+                db.rollback()
+        return count
+    finally:
+        db.close()
+
+
+def _background_verifier(stop_event: threading.Event):
+    """Daemon thread that verifies propositions every 10 minutes."""
+    while not stop_event.is_set():
+        try:
+            n = _verify_all_unverified()
+            if n:
+                logger.info(f"Background verifier: verified {n} propositions")
+        except Exception:
+            logger.exception("Background verifier error")
+        stop_event.wait(600)  # 10 minutes
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    stop_event = threading.Event()
+    t = threading.Thread(target=_background_verifier, args=(stop_event,), daemon=True)
+    t.start()
+    logger.info("Background proposition verifier started")
+    yield
+    stop_event.set()
+    t.join(timeout=5)
+    logger.info("Background proposition verifier stopped")
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 # --- Helpers ---
@@ -56,6 +126,9 @@ def _prop_to_schema(
         statement=p.statement,
         verifyAt=p.verify_at,
         video=_video_to_schema(video),
+        verdict=p.verdict,
+        verdictReasoning=p.verdict_reasoning,
+        verifiedAt=p.verified_at,
     )
 
 
@@ -357,6 +430,39 @@ def delete_proposition(prop_id: int, db: Session = Depends(get_db)):
     db.delete(p)
     db.commit()
     return {"ok": True}
+
+
+# ========== Proposition Verification ==========
+
+
+@app.post("/propositions/{prop_id}/verify", response_model=Proposition)
+def verify_single_proposition(prop_id: int, db: Session = Depends(get_db)):
+    p = db.get(PropositionDB, prop_id)
+    if not p:
+        raise HTTPException(status_code=404, detail="Proposition not found")
+    speaker = db.get(PersonDB, p.speaker_id)
+    org = db.get(OrganizationDB, speaker.organization_id)
+    video = db.get(VideoDB, p.video_id)
+    result = verify_proposition(
+        statement=p.statement,
+        speaker_name=speaker.name,
+        speaker_org=org.name,
+        video_title=video.title,
+        date_stated=video.time,
+        verify_at=p.verify_at,
+    )
+    p.verdict = result["verdict"]
+    p.verdict_reasoning = result["reasoning"]
+    p.verified_at = datetime.utcnow()
+    db.commit()
+    db.refresh(p)
+    return _prop_to_schema(p, speaker, org, video)
+
+
+@app.post("/propositions/verify-all")
+def verify_all_propositions():
+    count = _verify_all_unverified()
+    return {"verified": count}
 
 
 # ========== Propositions by Person ==========

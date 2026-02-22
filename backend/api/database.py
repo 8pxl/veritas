@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "postgresql://user:password@localhost:5432/veritasDB"
+DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/nexus"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -15,9 +15,11 @@ def _enable_pg_trgm(dbapi_connection, connection_record):
         cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
     dbapi_connection.commit()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+

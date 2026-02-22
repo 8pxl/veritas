@@ -34,6 +34,9 @@ class PropositionDB(Base):
     statement = Column(Text, nullable=False)
     verify_at = Column(DateTime, nullable=False)
     video_id = Column(String, ForeignKey("videos.video_id"), nullable=False)
+    verdict = Column(String, nullable=True)
+    verdict_reasoning = Column(Text, nullable=True)
+    verified_at = Column(DateTime, nullable=True)
 
     speaker = relationship("PersonDB")
     video = relationship("VideoDB")

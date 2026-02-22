@@ -72,6 +72,9 @@ class PropositionUpdate(BaseModel):
     statement: Optional[str] = None
     verify_at: Optional[datetime] = None
     video_id: Optional[str] = None
+    verdict: Optional[str] = None
+    verdictReasoning: Optional[str] = None
+    verifiedAt: Optional[datetime] = None
 
 class Proposition(BaseModel):
     id: int
@@ -79,3 +82,6 @@ class Proposition(BaseModel):
     statement: str
     verifyAt: datetime
     video: Video
+    verdict: Optional[str] = None
+    verdictReasoning: Optional[str] = None
+    verifiedAt: Optional[datetime] = None
