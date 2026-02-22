@@ -30,10 +30,14 @@ from structures import (
     OrganizationStats,
     VideoStats,
     LeaderboardEntry,
+    RunningAvgPoint,
+    OrgRunningAverage,
+    TopOrgsRunningAvgResponse,
 )
 from verifier import verify_proposition
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import defaultdict
 from sqlalchemy import func, case
 import uuid
 
@@ -716,31 +720,67 @@ def get_truth_leaderboard(
     ),
     db: Session = Depends(get_db),
 ):
-    """Rank speakers by truth index. `most_honest` = highest truth index first,
-    `biggest_liars` = lowest truth index first. Only includes speakers with
-    at least `min_claims` decided (true/false) propositions."""
+    """Rank speakers by truth index using a **Bayesian average**.
+
+    The Bayesian truth index shrinks each speaker's raw true-ratio toward
+    the global mean, weighted by how many decided claims they have
+    relative to the average speaker:
+
+        bayesian_truth_index = (C * m + true_count) / (C + decided)
+
+    where
+        C = mean number of decided claims across *all* speakers
+        m = global true ratio   (sum of true / sum of decided)
+
+    Speakers with few claims are pulled toward the global average,
+    while speakers with many claims are dominated by their own ratio.
+
+    `most_honest` = highest truth index first,
+    `biggest_liars` = lowest truth index first.
+    Only includes speakers with at least `min_claims` decided (true/false)
+    propositions."""
+
+    # -- gather per-speaker counts in a single pass --
     rows = db.query(PropositionDB.speaker_id).group_by(PropositionDB.speaker_id).all()
-    entries = []
+    speaker_data: list[tuple] = []          # (speaker_id, counts, decided)
+    global_true_sum = 0
+    global_decided_sum = 0
+
     for (speaker_id,) in rows:
-        person = db.get(PersonDB, speaker_id)
-        org = db.get(OrganizationDB, person.organization_id)
         props = (
             db.query(PropositionDB).filter(PropositionDB.speaker_id == speaker_id).all()
         )
         counts = _verdict_counts(props)
         decided = counts.true + counts.false
+        speaker_data.append((speaker_id, counts, len(props), decided))
+        global_true_sum += counts.true
+        global_decided_sum += decided
+
+    # -- compute Bayesian prior --
+    num_speakers = len(speaker_data)
+    if num_speakers == 0 or global_decided_sum == 0:
+        return []
+    C = global_decided_sum / num_speakers          # avg decided claims per speaker
+    m = global_true_sum / global_decided_sum        # global truth ratio
+
+    # -- build leaderboard entries --
+    entries: list[LeaderboardEntry] = []
+    for speaker_id, counts, total, decided in speaker_data:
         if decided < min_claims:
             continue
-        ti = _truth_index(counts)
+        bayesian_ti = round((C * m + counts.true) / (C + decided), 4)
+        person = db.get(PersonDB, speaker_id)
+        org = db.get(OrganizationDB, person.organization_id)
         entries.append(
             LeaderboardEntry(
                 person=_person_to_schema(person, org),
-                truthIndex=ti,
-                total=len(props),
+                truthIndex=bayesian_ti,
+                total=total,
                 trueCount=counts.true,
                 falseCount=counts.false,
             )
         )
+
     reverse = order == "most_honest"
     entries.sort(key=lambda e: (e.truthIndex or 0, e.total), reverse=reverse)
     return entries
@@ -782,3 +822,115 @@ def get_organization_stats(org_id: int, db: Session = Depends(get_db)):
         verdictCounts=counts,
         truthIndex=_truth_index(counts),
     )
+
+
+@app.get("/stats/top-orgs-running-avg", response_model=TopOrgsRunningAvgResponse)
+def get_top_orgs_running_avg(
+    top_n: int = Query(5, ge=1, le=50, description="Number of top organizations to return"),
+    db: Session = Depends(get_db),
+):
+    """Return the running-average truth index for the top N organizations.
+
+    1. Determine each organization's truth index over the **last year** using
+       only decided (true / false) propositions whose `verify_at` falls within
+       the past 365 days.
+    2. Pick the top `top_n` organizations by that recent truth index.
+    3. For each selected organization, compute the **running average** truth
+       index from the earliest proposition date to the latest, emitting one
+       data-point per calendar day that has at least one decided proposition.
+    """
+    now = datetime.utcnow()
+    one_year_ago = now - timedelta(days=365)
+
+    # -- Step 1: collect all orgs and their decided propositions in the last year --
+    recent_props = (
+        db.query(PropositionDB, PersonDB.organization_id)
+        .join(PersonDB, PropositionDB.speaker_id == PersonDB.id)
+        .filter(
+            PropositionDB.verify_at >= one_year_ago,
+            PropositionDB.verdict.in_(["true", "false"]),
+        )
+        .all()
+    )
+
+    org_recent: dict[int, dict] = defaultdict(lambda: {"true": 0, "decided": 0})
+    for prop, org_id in recent_props:
+        org_recent[org_id]["decided"] += 1
+        if prop.verdict == "true":
+            org_recent[org_id]["true"] += 1
+
+    # truth index for last year per org
+    org_recent_ti: dict[int, float] = {}
+    for org_id, c in org_recent.items():
+        if c["decided"] > 0:
+            org_recent_ti[org_id] = c["true"] / c["decided"]
+
+    if not org_recent_ti:
+        return TopOrgsRunningAvgResponse(topN=top_n, organizations=[])
+
+    # -- Step 2: pick top N by recent truth index --
+    sorted_orgs = sorted(org_recent_ti.items(), key=lambda x: x[1], reverse=True)
+    top_org_ids = [org_id for org_id, _ in sorted_orgs[:top_n]]
+
+    # -- Step 3: running average from earliest to latest for each top org --
+    all_props = (
+        db.query(PropositionDB, PersonDB.organization_id)
+        .join(PersonDB, PropositionDB.speaker_id == PersonDB.id)
+        .filter(
+            PersonDB.organization_id.in_(top_org_ids),
+            PropositionDB.verdict.in_(["true", "false"]),
+        )
+        .order_by(PropositionDB.verify_at)
+        .all()
+    )
+
+    # group by org
+    org_props: dict[int, list] = defaultdict(list)
+    for prop, org_id in all_props:
+        org_props[org_id].append(prop)
+
+    results: list[OrgRunningAverage] = []
+    for org_id in top_org_ids:
+        org = db.get(OrganizationDB, org_id)
+        props = org_props.get(org_id, [])
+        if not props:
+            continue
+
+        cum_true = 0
+        cum_decided = 0
+        series: list[RunningAvgPoint] = []
+
+        # aggregate by calendar date, emit one point per day with activity
+        day_buckets: dict[str, dict] = {}
+        for p in props:
+            day = p.verify_at.strftime("%Y-%m-%d")
+            if day not in day_buckets:
+                day_buckets[day] = {"true": 0, "decided": 0}
+            day_buckets[day]["decided"] += 1
+            if p.verdict == "true":
+                day_buckets[day]["true"] += 1
+
+        for day in sorted(day_buckets):
+            cum_true += day_buckets[day]["true"]
+            cum_decided += day_buckets[day]["decided"]
+            series.append(
+                RunningAvgPoint(
+                    date=day,
+                    truthIndex=round(cum_true / cum_decided, 4),
+                    cumulativeTrue=cum_true,
+                    cumulativeDecided=cum_decided,
+                )
+            )
+
+        results.append(
+            OrgRunningAverage(
+                organization=_org_to_schema(org),
+                currentTruthIndex=series[-1].truthIndex,
+                series=series,
+            )
+        )
+
+    # maintain the ranking order
+    rank = {oid: i for i, oid in enumerate(top_org_ids)}
+    results.sort(key=lambda r: rank[r.organization.id])
+    return TopOrgsRunningAvgResponse(topN=top_n, organizations=results)

@@ -124,3 +124,21 @@ class LeaderboardEntry(BaseModel):
     total: int
     trueCount: int
     falseCount: int
+
+
+class RunningAvgPoint(BaseModel):
+    date: str                       # ISO date string (YYYY-MM-DD)
+    truthIndex: float               # running average truth index up to this date
+    cumulativeTrue: int
+    cumulativeDecided: int
+
+
+class OrgRunningAverage(BaseModel):
+    organization: Organization
+    currentTruthIndex: float        # latest cumulative truth index
+    series: List[RunningAvgPoint]   # chronological running average points
+
+
+class TopOrgsRunningAvgResponse(BaseModel):
+    topN: int
+    organizations: List[OrgRunningAverage]
