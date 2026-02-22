@@ -226,8 +226,9 @@ def _db_search(query: str, max_results: int = 5) -> str:
 
     resp = requests.get(
         "http://totsuki.harvey-l.com:7000/people/search", params={"q": query}
-    )
-    return resp.text
+    ).json()
+    resp["speakerId"] = resp["id"]
+    return json.dumps(resp)
 
 
 def _db_insert(name: str, organization: str, role: str) -> str:
@@ -236,9 +237,9 @@ def _db_insert(name: str, organization: str, role: str) -> str:
     resp = requests.post(
         "http://totsuki.harvey-l.com:7000/people",
         json={"name": name, "organization": organization, "role": role},
-    )
-
-    return resp.text
+    ).json()
+    resp["speakerId"] = resp["id"]
+    return json.dumps(resp)
 
 
 def _execute_tool(name: str, args: dict) -> str:
