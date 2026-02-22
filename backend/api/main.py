@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 import threading
 import time
+import os
 import logging
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text as sql_text
 from database import engine, get_db, SessionLocal, Base
@@ -43,6 +45,7 @@ def _model_dump(obj, **kwargs):
     if hasattr(obj, "model_dump"):
         return obj.model_dump(**kwargs)
     return obj.dict(**kwargs)
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -156,10 +159,10 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # Allow all origins
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
-    allow_methods=["*"],        # Allow all HTTP methods
-    allow_headers=["*"],        # Allow all headers
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 
@@ -381,6 +384,33 @@ def create_video(video: VideoCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_video)
     return _video_to_schema(db_video)
+
+
+@app.get("/videos/{video_id}/stream")
+def stream_video(video_id: str):
+    ## Check ext: webm, mp4, mkv
+    exts = ["mp4", "webm", "mkv"]
+    media_types = [
+        "video/mp4",
+        "video/webm",
+        "video/x-matroska",
+    ]
+    for ext, media_type in zip(exts, media_types):
+        path = f"./video_storage/{video_id}.{ext}"
+        if os.path.exists(path):
+            return FileResponse(
+                path, media_type=media_type, filename=f"{video_id}.{ext}"
+            )
+
+
+@app.get("/videos/{video_id}/results")
+def stream_json(video_id: str):
+    storage_path = f"./video_storage/{video_id}.json"
+    return FileResponse(
+        storage_path,
+        media_type="application/json",
+        content_disposition_type="inline",
+    )
 
 
 @app.get("/videos", response_model=List[Video])
@@ -605,18 +635,14 @@ def get_overall_stats(db: Session = Depends(get_db)):
 @app.get("/stats/by-person", response_model=List[PersonStats])
 def get_stats_by_person(db: Session = Depends(get_db)):
     """Truth index per speaker, sorted by number of propositions descending."""
-    rows = (
-        db.query(PropositionDB.speaker_id)
-        .group_by(PropositionDB.speaker_id)
-        .all()
-    )
+    rows = db.query(PropositionDB.speaker_id).group_by(PropositionDB.speaker_id).all()
     results = []
     for (speaker_id,) in rows:
         person = db.get(PersonDB, speaker_id)
         org = db.get(OrganizationDB, person.organization_id)
-        props = db.query(PropositionDB).filter(
-            PropositionDB.speaker_id == speaker_id
-        ).all()
+        props = (
+            db.query(PropositionDB).filter(PropositionDB.speaker_id == speaker_id).all()
+        )
         counts = _verdict_counts(props)
         results.append(
             PersonStats(
@@ -664,17 +690,11 @@ def get_stats_by_organization(db: Session = Depends(get_db)):
 @app.get("/stats/by-video", response_model=List[VideoStats])
 def get_stats_by_video(db: Session = Depends(get_db)):
     """Truth index per video, sorted by number of propositions descending."""
-    rows = (
-        db.query(PropositionDB.video_id)
-        .group_by(PropositionDB.video_id)
-        .all()
-    )
+    rows = db.query(PropositionDB.video_id).group_by(PropositionDB.video_id).all()
     results = []
     for (video_id,) in rows:
         video = db.get(VideoDB, video_id)
-        props = db.query(PropositionDB).filter(
-            PropositionDB.video_id == video_id
-        ).all()
+        props = db.query(PropositionDB).filter(PropositionDB.video_id == video_id).all()
         counts = _verdict_counts(props)
         results.append(
             VideoStats(
@@ -691,24 +711,22 @@ def get_stats_by_video(db: Session = Depends(get_db)):
 @app.get("/stats/leaderboard", response_model=List[LeaderboardEntry])
 def get_truth_leaderboard(
     order: str = Query("most_honest", regex="^(most_honest|biggest_liars)$"),
-    min_claims: int = Query(1, ge=1, description="Minimum true+false claims to qualify"),
+    min_claims: int = Query(
+        1, ge=1, description="Minimum true+false claims to qualify"
+    ),
     db: Session = Depends(get_db),
 ):
     """Rank speakers by truth index. `most_honest` = highest truth index first,
     `biggest_liars` = lowest truth index first. Only includes speakers with
     at least `min_claims` decided (true/false) propositions."""
-    rows = (
-        db.query(PropositionDB.speaker_id)
-        .group_by(PropositionDB.speaker_id)
-        .all()
-    )
+    rows = db.query(PropositionDB.speaker_id).group_by(PropositionDB.speaker_id).all()
     entries = []
     for (speaker_id,) in rows:
         person = db.get(PersonDB, speaker_id)
         org = db.get(OrganizationDB, person.organization_id)
-        props = db.query(PropositionDB).filter(
-            PropositionDB.speaker_id == speaker_id
-        ).all()
+        props = (
+            db.query(PropositionDB).filter(PropositionDB.speaker_id == speaker_id).all()
+        )
         counts = _verdict_counts(props)
         decided = counts.true + counts.false
         if decided < min_claims:
@@ -735,9 +753,7 @@ def get_person_stats(person_id: str, db: Session = Depends(get_db)):
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
     org = db.get(OrganizationDB, person.organization_id)
-    props = db.query(PropositionDB).filter(
-        PropositionDB.speaker_id == person_id
-    ).all()
+    props = db.query(PropositionDB).filter(PropositionDB.speaker_id == person_id).all()
     counts = _verdict_counts(props)
     return PersonStats(
         person=_person_to_schema(person, org),
