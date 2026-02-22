@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import Tabbar from "../components/shared/tabbar";
 import { ExploreBar } from "./components/ExploreBar";
 import { VideoPlayer } from "./components/VideoPlayer";
+import Logo from "../components/shared/logo";
 
 export default function Home() {
   return (
@@ -12,6 +13,8 @@ export default function Home() {
         <ExploreBar />
         <SidebarInset >
           <div className="flex flex-1 flex-col gap-4 p-4">
+
+            <Logo />
             <VideoPlayer />
           </div>
         </SidebarInset>
